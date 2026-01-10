@@ -1,0 +1,256 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// Get all resource entries
+const resourceEntries = await getCollection('resources');
+
+// Sort by date (newest first)
+const sortedResources = resourceEntries.sort((a, b) =>
+  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+// Type icons map
+const typeLabels: Record<string, string> = {
+  spreadsheet: 'Spreadsheet',
+  pdf: 'PDF',
+  tool: 'Tool',
+  video: 'Video',
+  template: 'Template',
+  guide: 'Guide',
+};
+---
+
+<BaseLayout title="Resources" description="Downloadable templates, tools, and guides for GTM, operations, and marketing">
+  <div class="resources-page">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="title animate-on-load">Resources</h1>
+      <p class="subtitle animate-on-load delay-1">Templates, tools, and guides to help you build better processes.</p>
+    </header>
+
+    <!-- Resources Grid -->
+    <div class="resources-grid animate-on-load delay-2">
+      {sortedResources.map((resource) => (
+        <a href={`/resources/${resource.slug}`} class="resource-card">
+          <!-- Preview -->
+          <div class="card-preview">
+            {resource.data.previewImage ? (
+              <img src={resource.data.previewImage} alt={resource.data.title} class="preview-image" />
+            ) : (
+              <div class="preview-placeholder">
+                <span class="type-icon">
+                  {resource.data.resourceType === 'spreadsheet' && (
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <line x1="3" y1="9" x2="21" y2="9" />
+                      <line x1="3" y1="15" x2="21" y2="15" />
+                      <line x1="9" y1="3" x2="9" y2="21" />
+                    </svg>
+                  )}
+                  {resource.data.resourceType === 'pdf' && (
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                      <polyline points="14,2 14,8 20,8" />
+                    </svg>
+                  )}
+                  {resource.data.resourceType === 'template' && (
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <line x1="3" y1="9" x2="21" y2="9" />
+                      <line x1="9" y1="21" x2="9" y2="9" />
+                    </svg>
+                  )}
+                  {resource.data.resourceType === 'guide' && (
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+                    </svg>
+                  )}
+                  {resource.data.resourceType === 'tool' && (
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
+                    </svg>
+                  )}
+                  {resource.data.resourceType === 'video' && (
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <polygon points="6,4 20,12 6,20" />
+                    </svg>
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <!-- Info -->
+          <div class="card-info">
+            <div class="card-meta">
+              <span class="card-type">{typeLabels[resource.data.resourceType]}</span>
+              {resource.data.fileFormat && (
+                <>
+                  <span class="meta-dot">·</span>
+                  <span>{resource.data.fileFormat}</span>
+                </>
+              )}
+            </div>
+            <h2 class="card-title">{resource.data.title}</h2>
+            <p class="card-description">{resource.data.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    {sortedResources.length === 0 && (
+      <div class="empty-state">
+        <p>No resources available yet.</p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .resources-page {
+    max-width: 900px;
+  }
+
+  .header {
+    margin-bottom: 48px;
+  }
+
+  .title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin: 0 0 16px 0;
+  }
+
+  .subtitle {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+    max-width: 500px;
+  }
+
+  .resources-grid {
+    display: grid;
+    gap: 32px;
+  }
+
+  .resource-card {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
+    text-decoration: none;
+    color: inherit;
+    padding: 24px;
+    margin: -24px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+
+  .resource-card:hover {
+    background: var(--bg-hover);
+  }
+
+  @media (max-width: 600px) {
+    .resource-card {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+
+  .card-preview {
+    aspect-ratio: 4/3;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .preview-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .type-icon {
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .card-type {
+    text-transform: capitalize;
+  }
+
+  .meta-dot {
+    opacity: 0.4;
+  }
+
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+  }
+
+  .card-description {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .empty-state {
+    padding: 48px 0;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  /* CSS variables for theming */
+  :global([data-theme="light"]) .resources-page {
+    --text: #2C2824;
+    --text-muted: #6B6560;
+    --bg-tertiary: #E3DED5;
+    --bg-hover: rgba(0, 0, 0, 0.02);
+    --border: rgba(0, 0, 0, 0.06);
+  }
+
+  :global([data-theme="dark"]) .resources-page {
+    --text: #E3E0DB;
+    --text-muted: #A8A49E;
+    --bg-tertiary: #2A2622;
+    --bg-hover: rgba(255, 255, 255, 0.02);
+    --border: rgba(255, 255, 255, 0.06);
+  }
+</style>

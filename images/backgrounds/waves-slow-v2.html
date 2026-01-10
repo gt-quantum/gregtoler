@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flowing Waves Background</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Source Serif 4', Georgia, serif;
+      overflow: hidden;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+      padding: 80px 48px;
+      max-width: 600px;
+    }
+    h1 {
+      font-size: 3rem;
+      font-weight: 400;
+      color: #2d2a26;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+    p {
+      font-size: 1.125rem;
+      color: #6b6560;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+  <div class="content">
+    <h1>Flowing Waves</h1>
+    <p>Soft sine waves in warm cream tones with slow, meditative motion.</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    // VERY slow - one full cycle takes ~60 seconds
+    const waves = [
+      { y: 0.8, amplitude: 0.08, frequency: 0.003, speed: 0.1, color: 'rgba(200, 190, 180, 0.4)' },
+      { y: 0.65, amplitude: 0.06, frequency: 0.004, speed: 0.08, color: 'rgba(210, 200, 190, 0.35)' },
+      { y: 0.5, amplitude: 0.07, frequency: 0.0025, speed: 0.12, color: 'rgba(220, 210, 200, 0.3)' },
+      { y: 0.35, amplitude: 0.05, frequency: 0.0035, speed: 0.07, color: 'rgba(230, 220, 210, 0.25)' },
+      { y: 0.2, amplitude: 0.04, frequency: 0.003, speed: 0.09, color: 'rgba(240, 235, 228, 0.2)' },
+    ];
+
+    let startTime = null;
+
+    const drawWave = (wave, time) => {
+      const { width, height } = canvas;
+      
+      ctx.beginPath();
+
+      for (let x = 0; x <= width; x += 2) {
+        const y = height * wave.y + 
+          Math.sin(x * wave.frequency + time * wave.speed) * height * wave.amplitude +
+          Math.sin(x * wave.frequency * 0.5 + time * wave.speed * 0.7) * height * wave.amplitude * 0.5;
+        
+        if (x === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+
+      ctx.fillStyle = wave.color;
+      ctx.fill();
+    };
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const time = (timestamp - startTime) / 1000; // Convert to seconds
+
+      const { width, height } = canvas;
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, '#faf8f5');
+      gradient.addColorStop(0.5, '#f5f2ed');
+      gradient.addColorStop(1, '#ebe6df');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      waves.forEach(wave => drawWave(wave, time));
+
+      requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

@@ -1,44 +1,26 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentListing from '../../components/content/ContentListing.jsx';
+
+// Get all content entries and transform for the component
+const contentEntries = await getCollection('content');
+
+const items = contentEntries.map((entry) => ({
+  slug: entry.slug,
+  title: entry.data.title,
+  description: entry.data.description,
+  contentType: entry.data.contentType,
+  date: entry.data.date,
+  tags: entry.data.tags,
+  featured: entry.data.featured,
+  videoUrl: entry.data.videoUrl,
+  videoDuration: entry.data.videoDuration,
+  readingTime: entry.data.readingTime,
+  coverImage: entry.data.coverImage,
+}));
 ---
 
-<BaseLayout title="Content" description="Articles and essays on operations, frameworks, and processes">
-  <div style="max-width: 800px;">
-    <h1 style="font-size: 48px; font-weight: 600; margin-bottom: 24px; letter-spacing: -0.02em;">
-      Content
-    </h1>
-    <p style="font-size: 16px; line-height: 1.6; opacity: 0.7; max-width: 600px; margin-bottom: 48px;">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-      incididunt ut labore et dolore magna aliqua.
-    </p>
-
-    <!-- Placeholder for articles -->
-    <div style="display: flex; flex-direction: column; gap: 32px;">
-      <article style="border-bottom: 1px solid var(--divider, #D5D0C9); padding-bottom: 32px;">
-        <p style="font-size: 13px; opacity: 0.5; margin-bottom: 8px;">
-          [PLACEHOLDER: Date]
-        </p>
-        <h3 style="font-size: 24px; font-weight: 500; margin-bottom: 12px;">
-          [PLACEHOLDER: Article Title]
-        </h3>
-        <p style="font-size: 16px; line-height: 1.6; opacity: 0.7;">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua.
-        </p>
-      </article>
-
-      <article style="border-bottom: 1px solid var(--divider, #D5D0C9); padding-bottom: 32px;">
-        <p style="font-size: 13px; opacity: 0.5; margin-bottom: 8px;">
-          [PLACEHOLDER: Date]
-        </p>
-        <h3 style="font-size: 24px; font-weight: 500; margin-bottom: 12px;">
-          [PLACEHOLDER: Article Title]
-        </h3>
-        <p style="font-size: 16px; line-height: 1.6; opacity: 0.7;">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua.
-        </p>
-      </article>
-    </div>
-  </div>
+<BaseLayout title="Content" description="Articles, videos, and insights on GTM, marketing, sales, and operations">
+  <ContentListing client:load items={items} />
 </BaseLayout>

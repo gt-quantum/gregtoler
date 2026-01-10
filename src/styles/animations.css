@@ -1,0 +1,170 @@
+/* Reveal Animations */
+/* Smooth, editorial timing with natural easing */
+/* Uses JavaScript trigger to avoid View Transitions conflict */
+
+/* Custom easing for smooth, natural motion */
+:root {
+  --ease-out-smooth: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ===========================================
+   JAVASCRIPT-TRIGGERED ANIMATIONS
+   Elements start hidden, JS adds .animate-ready
+   to trigger the transition
+   =========================================== */
+
+/* Base state - hidden until JS triggers */
+.animate-on-load {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1.1s var(--ease-out-smooth), transform 1.1s var(--ease-out-smooth);
+}
+
+.animate-on-load.animate-ready {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered delays */
+.animate-on-load.delay-1 { transition-delay: 0.12s; }
+.animate-on-load.delay-2 { transition-delay: 0.24s; }
+.animate-on-load.delay-3 { transition-delay: 0.36s; }
+.animate-on-load.delay-4 { transition-delay: 0.48s; }
+.animate-on-load.delay-5 { transition-delay: 0.6s; }
+
+/* Slide from left variant */
+.animate-on-load.from-left {
+  transform: translateX(-16px);
+}
+.animate-on-load.from-left.animate-ready {
+  transform: translateX(0);
+}
+
+/* Scale variant for images */
+.animate-on-load.scale {
+  transform: scale(0.98);
+}
+.animate-on-load.scale.animate-ready {
+  transform: scale(1);
+}
+
+/* ===========================================
+   SCROLL-TRIGGERED REVEALS
+   Uses Intersection Observer
+   =========================================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s var(--ease-out-smooth), transform 0.8s var(--ease-out-smooth);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ===========================================
+   LEGACY CSS ANIMATIONS (for React components)
+   These work fine in React/Framer Motion context
+   =========================================== */
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.8s var(--ease-out-smooth) forwards;
+}
+
+.fade-in-up-delay-1 { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.8s var(--ease-out-smooth) 0.1s forwards; }
+.fade-in-up-delay-2 { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.8s var(--ease-out-smooth) 0.2s forwards; }
+.fade-in-up-delay-3 { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.8s var(--ease-out-smooth) 0.3s forwards; }
+.fade-in-up-delay-4 { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.8s var(--ease-out-smooth) 0.4s forwards; }
+.fade-in-up-delay-5 { opacity: 0; transform: translateY(20px); animation: fadeInUp 0.8s var(--ease-out-smooth) 0.5s forwards; }
+
+.slide-in-left {
+  opacity: 0;
+  transform: translateX(-16px);
+  animation: slideInLeft 0.8s var(--ease-out-smooth) forwards;
+}
+
+.scale-fade-in {
+  opacity: 0;
+  transform: scale(0.98);
+  animation: scaleFadeIn 0.9s var(--ease-out-expo) forwards;
+}
+
+.scale-fade-in-delay {
+  opacity: 0;
+  transform: scale(0.98);
+  animation: scaleFadeIn 0.9s var(--ease-out-expo) 0.3s forwards;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-load,
+  .reveal,
+  .fade-in-up,
+  .fade-in-up-delay-1,
+  .fade-in-up-delay-2,
+  .fade-in-up-delay-3,
+  .fade-in-up-delay-4,
+  .fade-in-up-delay-5,
+  .slide-in-left,
+  .scale-fade-in,
+  .scale-fade-in-delay {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

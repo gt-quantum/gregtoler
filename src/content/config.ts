@@ -21,10 +21,11 @@ const workCollection = defineCollection({
     client: z.string().optional(),
     projectType: z.enum(['past', 'current']),
     date: z.date(),
-    endDate: z.date().optional(), // For past projects
+    endDate: z.date().optional(),
     tags: z.array(z.string()),
     featured: z.boolean().default(false),
     coverImage: z.string().optional(),
+    author: z.string().default('Greg Toler'),
     // Optional metrics/results
     metrics: z.array(z.object({
       label: z.string(),
@@ -41,14 +42,19 @@ const contentCollection = defineCollection({
     description: z.string(),
     contentType: z.enum(['video', 'blog', 'post']),
     date: z.date(),
+    updatedDate: z.date().optional(),
     tags: z.array(z.enum(contentTags)),
     featured: z.boolean().default(false),
+    author: z.string().default('Greg Toler'),
     // Video-specific fields
-    videoUrl: z.string().optional(), // YouTube URL
-    videoDuration: z.string().optional(), // e.g., "12:34"
+    videoUrl: z.string().optional(),
+    videoDuration: z.string().optional(),
+    videoThumbnail: z.string().optional(),
     // Blog-specific fields
-    readingTime: z.number().optional(), // minutes
+    readingTime: z.number().optional(),
     coverImage: z.string().optional(),
+    // SEO
+    ogImage: z.string().optional(),
   }),
 });
 
@@ -60,15 +66,20 @@ const resourcesCollection = defineCollection({
     description: z.string(),
     resourceType: z.enum(['spreadsheet', 'pdf', 'tool', 'video', 'template', 'guide']),
     date: z.date(),
+    updatedDate: z.date().optional(),
     tags: z.array(z.string()),
     featured: z.boolean().default(false),
+    author: z.string().default('Greg Toler'),
     // File info
-    fileUrl: z.string().optional(), // For downloadable files
-    fileSize: z.string().optional(), // e.g., "2.4 MB"
-    // Video resources
+    fileUrl: z.string().optional(),
+    fileSize: z.string().optional(),
+    fileFormat: z.string().optional(),
+    // Video walkthrough
     videoUrl: z.string().optional(),
     // Preview image
     previewImage: z.string().optional(),
+    // SEO
+    ogImage: z.string().optional(),
   }),
 });
 

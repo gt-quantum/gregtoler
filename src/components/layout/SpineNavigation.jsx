@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, LayoutGroup } from 'framer-motion';
-import { theme as themeConfig } from '../../lib/theme';
+import { motion } from 'framer-motion';
 
 const menuItems = [
   { id: 'home', label: 'Home', path: '/' },
@@ -55,7 +54,6 @@ const SpineNavigation = ({ initialPath = '/' }) => {
       // This prevents the flash of wrong theme
       const newDoc = event.newDocument;
       newDoc.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-      newDoc.documentElement.style.backgroundColor = isDarkMode ? '#1A1714' : '#F3EEE7';
     };
 
     const handleAfterSwap = () => {
@@ -83,10 +81,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
   useEffect(() => {
     localStorage.setItem('darkMode', String(isDarkMode));
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-    document.documentElement.style.backgroundColor = isDarkMode ? '#1A1714' : '#F3EEE7';
   }, [isDarkMode]);
-
-  const currentTheme = isDarkMode ? themeConfig.dark : themeConfig.light;
 
   const handleNavClick = (path) => {
     if (path !== currentPath) {
@@ -104,18 +99,22 @@ const SpineNavigation = ({ initialPath = '/' }) => {
     damping: 35,
   };
 
-  const shouldAnimate = hasNavigated;
 
   return (
     <>
       {/* Header */}
       <header
         style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '24px 40px 16px 16px',
           backgroundColor: 'transparent',
+          zIndex: 100,
         }}
       >
         <a
@@ -140,12 +139,13 @@ const SpineNavigation = ({ initialPath = '/' }) => {
         </a>
 
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <motion.button
+          <button
             onClick={toggleDarkMode}
+            className="header-btn"
             style={{
               background: 'none',
               border: 'none',
-              color: currentTheme.headerButton,
+              color: 'var(--nav-header-button)',
               fontSize: '14px',
               cursor: 'pointer',
               padding: '8px 12px',
@@ -154,9 +154,8 @@ const SpineNavigation = ({ initialPath = '/' }) => {
               gap: '6px',
               opacity: 0.6,
               fontFamily: 'inherit',
+              transition: 'opacity 0.2s',
             }}
-            whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               {isDarkMode ? (
@@ -175,41 +174,41 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               )}
             </svg>
-          </motion.button>
+          </button>
 
-          <motion.button
+          <button
+            className="header-btn"
             style={{
               background: 'none',
               border: 'none',
-              color: currentTheme.headerButton,
+              color: 'var(--nav-header-button)',
               fontSize: '14px',
               cursor: 'pointer',
               padding: '8px 12px',
               opacity: 0.6,
               fontFamily: 'inherit',
+              transition: 'opacity 0.2s',
             }}
-            whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
           >
             Services
-          </motion.button>
+          </button>
 
-          <motion.button
+          <button
+            className="header-btn"
             style={{
               background: 'none',
               border: 'none',
-              color: currentTheme.headerButton,
+              color: 'var(--nav-header-button)',
               fontSize: '14px',
               cursor: 'pointer',
               padding: '8px 12px',
               opacity: 0.6,
               fontFamily: 'inherit',
+              transition: 'opacity 0.2s',
             }}
-            whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
           >
             Contact
-          </motion.button>
+          </button>
         </div>
       </header>
 
@@ -221,137 +220,129 @@ const SpineNavigation = ({ initialPath = '/' }) => {
           display: 'flex',
           flexDirection: 'column',
           marginLeft: '10px',
-          position: 'absolute',
+          position: 'fixed',
           left: 0,
           top: '77px',
           bottom: 0,
+          zIndex: 100,
         }}
       >
         {/* Menu Container */}
-        <LayoutGroup>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              flex: 1,
-              alignItems: 'center',
-              minHeight: 0,
-            }}
-          >
-            {menuItems.map((item, index) => {
-              const isActive = index === activeIndex;
-              const lineVisible = shouldShowLineForIndex(index, activeIndex);
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            alignItems: 'center',
+            minHeight: 0,
+          }}
+        >
+          {menuItems.map((item, index) => {
+            const isActive = index === activeIndex;
+            const lineVisible = shouldShowLineForIndex(index, activeIndex);
 
-              return (
-                <React.Fragment key={item.id}>
-                  {/* Menu Item */}
-                  <motion.a
-                    href={item.path}
-                    onClick={() => handleNavClick(item.path)}
-                    layout={shouldAnimate}
+            return (
+              <React.Fragment key={item.id}>
+                {/* Menu Item */}
+                <motion.a
+                  href={item.path}
+                  onClick={() => handleNavClick(item.path)}
+                  className="nav-item"
+                  style={{
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: '0 0 auto',
+                    paddingLeft: '20px',
+                    paddingRight: '20px',
+                    textDecoration: 'none',
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                >
+                  <span
+                    className={isActive ? '' : 'nav-item-inactive'}
                     style={{
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flex: '0 0 auto',
-                      paddingLeft: '20px',
-                      paddingRight: '20px',
-                      textDecoration: 'none',
+                      fontSize: '14px',
+                      letterSpacing: '0.2px',
+                      whiteSpace: 'nowrap',
+                      paddingTop: '4px',
+                      paddingBottom: '4px',
+                      color: isActive ? 'var(--nav-active-text)' : 'var(--nav-inactive-text)',
+                      fontWeight: isActive ? 500 : 400,
+                      transition: 'color 0.2s, font-weight 0.3s',
                     }}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                   >
-                    <span
+                    {item.label}
+                  </span>
+                </motion.a>
+
+                {/* Line Segment - flexGrow animates to push items apart */}
+                {index < menuItems.length - 1 && (
+                  <motion.div
+                    initial={false}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      overflow: 'hidden',
+                      // Set initial styles to match animate target (prevents SSR flash)
+                      flexGrow: lineVisible ? 1 : 0,
+                      marginTop: lineVisible ? 10 : 0,
+                      marginBottom: lineVisible ? 10 : 0,
+                    }}
+                    animate={{
+                      flexGrow: lineVisible ? 1 : 0,
+                      marginTop: lineVisible ? 10 : 0,
+                      marginBottom: lineVisible ? 10 : 0,
+                    }}
+                    transition={hasNavigated ? springTransition : { duration: 0 }}
+                  >
+                    {/* Top dot */}
+                    <div
                       style={{
-                        fontSize: '14px',
-                        letterSpacing: '0.2px',
-                        whiteSpace: 'nowrap',
-                        paddingTop: '4px',
-                        paddingBottom: '4px',
-                        color: isActive ? currentTheme.activeText : currentTheme.inactiveText,
-                        fontWeight: isActive ? 500 : 400,
-                        transition: shouldAnimate ? 'color 0.3s, font-weight 0.3s' : 'none',
+                        width: '4px',
+                        height: '4px',
+                        backgroundColor: 'var(--nav-dot)',
+                        borderRadius: '50%',
                       }}
-                    >
-                      {item.label}
-                    </span>
-                  </motion.a>
+                    />
 
-                  {/* Line Segment */}
-                  {index < menuItems.length - 1 && (
-                    <motion.div
-                      layout={shouldAnimate}
-                      initial={false}
-                      animate={shouldAnimate ? {
-                        flexGrow: lineVisible ? 1 : 0,
-                        opacity: lineVisible ? 1 : 0,
-                        marginTop: lineVisible ? 10 : 0,
-                        marginBottom: lineVisible ? 10 : 0,
-                      } : undefined}
-                      transition={shouldAnimate ? {
-                        flexGrow: springTransition,
-                        opacity: { duration: 0.2 },
-                        marginTop: springTransition,
-                        marginBottom: springTransition,
-                        layout: springTransition,
-                      } : undefined}
+                    {/* Line */}
+                    <div
                       style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        overflow: 'hidden',
-                        flexGrow: lineVisible ? 1 : 0,
-                        opacity: lineVisible ? 1 : 0,
-                        marginTop: lineVisible ? 10 : 0,
-                        marginBottom: lineVisible ? 10 : 0,
+                        width: '1px',
+                        flex: 1,
+                        minHeight: '8px',
+                        backgroundColor: 'var(--nav-line)',
                       }}
-                    >
-                      {/* Top dot */}
-                      <div
-                        style={{
-                          width: '4px',
-                          height: '4px',
-                          backgroundColor: currentTheme.dot,
-                          borderRadius: '50%',
-                        }}
-                      />
+                    />
 
-                      {/* Line */}
-                      <div
-                        style={{
-                          width: '1px',
-                          flex: 1,
-                          minHeight: '8px',
-                          backgroundColor: currentTheme.line,
-                        }}
-                      />
-
-                      {/* Bottom dot */}
-                      <div
-                        style={{
-                          width: '4px',
-                          height: '4px',
-                          backgroundColor: currentTheme.dot,
-                          borderRadius: '50%',
-                        }}
-                      />
-                    </motion.div>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </LayoutGroup>
+                    {/* Bottom dot */}
+                    <div
+                      style={{
+                        width: '4px',
+                        height: '4px',
+                        backgroundColor: 'var(--nav-dot)',
+                        borderRadius: '50%',
+                      }}
+                    />
+                  </motion.div>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
 
         {/* Divider */}
         <div
           style={{
             width: '40px',
             height: '1px',
-            backgroundColor: currentTheme.divider,
+            backgroundColor: 'var(--nav-divider)',
             marginTop: '20px',
             marginBottom: '28px',
             marginLeft: 'auto',
@@ -369,43 +360,43 @@ const SpineNavigation = ({ initialPath = '/' }) => {
             alignItems: 'center',
           }}
         >
-          <motion.a
+          <a
             href="https://linkedin.com/in/gregtoler"
             target="_blank"
             rel="noopener noreferrer"
+            className="social-icon"
             style={{
-              color: currentTheme.socialIcon,
+              color: 'var(--nav-social-icon)',
               cursor: 'pointer',
               textDecoration: 'none',
               display: 'flex',
               alignItems: 'center',
+              transition: 'color 0.2s',
             }}
-            whileHover={{ color: currentTheme.text }}
-            transition={{ duration: 0.2 }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
             </svg>
-          </motion.a>
+          </a>
 
-          <motion.a
+          <a
             href="https://youtube.com/@gregtoler"
             target="_blank"
             rel="noopener noreferrer"
+            className="social-icon"
             style={{
-              color: currentTheme.socialIcon,
+              color: 'var(--nav-social-icon)',
               cursor: 'pointer',
               textDecoration: 'none',
               display: 'flex',
               alignItems: 'center',
+              transition: 'color 0.2s',
             }}
-            whileHover={{ color: currentTheme.text }}
-            transition={{ duration: 0.2 }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
             </svg>
-          </motion.a>
+          </a>
         </div>
       </aside>
     </>

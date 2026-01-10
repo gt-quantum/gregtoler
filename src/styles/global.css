@@ -10,6 +10,52 @@
   padding: 0;
 }
 
+/* Layout Variables - Single source of truth */
+:root {
+  --sidebar-width: 147px;
+  --header-height: 77px;
+  --content-top-padding: 48px;
+  --back-link-column-width: 160px;
+  --layout-gap: 24px;
+}
+
+/* Theme CSS Variables */
+:root,
+[data-theme="light"] {
+  --nav-active-text: #2C2824;
+  --nav-inactive-text: #A09A94;
+  --nav-line: #2C2824;
+  --nav-dot: #2C2824;
+  --nav-divider: #D5D0C9;
+  --nav-social-icon: #7A756E;
+  --nav-header-button: #6B6560;
+  --nav-text: #2C2824;
+}
+
+[data-theme="dark"] {
+  --nav-active-text: #E3E0DB;
+  --nav-inactive-text: #6E6A64;
+  --nav-line: #E3E0DB;
+  --nav-dot: #E3E0DB;
+  --nav-divider: #3D3935;
+  --nav-social-icon: #908C86;
+  --nav-header-button: #A8A49E;
+  --nav-text: #E3E0DB;
+}
+
+/* Navigation hover styles */
+.header-btn:hover {
+  opacity: 1 !important;
+}
+
+.social-icon:hover {
+  color: var(--nav-active-text) !important;
+}
+
+.nav-item-inactive:hover {
+  color: var(--nav-active-text) !important;
+}
+
 /* Base */
 html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -18,11 +64,19 @@ html {
   text-rendering: optimizeLegibility;
 }
 
+/* Fallback backgrounds before canvas loads - matches canvas gradient top */
+html, [data-theme="light"] {
+  background-color: #fcfaf7;
+}
+
+[data-theme="dark"] {
+  background-color: #1a1714;
+}
+
 body {
   min-height: 100vh;
   line-height: 1.6;
-  /* Prevent flash - JS will set this based on theme preference */
-  background-color: #F3EEE7;
+  background-color: transparent;
 }
 
 /* Remove default link styles */

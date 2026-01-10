@@ -2,6 +2,7 @@
 import { ViewTransitions } from 'astro:transitions';
 import SpineNavigation from '../components/layout/SpineNavigation.jsx';
 import '../styles/global.css';
+import '../styles/animations.css';
 
 interface Props {
   title: string;
@@ -15,6 +16,19 @@ const currentPath = Astro.url.pathname;
 <!doctype html>
 <html lang="en">
   <head>
+    <style>
+      html {
+        background-attachment: fixed;
+        min-height: 100vh;
+      }
+      html, html[data-theme="light"] {
+        background: linear-gradient(180deg, #fcfaf7 0%, #f8f5f0 30%, #f3efe8 70%, #ebe5dc 100%);
+      }
+      html[data-theme="dark"] {
+        background: linear-gradient(180deg, #1a1714 0%, #1e1b17 30%, #22201c 70%, #2a2622 100%);
+      }
+      body { background-color: transparent; }
+    </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
@@ -28,7 +42,6 @@ const currentPath = Astro.url.pathname;
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const isDark = stored !== null ? stored === 'true' : prefersDark;
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        document.documentElement.style.backgroundColor = isDark ? '#1A1714' : '#F3EEE7';
       })();
     </script>
     <style>
@@ -41,28 +54,28 @@ const currentPath = Astro.url.pathname;
       }
 
       [data-theme="dark"] .shell-layout {
-        background-color: #1A1714;
+        background-color: transparent;
         color: #E8E3DC;
       }
 
       [data-theme="light"] .shell-layout {
-        background-color: #F3EEE7;
+        background-color: transparent;
         color: #2C2824;
       }
 
       .main-container {
         display: flex;
         flex: 1;
-        overflow: hidden;
       }
 
       .content-area {
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 24px 64px 64px 24px;
-        overflow: auto;
+        padding: 48px 64px 64px 24px;
+        margin-top: 77px; /* account for fixed header */
         margin-left: 147px; /* sidebar width + padding */
+        overflow-y: auto;
       }
 
       [data-theme="dark"] .content-area {
@@ -75,6 +88,117 @@ const currentPath = Astro.url.pathname;
     </style>
   </head>
   <body>
+    <!-- Animated background canvas - inline for immediate load -->
+    <canvas id="silk-bg" transition:persist="silk-bg" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
+    <script is:inline>
+      (function() {
+        const canvas = document.getElementById('silk-bg');
+        const ctx = canvas.getContext('2d');
+
+        const resize = () => {
+          const dpr = window.devicePixelRatio || 1;
+          canvas.width = window.innerWidth * dpr;
+          canvas.height = window.innerHeight * dpr;
+          canvas.style.width = window.innerWidth + 'px';
+          canvas.style.height = window.innerHeight + 'px';
+          ctx.scale(dpr, dpr);
+        };
+
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Theme-aware color definitions
+        const themes = {
+          light: {
+            bg: ['#fcfaf7', '#f8f5f0', '#f3efe8', '#ebe5dc'],
+            layers: [
+              'rgba(162, 150, 141, 0.32)',
+              'rgba(172, 160, 149, 0.27)',
+              'rgba(182, 170, 157, 0.22)',
+              'rgba(192, 180, 167, 0.18)',
+              'rgba(202, 190, 177, 0.14)',
+            ]
+          },
+          dark: {
+            bg: ['#1a1714', '#1e1b17', '#22201c', '#2a2622'],
+            layers: [
+              'rgba(60, 55, 50, 0.25)',
+              'rgba(70, 65, 58, 0.20)',
+              'rgba(80, 74, 66, 0.16)',
+              'rgba(90, 84, 76, 0.12)',
+              'rgba(100, 94, 86, 0.08)',
+            ]
+          }
+        };
+
+        const getTheme = () => document.documentElement.getAttribute('data-theme') || 'light';
+
+        const layerConfigs = [
+          { points: 5, baseY: 0.75, amplitude: 80, frequency: 0.8, speed: 0.15, phase: 0 },
+          { points: 6, baseY: 0.6, amplitude: 60, frequency: 1.0, speed: 0.12, phase: 1 },
+          { points: 5, baseY: 0.45, amplitude: 70, frequency: 0.7, speed: 0.18, phase: 2 },
+          { points: 4, baseY: 0.3, amplitude: 50, frequency: 0.9, speed: 0.1, phase: 3 },
+          { points: 5, baseY: 0.18, amplitude: 40, frequency: 1.1, speed: 0.14, phase: 4 },
+        ];
+
+        const drawLayer = (config, color, time) => {
+          const w = window.innerWidth, h = window.innerHeight;
+          const pts = [];
+          for (let i = 0; i <= config.points; i++) {
+            const x = (i / config.points) * w;
+            const y = h * config.baseY +
+              Math.sin(i * config.frequency + time * config.speed + config.phase) * config.amplitude +
+              Math.sin(i * config.frequency * 0.5 + time * config.speed * 0.7 + config.phase) * config.amplitude * 0.4;
+            pts.push({ x, y });
+          }
+
+          ctx.beginPath();
+          ctx.moveTo(0, h);
+          ctx.lineTo(pts[0].x, pts[0].y);
+
+          for (let i = 0; i < pts.length - 1; i++) {
+            const cpX = (pts[i].x + pts[i+1].x) / 2;
+            ctx.bezierCurveTo(cpX, pts[i].y, cpX, pts[i+1].y, pts[i+1].x, pts[i+1].y);
+          }
+
+          ctx.lineTo(w, h);
+          ctx.closePath();
+
+          const grad = ctx.createLinearGradient(0, h * config.baseY - config.amplitude, 0, h);
+          const alpha = parseFloat(color.match(/[\d.]+\)$/)[0]);
+          grad.addColorStop(0, color);
+          grad.addColorStop(0.5, color.replace(/[\d.]+\)$/, (alpha * 1.2) + ')'));
+          grad.addColorStop(1, color.replace(/[\d.]+\)$/, (alpha * 0.5) + ')'));
+
+          ctx.fillStyle = grad;
+          ctx.fill();
+        };
+
+        let start = null;
+        const animate = (ts) => {
+          if (!start) start = ts;
+          const time = (ts - start) / 1000;
+          const w = window.innerWidth, h = window.innerHeight;
+
+          const theme = themes[getTheme()] || themes.light;
+
+          const bg = ctx.createLinearGradient(0, 0, w * 0.3, h);
+          bg.addColorStop(0, theme.bg[0]);
+          bg.addColorStop(0.3, theme.bg[1]);
+          bg.addColorStop(0.7, theme.bg[2]);
+          bg.addColorStop(1, theme.bg[3]);
+
+          ctx.fillStyle = bg;
+          ctx.fillRect(0, 0, w, h);
+
+          layerConfigs.forEach((config, i) => drawLayer(config, theme.layers[i], time));
+          requestAnimationFrame(animate);
+        };
+
+        requestAnimationFrame(animate);
+      })();
+    </script>
+
     <div class="shell-layout">
       <!-- Navigation shell - PERSISTED across page transitions -->
       <div transition:persist="spine-nav">
@@ -88,5 +212,23 @@ const currentPath = Astro.url.pathname;
         </main>
       </div>
     </div>
+
+    <!-- Trigger animations after View Transitions complete -->
+    <script>
+      const triggerAnimations = () => {
+        // Small delay to ensure View Transition is fully complete
+        requestAnimationFrame(() => {
+          document.querySelectorAll('.animate-on-load').forEach(el => {
+            el.classList.add('animate-ready');
+          });
+        });
+      };
+
+      // Run on initial page load
+      triggerAnimations();
+
+      // Run after View Transitions (Astro navigation)
+      document.addEventListener('astro:page-load', triggerAnimations);
+    </script>
   </body>
 </html>
