@@ -112,11 +112,20 @@ const SpineNavigation = ({ initialPath = '/' }) => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '24px 40px 16px 16px',
-          backgroundColor: 'transparent',
+          padding: '24px 40px 24px 16px',
+          background: isDarkMode
+            ? 'linear-gradient(to bottom, #1a1714 0%, #1a1714 60%, transparent 100%)'
+            : 'linear-gradient(to bottom, #fcfaf7 0%, #fcfaf7 60%, transparent 100%)',
           zIndex: 100,
+          transition: 'background 0.3s ease',
+          pointerEvents: 'none',
         }}
       >
+      <style>{`
+        header > * {
+          pointer-events: auto;
+        }
+      `}</style>
         <a
           href="/"
           onClick={() => handleNavClick('/')}
@@ -193,7 +202,8 @@ const SpineNavigation = ({ initialPath = '/' }) => {
             Services
           </button>
 
-          <button
+          <a
+            href="/contact"
             className="header-btn"
             style={{
               background: 'none',
@@ -205,10 +215,11 @@ const SpineNavigation = ({ initialPath = '/' }) => {
               opacity: 0.6,
               fontFamily: 'inherit',
               transition: 'opacity 0.2s',
+              textDecoration: 'none',
             }}
           >
             Contact
-          </button>
+          </a>
         </div>
       </header>
 
@@ -382,7 +393,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
           </a>
 
           <a
-            href="https://youtube.com/@gregtoler"
+            href="https://youtube.com/@gregtolerops"
             target="_blank"
             rel="noopener noreferrer"
             className="social-icon"

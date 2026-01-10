@@ -1,19 +1,57 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HomePage from '../components/home/HomePage.jsx';
+
+// Get latest project (prefer active status)
+const projectEntries = await getCollection('projects');
+const sortedProjects = projectEntries.sort((a, b) => {
+  // Prefer active projects
+  if (a.data.status === 'active' && b.data.status !== 'active') return -1;
+  if (b.data.status === 'active' && a.data.status !== 'active') return 1;
+  // Then sort by date
+  return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
+});
+const latestProject = sortedProjects[0] ? {
+  slug: sortedProjects[0].slug,
+  title: sortedProjects[0].data.title,
+  subtitle: sortedProjects[0].data.subtitle,
+  status: sortedProjects[0].data.status,
+  coverImage: sortedProjects[0].data.coverImage || '',
+} : null;
+
+// Get latest app
+const appEntries = await getCollection('apps');
+const sortedApps = appEntries.sort((a, b) =>
+  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+const latestApp = sortedApps[0] ? {
+  slug: sortedApps[0].slug,
+  name: sortedApps[0].data.name,
+  tagline: sortedApps[0].data.tagline,
+  videoUrl: sortedApps[0].data.videoUrl,
+  previewImage: sortedApps[0].data.previewImage || '',
+} : null;
+
+// Get latest content
+const contentEntries = await getCollection('content');
+const sortedContent = contentEntries.sort((a, b) =>
+  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+const latestContent = sortedContent[0] ? {
+  slug: sortedContent[0].slug,
+  title: sortedContent[0].data.title,
+  contentType: sortedContent[0].data.contentType,
+  date: sortedContent[0].data.date,
+  coverImage: sortedContent[0].data.coverImage || '',
+} : null;
 ---
 
-<BaseLayout title="Home">
-  <div style="max-width: 800px;">
-    <h1 class="animate-on-load" style="font-size: 48px; font-weight: 600; margin-bottom: 24px; letter-spacing: -0.02em;">
-      Greg Toler
-    </h1>
-    <p class="animate-on-load delay-1" style="font-size: 24px; font-weight: 400; margin-bottom: 16px; opacity: 0.8;">
-      Developing and optimizing processes that scale.
-    </p>
-    <p class="animate-on-load delay-2" style="font-size: 16px; line-height: 1.6; opacity: 0.7; max-width: 600px;">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-      incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-      exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    </p>
-  </div>
+<BaseLayout title="Greg Toler - GTM Strategy & Operations">
+  <HomePage
+    client:load
+    latestProject={latestProject}
+    latestApp={latestApp}
+    latestContent={latestContent}
+  />
 </BaseLayout>

@@ -401,7 +401,7 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
             </motion.a>
 
             <motion.a
-              href="https://youtube.com/@gregtoler"
+              href="https://youtube.com/@gregtolerops"
               target="_blank"
               rel="noopener noreferrer"
               style={{

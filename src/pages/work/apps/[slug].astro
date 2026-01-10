@@ -1,0 +1,120 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AppDetail from '../../../components/work/AppDetail.jsx';
+import '../../../styles/prose.css';
+
+export async function getStaticPaths() {
+  const appEntries = await getCollection('apps');
+  return appEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+// Format the app data for the component
+const app = {
+  name: entry.data.name,
+  type: entry.data.type,
+  tagline: entry.data.tagline,
+  description: entry.data.description,
+  status: entry.data.status,
+  version: entry.data.version,
+  tags: entry.data.tags,
+  videoUrl: entry.data.videoUrl,
+  previewImage: entry.data.previewImage,
+  downloadUrl: entry.data.downloadUrl,
+  signupUrl: entry.data.signupUrl,
+  features: entry.data.features,
+  requirements: entry.data.requirements,
+};
+---
+
+<BaseLayout
+  title={entry.data.name}
+  description={entry.data.tagline}
+>
+  <Fragment slot="head">
+    {entry.data.ogImage && <meta property="og:image" content={entry.data.ogImage} />}
+    <meta property="og:type" content="article" />
+  </Fragment>
+
+  <!-- Fixed Back Link -->
+  <a href="/work?tab=Apps" class="back-link slide-in-left">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M19 12H5m0 0l6-6m-6 6l6 6" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <span>Back to Work</span>
+  </a>
+
+  <div class="app-page">
+    <AppDetail client:load app={app}>
+      <Content />
+    </AppDetail>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Desktop: Fixed back link in left column */
+  .back-link {
+    position: fixed;
+    top: calc(var(--header-height) + var(--content-top-padding));
+    left: calc(var(--sidebar-width) + var(--layout-gap));
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+    z-index: 50;
+  }
+
+  .back-link:hover {
+    color: var(--text);
+  }
+
+  .app-page {
+    margin-left: calc(var(--back-link-column-width) + var(--layout-gap));
+  }
+
+  /* Tablet: Reduce back link column */
+  @media (max-width: 1024px) {
+    .back-link {
+      left: calc(var(--sidebar-width) + 16px);
+    }
+
+    .app-page {
+      margin-left: calc(var(--back-link-column-width) + 16px);
+    }
+  }
+
+  /* Mobile: Back link flows with content */
+  @media (max-width: 768px) {
+    .back-link {
+      position: relative;
+      top: auto;
+      left: auto;
+      margin-bottom: 24px;
+    }
+
+    .app-page {
+      margin-left: 0;
+    }
+  }
+
+  /* CSS variables for theming */
+  :global([data-theme="light"]) .app-page {
+    --text: #2C2824;
+    --text-muted: #6B6560;
+  }
+
+  :global([data-theme="dark"]) .app-page {
+    --text: #E3E0DB;
+    --text-muted: #A8A49E;
+  }
+</style>

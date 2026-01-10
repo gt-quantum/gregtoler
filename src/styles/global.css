@@ -23,7 +23,7 @@
 :root,
 [data-theme="light"] {
   --nav-active-text: #2C2824;
-  --nav-inactive-text: #A09A94;
+  --nav-inactive-text: #8A857E;
   --nav-line: #2C2824;
   --nav-dot: #2C2824;
   --nav-divider: #B5AFA6;
@@ -34,7 +34,7 @@
 
 [data-theme="dark"] {
   --nav-active-text: #E3E0DB;
-  --nav-inactive-text: #6E6A64;
+  --nav-inactive-text: #807A74;
   --nav-line: #E3E0DB;
   --nav-dot: #E3E0DB;
   --nav-divider: #605B55;

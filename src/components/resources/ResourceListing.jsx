@@ -2,37 +2,57 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { theme, animation } from '../../lib/theme';
 
-// Tags match the content collection schema
-const TAGS = ['GTM', 'Marketing', 'Sales', 'Process', 'Frameworks', 'Operations', 'AI', 'Technology'];
-const TYPES = ['Blog', 'Video', 'Post'];
+// Resource types from schema
+const TYPES = ['Spreadsheet', 'PDF', 'Tool', 'Video', 'Template', 'Guide'];
 
-// Content type icons - minimal stroke style
+// Common tags for resources
+const TAGS = ['GTM', 'Marketing', 'Sales', 'Process', 'Operations', 'Strategy'];
+
+// Type icons
 const TypeIcon = ({ type, color }) => {
   const icons = {
+    spreadsheet: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="3" y1="9" x2="21" y2="9" />
+        <line x1="3" y1="15" x2="21" y2="15" />
+        <line x1="9" y1="3" x2="9" y2="21" />
+      </svg>
+    ),
+    pdf: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+        <polyline points="14,2 14,8 20,8" />
+      </svg>
+    ),
+    template: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="3" y1="9" x2="21" y2="9" />
+        <line x1="9" y1="21" x2="9" y2="9" />
+      </svg>
+    ),
+    guide: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+      </svg>
+    ),
+    tool: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
+        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
+      </svg>
+    ),
     video: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
         <polygon points="6,4 20,12 6,20" />
-      </svg>
-    ),
-    blog: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
-        <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
-        <line x1="4" y1="12" x2="16" y2="12" strokeLinecap="round" />
-        <line x1="4" y1="18" x2="12" y2="18" strokeLinecap="round" />
-      </svg>
-    ),
-    post: (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <line x1="7" y1="8" x2="17" y2="8" strokeLinecap="round" />
-        <line x1="7" y1="12" x2="14" y2="12" strokeLinecap="round" />
       </svg>
     ),
   };
 
   return (
     <span style={{ display: 'flex', alignItems: 'center' }}>
-      {icons[type] || icons.blog}
+      {icons[type] || icons.template}
     </span>
   );
 };
@@ -57,18 +77,7 @@ const SortArrow = ({ active, direction, color }) => (
   </svg>
 );
 
-// Calculate reading time from content
-const getReadingTime = (item) => {
-  if (item.contentType === 'video' && item.videoDuration) {
-    return item.videoDuration;
-  }
-  if (item.readingTime) {
-    return `${item.readingTime} min`;
-  }
-  return null;
-};
-
-export default function ContentListing({ items = [] }) {
+export default function ResourceListing({ items = [] }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeTag, setActiveTag] = useState(null);
   const [activeType, setActiveType] = useState(null);
@@ -83,7 +92,6 @@ export default function ContentListing({ items = [] }) {
 
     checkTheme();
 
-    // Listen for theme changes
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
@@ -92,7 +100,7 @@ export default function ContentListing({ items = [] }) {
 
   const currentTheme = isDarkMode ? theme.dark : theme.light;
 
-  // Toggle filters - click again to deselect
+  // Toggle filters
   const toggleTag = (tag) => setActiveTag((prev) => (prev === tag ? null : tag));
   const toggleType = (type) => setActiveType((prev) => (prev === type ? null : type));
 
@@ -109,7 +117,7 @@ export default function ContentListing({ items = [] }) {
   // Filter and sort items
   const filtered = items
     .filter((item) => !activeTag || item.tags.includes(activeTag))
-    .filter((item) => !activeType || item.contentType.toLowerCase() === activeType.toLowerCase())
+    .filter((item) => !activeType || item.resourceType.toLowerCase() === activeType.toLowerCase())
     .sort((a, b) => {
       if (sortKey === 'date') {
         const dateA = new Date(a.date);
@@ -123,7 +131,17 @@ export default function ContentListing({ items = [] }) {
       }
     });
 
-  // Styles using theme tokens
+  // Type labels
+  const typeLabels = {
+    spreadsheet: 'Spreadsheet',
+    pdf: 'PDF',
+    tool: 'Tool',
+    video: 'Video',
+    template: 'Template',
+    guide: 'Guide',
+  };
+
+  // Styles
   const styles = {
     container: {
       width: '100%',
@@ -224,8 +242,8 @@ export default function ContentListing({ items = [] }) {
     tableHeaderDate: {
       minWidth: '64px',
     },
-    tableHeaderDuration: {
-      minWidth: '56px',
+    tableHeaderType: {
+      minWidth: '80px',
       textAlign: 'right',
     },
 
@@ -263,11 +281,12 @@ export default function ContentListing({ items = [] }) {
       color: currentTheme.textMuted,
       minWidth: '64px',
     },
-    itemDuration: {
+    itemType: {
       fontSize: '13px',
       color: currentTheme.textMuted,
-      minWidth: '56px',
+      minWidth: '80px',
       textAlign: 'right',
+      textTransform: 'capitalize',
     },
 
     // Empty state
@@ -321,7 +340,7 @@ export default function ContentListing({ items = [] }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
-        <h1 style={styles.title}>Content</h1>
+        <h1 style={styles.title}>Resources</h1>
       </motion.header>
 
       {/* Filters */}
@@ -400,10 +419,10 @@ export default function ContentListing({ items = [] }) {
           Date
           <SortArrow active={sortKey === 'date'} direction={sortKey === 'date' ? sortDir : 'desc'} color={currentTheme.textMuted} />
         </button>
-        <span style={styles.tableHeaderDuration}>Length</span>
+        <span style={styles.tableHeaderType}>Type</span>
       </motion.div>
 
-      {/* Content List */}
+      {/* Resource List */}
       <motion.main
         style={styles.list}
         initial={{ opacity: 0 }}
@@ -413,7 +432,7 @@ export default function ContentListing({ items = [] }) {
         <AnimatePresence mode="popLayout">
           {filtered.map((item, index) => (
             <motion.a
-              href={`/content/${item.slug}`}
+              href={`/resources/${item.slug}`}
               key={item.slug}
               style={styles.item}
               initial={{ opacity: 0 }}
@@ -424,13 +443,13 @@ export default function ContentListing({ items = [] }) {
               layout
             >
               <div style={styles.itemIcon}>
-                <TypeIcon type={item.contentType} color={currentTheme.textMuted} />
+                <TypeIcon type={item.resourceType} color={currentTheme.textMuted} />
               </div>
               <h2 style={styles.itemTitle}>{item.title}</h2>
               <span style={styles.itemDate}>
                 {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </span>
-              <span style={styles.itemDuration}>{getReadingTime(item)}</span>
+              <span style={styles.itemType}>{typeLabels[item.resourceType]}</span>
             </motion.a>
           ))}
         </AnimatePresence>
@@ -444,7 +463,7 @@ export default function ContentListing({ items = [] }) {
           animate={{ opacity: 1 }}
           transition={animation.fade}
         >
-          <p>No content found.</p>
+          <p>No resources found.</p>
           <button
             onClick={() => {
               setActiveTag(null);

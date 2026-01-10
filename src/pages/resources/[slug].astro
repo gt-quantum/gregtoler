@@ -256,11 +256,11 @@ const typeLabels: Record<string, string> = {
     }
   }
 
-  /* Two-column grid */
+  /* Two-column grid - 50/50 layout */
   .header-grid {
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 48px;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
     margin-bottom: 56px;
     align-items: start;
   }
@@ -380,13 +380,13 @@ const typeLabels: Record<string, string> = {
 
   .preview-image {
     width: 100%;
-    aspect-ratio: 4/3;
+    aspect-ratio: 3/2;
     object-fit: cover;
   }
 
   .preview-placeholder {
     width: 100%;
-    aspect-ratio: 4/3;
+    aspect-ratio: 3/2;
     background: var(--bg-tertiary);
   }
 
