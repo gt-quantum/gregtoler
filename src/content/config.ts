@@ -72,7 +72,6 @@ const resourcesCollection = defineCollection({
     author: z.string().default('Greg Toler'),
     // File info
     fileUrl: z.string().optional(),
-    fileSize: z.string().optional(),
     fileFormat: z.string().optional(),
     // Video walkthrough
     videoUrl: z.string().optional(),

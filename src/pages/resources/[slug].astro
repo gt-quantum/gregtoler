@@ -113,12 +113,6 @@ const typeLabels: Record<string, string> = {
               <span>{entry.data.fileFormat}</span>
             </>
           )}
-          {entry.data.fileSize && (
-            <>
-              <span class="meta-dot">·</span>
-              <span>{entry.data.fileSize}</span>
-            </>
-          )}
         </div>
 
         <!-- Title -->
@@ -471,7 +465,7 @@ const typeLabels: Record<string, string> = {
     --text-muted: #6B6560;
     --bg-tertiary: #E3DED5;
     --bg-overlay: rgba(243, 238, 231, 0.9);
-    --border: rgba(0, 0, 0, 0.08);
+    --border: rgba(0, 0, 0, 0.15);
     --button-bg: #2C2824;
     --button-text: #F3EEE7;
   }
@@ -481,7 +475,7 @@ const typeLabels: Record<string, string> = {
     --text-muted: #A8A49E;
     --bg-tertiary: #2A2622;
     --bg-overlay: rgba(26, 23, 20, 0.9);
-    --border: rgba(255, 255, 255, 0.08);
+    --border: rgba(255, 255, 255, 0.14);
     --button-bg: #E3E0DB;
     --button-text: #1A1714;
   }

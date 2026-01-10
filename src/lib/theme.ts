@@ -17,7 +17,7 @@ export const theme = {
     // Lines & dividers
     line: '#2C2824',
     dot: '#2C2824',
-    divider: '#D5D0C9',
+    divider: '#B5AFA6',
 
     // Interactive elements
     socialIcon: '#7A756E',
@@ -38,7 +38,7 @@ export const theme = {
     // Lines & dividers
     line: '#E3E0DB',
     dot: '#E3E0DB',
-    divider: '#3D3935',
+    divider: '#605B55',
 
     // Interactive elements
     socialIcon: '#908C86',

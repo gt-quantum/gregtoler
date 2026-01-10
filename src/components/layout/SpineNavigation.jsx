@@ -293,11 +293,13 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                       flexGrow: lineVisible ? 1 : 0,
                       marginTop: lineVisible ? 10 : 0,
                       marginBottom: lineVisible ? 10 : 0,
+                      opacity: lineVisible ? 1 : 0,
                     }}
                     animate={{
                       flexGrow: lineVisible ? 1 : 0,
                       marginTop: lineVisible ? 10 : 0,
                       marginBottom: lineVisible ? 10 : 0,
+                      opacity: lineVisible ? 1 : 0,
                     }}
                     transition={hasNavigated ? springTransition : { duration: 0 }}
                   >

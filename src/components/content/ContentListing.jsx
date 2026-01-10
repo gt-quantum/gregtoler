@@ -182,7 +182,7 @@ export default function ContentListing({ items = [] }) {
     },
     filterDivider: {
       color: currentTheme.textMuted,
-      opacity: 0.3,
+      opacity: 0.5,
       fontSize: '12px',
     },
 
@@ -239,7 +239,7 @@ export default function ContentListing({ items = [] }) {
       alignItems: 'center',
       gap: '16px',
       padding: '16px 0',
-      borderBottom: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+      borderBottom: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.13)' : 'rgba(0,0,0,0.12)'}`,
       textDecoration: 'none',
       color: 'inherit',
       cursor: 'pointer',
