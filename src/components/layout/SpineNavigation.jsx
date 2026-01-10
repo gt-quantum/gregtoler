@@ -416,7 +416,6 @@ const SpineNavigation = ({ initialPath = '/' }) => {
             flex: 1,
             alignItems: 'center',
             minHeight: 0,
-            gap: isMobile ? '8px' : '0',
           }}
         >
           {menuItems.map((item, index) => {
@@ -438,12 +437,8 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     flex: '0 0 auto',
-                    padding: isMobile ? '10px' : '4px 20px',
+                    padding: isMobile ? '8px' : '4px 20px',
                     textDecoration: 'none',
-                    borderRadius: isMobile ? '10px' : '0',
-                    background: isMobile && isActive
-                      ? (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)')
-                      : 'transparent',
                   }}
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -482,8 +477,8 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                   )}
                 </motion.a>
 
-                {/* Line Segment - only show on desktop */}
-                {!isMobile && index < menuItems.length - 1 && (
+                {/* Line Segment - shows on both desktop and mobile */}
+                {index < menuItems.length - 1 && (
                   <motion.div
                     initial={false}
                     style={{
@@ -493,14 +488,14 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                       overflow: 'hidden',
                       // Set initial styles to match animate target (prevents SSR flash)
                       flexGrow: lineVisible ? 1 : 0,
-                      marginTop: lineVisible ? 10 : 0,
-                      marginBottom: lineVisible ? 10 : 0,
+                      marginTop: lineVisible ? (isMobile ? 6 : 10) : 0,
+                      marginBottom: lineVisible ? (isMobile ? 6 : 10) : 0,
                       opacity: lineVisible ? 1 : 0,
                     }}
                     animate={{
                       flexGrow: lineVisible ? 1 : 0,
-                      marginTop: lineVisible ? 10 : 0,
-                      marginBottom: lineVisible ? 10 : 0,
+                      marginTop: lineVisible ? (isMobile ? 6 : 10) : 0,
+                      marginBottom: lineVisible ? (isMobile ? 6 : 10) : 0,
                       opacity: lineVisible ? 1 : 0,
                     }}
                     transition={hasNavigated ? springTransition : { duration: 0 }}
@@ -508,8 +503,8 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                     {/* Top dot */}
                     <div
                       style={{
-                        width: '4px',
-                        height: '4px',
+                        width: isMobile ? '3px' : '4px',
+                        height: isMobile ? '3px' : '4px',
                         backgroundColor: 'var(--nav-dot)',
                         borderRadius: '50%',
                       }}
@@ -520,7 +515,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                       style={{
                         width: '1px',
                         flex: 1,
-                        minHeight: '8px',
+                        minHeight: isMobile ? '4px' : '8px',
                         backgroundColor: 'var(--nav-line)',
                       }}
                     />
@@ -528,8 +523,8 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                     {/* Bottom dot */}
                     <div
                       style={{
-                        width: '4px',
-                        height: '4px',
+                        width: isMobile ? '3px' : '4px',
+                        height: isMobile ? '3px' : '4px',
                         backgroundColor: 'var(--nav-dot)',
                         borderRadius: '50%',
                       }}

@@ -232,30 +232,6 @@ const typeLabels: Record<string, string> = {
     }
   }
 
-  /* Mobile: Back link flows with content */
-  @media (max-width: 768px) {
-    .back-link {
-      position: relative;
-      top: auto;
-      left: auto;
-      margin-bottom: 24px;
-    }
-
-    .resource-detail {
-      margin-left: 0;
-      max-width: 100%;
-    }
-
-    .header-grid {
-      grid-template-columns: 1fr;
-      gap: 32px;
-    }
-
-    .preview-wrapper {
-      order: -1;
-    }
-  }
-
   /* Two-column grid - 50/50 layout */
   .header-grid {
     display: grid;
@@ -478,6 +454,88 @@ const typeLabels: Record<string, string> = {
     --border: rgba(255, 255, 255, 0.14);
     --button-bg: #E3E0DB;
     --button-text: #1A1714;
+  }
+
+  /* Tablet: Stack vertically at 900px */
+  @media (max-width: 900px) {
+    .back-link {
+      position: relative;
+      top: auto;
+      left: auto;
+      margin-bottom: 24px;
+    }
+
+    .resource-detail {
+      margin-left: 0;
+      max-width: 100%;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .header-grid {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 32px !important;
+    }
+
+    .header-info {
+      width: 100%;
+      order: 1; /* Title, description, tags first */
+    }
+
+    .preview-wrapper {
+      order: 2; /* Image second */
+      position: relative;
+      top: auto;
+      width: 100%;
+      max-width: 500px; /* Constrain image width on tablet */
+    }
+
+    .preview-card {
+      width: 100%;
+    }
+
+    .preview-image {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .video-wrapper,
+    .content-wrapper,
+    .footer {
+      max-width: 100%;
+    }
+  }
+
+  /* Mobile: Tighter spacing and full-width elements */
+  @media (max-width: 600px) {
+    .header-grid {
+      gap: 24px !important;
+    }
+
+    .preview-wrapper {
+      max-width: 100%; /* Full width on mobile */
+    }
+
+    .title {
+      font-size: 1.5rem;
+      word-wrap: break-word;
+    }
+
+    .description {
+      font-size: 1rem;
+    }
+
+    .tags {
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .download-button {
+      width: 100%;
+      justify-content: center;
+    }
   }
 </style>
 

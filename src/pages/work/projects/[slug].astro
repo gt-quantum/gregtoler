@@ -158,8 +158,8 @@ const ogImage = entry.data.ogImage || entry.data.coverImage;
     }
   }
 
-  /* Mobile: Back link flows with content */
-  @media (max-width: 768px) {
+  /* Tablet/Mobile: Back link flows with content */
+  @media (max-width: 900px) {
     .back-link {
       position: relative;
       top: auto;
@@ -169,6 +169,23 @@ const ogImage = entry.data.ogImage || entry.data.coverImage;
 
     .project-detail {
       margin-left: 0;
+      max-width: 100%;
+    }
+  }
+
+  /* Mobile: Smaller text */
+  @media (max-width: 600px) {
+    .title {
+      font-size: 1.75rem;
+    }
+
+    .description {
+      font-size: 1.125rem;
+    }
+
+    .tags {
+      flex-wrap: wrap;
+      gap: 8px;
     }
   }
 

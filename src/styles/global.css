@@ -19,6 +19,16 @@
   --layout-gap: 24px;
 }
 
+/* Mobile layout overrides */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 60px;
+    --content-top-padding: 24px;
+    --back-link-column-width: 0px;
+    --layout-gap: 16px;
+  }
+}
+
 /* Theme CSS Variables */
 :root,
 [data-theme="light"] {

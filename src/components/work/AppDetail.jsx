@@ -361,19 +361,51 @@ export default function AppDetail({ app, children }) {
   return (
     <article style={styles.container} className="app-detail">
       <style>{`
+        /* Tablet: Switch to single column at 900px */
         @media (max-width: 900px) {
           .app-detail .header-grid {
-            grid-template-columns: 1fr !important;
+            display: flex !important;
+            flex-direction: column !important;
             gap: 32px !important;
           }
+          .app-detail .header-info {
+            order: 1; /* Title, description, tags, button first */
+            width: 100%;
+          }
           .app-detail .preview-wrapper {
-            order: -1;
+            order: 2; /* Image/video second */
             position: relative !important;
             top: 0 !important;
+            width: 100%;
+            max-width: 500px; /* Constrain image width on tablet */
+          }
+          .app-detail .preview-card {
+            width: 100%;
           }
           .app-detail .details-grid {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
+          }
+          .app-detail .video-thumbnail,
+          .app-detail .video-embed,
+          .app-detail .content {
+            max-width: 100% !important;
+          }
+        }
+        /* Mobile: Tighter spacing */
+        @media (max-width: 600px) {
+          .app-detail .header-grid {
+            gap: 24px !important;
+          }
+          .app-detail .preview-wrapper {
+            max-width: 100%; /* Full width on mobile */
+          }
+          .app-detail .name {
+            font-size: 1.75rem !important;
+          }
+          .app-detail .action-button {
+            width: 100%;
+            justify-content: center;
           }
         }
       `}</style>
@@ -381,7 +413,7 @@ export default function AppDetail({ app, children }) {
       {/* Two-column header */}
       <div style={styles.headerGrid} className="header-grid">
         {/* Left: Info */}
-        <div style={styles.headerInfo}>
+        <div style={styles.headerInfo} className="header-info">
           {/* Type meta */}
           <motion.div
             style={styles.typeMeta}
@@ -443,6 +475,7 @@ export default function AppDetail({ app, children }) {
             <motion.a
               href={app.status === 'download' ? app.downloadUrl : app.signupUrl || '#'}
               style={styles.actionButton}
+              className="action-button"
               whileHover={{ opacity: 0.9 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -460,7 +493,7 @@ export default function AppDetail({ app, children }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ ...transition, delay: 0.2 }}
         >
-          <div style={styles.previewCard}>
+          <div style={styles.previewCard} className="preview-card">
             {app.previewImage ? (
               <img
                 src={app.previewImage}
@@ -485,7 +518,7 @@ export default function AppDetail({ app, children }) {
         >
           <h2 style={styles.sectionLabel}>Video Walkthrough</h2>
           {!isVideoPlaying ? (
-            <div style={styles.videoThumbnail}>
+            <div style={styles.videoThumbnail} className="video-thumbnail">
               <div style={styles.videoPlaceholder} />
               <motion.button
                 onClick={() => setIsVideoPlaying(true)}
@@ -497,7 +530,7 @@ export default function AppDetail({ app, children }) {
               </motion.button>
             </div>
           ) : (
-            <div style={styles.videoEmbed}>
+            <div style={styles.videoEmbed} className="video-embed">
               <iframe
                 src={embedUrl}
                 style={styles.iframe}
@@ -555,7 +588,7 @@ export default function AppDetail({ app, children }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ ...transition, delay: 0.45 }}
-          className="prose-content"
+          className="prose-content content"
         >
           {children}
         </motion.div>
