@@ -1,22 +1,22 @@
 # Project Roadmap & Tasks
 
-## Phase 1: Foundation
+## Phase 1: Foundation ✅
 **Goal**: Get the basic site structure running with the FluidSpineMenu as the shell
 
 ### Tasks
-- [ ] Initialize Astro project in root directory
-- [ ] Install dependencies (react, framer-motion, @astrojs/cloudflare)
-- [ ] Create `src/lib/theme.ts` with color palette
-- [ ] Adapt FluidSpineMenu.jsx to work as layout component
-  - [ ] Accept `children` prop for page content
-  - [ ] Convert menu items to actual navigation links
-  - [ ] Handle active state based on current route
-  - [ ] Persist dark mode preference (localStorage)
-- [ ] Create BaseLayout.astro that wraps pages with FluidSpineMenu
-- [ ] Create stub pages for all menu items (Home, About, Work, Content, Resources)
-- [ ] Set up global CSS reset/base styles
-- [ ] Test dark mode toggle works across pages
-- [ ] Configure Cloudflare adapter
+- [x] Initialize Astro project in root directory
+- [x] Install dependencies (react, framer-motion, @astrojs/cloudflare)
+- [x] Create `src/lib/theme.ts` with color palette
+- [x] Adapt FluidSpineMenu.jsx to work as layout component
+  - [x] Accept `children` prop for page content
+  - [x] Convert menu items to actual navigation links
+  - [x] Handle active state based on current route
+  - [x] Persist dark mode preference (localStorage)
+- [x] Create BaseLayout.astro that wraps pages with FluidSpineMenu
+- [x] Create stub pages for all menu items (Home, About, Work, Content, Resources)
+- [x] Set up global CSS reset/base styles
+- [x] Test dark mode toggle works across pages
+- [x] Configure Cloudflare adapter
 - [ ] Push to GitHub and deploy to Cloudflare Pages
 
 ### Deliverable
@@ -24,92 +24,61 @@ Basic site navigation works, all pages accessible, consistent layout
 
 ---
 
-## Phase 2: Home Page
-**Goal**: Build the dashboard-style home page
-
-### Tasks
-- [ ] Design home page layout (reference inspiration images)
-- [ ] Create hero section with name, tagline, CTA
-- [ ] Add "Quick Stats" component (Active Projects, Apps Shipped, etc.)
-- [ ] Add "Services & Focus" component
-- [ ] Add "Recent Highlights" section (pulls from content collections)
-- [ ] Add "Behind the Work" preview section
-- [ ] Implement responsive layout
-- [ ] Add entrance animations
-
-### Placeholder Images Needed
-- Hero/profile image area
-- Work preview thumbnails
-- Project preview thumbnails
-
----
-
-## Phase 3: Content Collections Setup
+## Phase 2: Content Collections Setup
 **Goal**: Define schemas and create sample content
 
 ### Tasks
 - [ ] Create `src/content/config.ts` with collection schemas
-- [ ] Define Work collection schema (case studies)
-  - title, description, client, date, tags, featured, cover image
-- [ ] Define Projects collection schema (apps/tools)
-  - title, description, status, date, tags, link, github
-- [ ] Define Articles collection schema
-  - title, description, date, tags, featured
-- [ ] Define Resources collection schema
-  - title, description, type, file, date, tags
-- [ ] Create 2-3 sample entries for each collection
+- [ ] Define Work collection schema (past and current projects)
+  - title, description, client, type (past/current), date, tags, featured, cover image
+- [ ] Define Content collection schema (videos, blogs, posts)
+  - title, description, type (video/blog/post), date, tags (multiselect), featured
+  - Tags: GTM, Marketing, Sales, Process, Frameworks, Operations, AI, Technology
+  - Optional: videoUrl, videoEmbed for video content
+- [ ] Define Resources collection schema (downloadable/viewable)
+  - title, description, type (spreadsheet/pdf/tool/video), file, date, tags
+- [ ] Create 1-2 sample entries for each collection
 - [ ] Test content queries work
 
 ---
 
-## Phase 4: Work Section
-**Goal**: Showcase consulting work and case studies
+## Phase 3: Work Section
+**Goal**: Showcase past and current projects
 
 ### Tasks
 - [ ] Create Work index page with filterable grid
 - [ ] Create Work detail page template ([slug].astro)
-- [ ] Design case study layout
+- [ ] Design project layout
 - [ ] Add related work suggestions
 - [ ] Implement smooth page transitions
 
 ---
 
-## Phase 5: Projects Section
-**Goal**: Showcase apps, tools, and templates built
+## Phase 4: Content Section
+**Goal**: Videos, blogs, and written content
 
 ### Tasks
-- [ ] Create Projects index page
-- [ ] Create Project detail page template
-- [ ] Add project status badges (Active, Shipped, etc.)
-- [ ] Add links to live projects/GitHub
-- [ ] Consider embedding demos where possible
-
----
-
-## Phase 6: Content/Articles Section
-**Goal**: Essays and written content
-
-### Tasks
-- [ ] Create Content index page with article list
-- [ ] Create Article detail page template
+- [ ] Create Content index page with filterable list
+- [ ] Create Content detail page template
+- [ ] Support video embeds (YouTube)
 - [ ] Design reading experience (typography, spacing)
 - [ ] Add reading time estimate
-- [ ] Add related articles
+- [ ] Add related content suggestions
 
 ---
 
-## Phase 7: Resources Section
-**Goal**: Downloadable resources
+## Phase 5: Resources Section
+**Goal**: Downloadable and viewable resources
 
 ### Tasks
 - [ ] Create Resources page with categorized list
-- [ ] Design resource cards with download buttons
+- [ ] Design resource cards with download/view buttons
 - [ ] Set up file hosting (public folder or Cloudflare R2)
-- [ ] Track downloads (optional analytics)
+- [ ] Support both downloadable files and video resources
 
 ---
 
-## Phase 8: About Page
+## Phase 6: About Page
 **Goal**: Personal/professional bio
 
 ### Tasks
@@ -121,7 +90,18 @@ Basic site navigation works, all pages accessible, consistent layout
 
 ---
 
-## Phase 9: Contact & Forms
+## Phase 7: Services Page
+**Goal**: Detail service offerings
+
+### Tasks
+- [ ] Design Services page layout
+- [ ] Define service categories
+- [ ] Add service descriptions
+- [ ] Include CTAs for contact
+
+---
+
+## Phase 8: Contact Page
 **Goal**: Enable visitor contact
 
 ### Tasks
@@ -130,6 +110,22 @@ Basic site navigation works, all pages accessible, consistent layout
 - [ ] Configure email forwarding or database storage
 - [ ] Add form validation
 - [ ] Add success/error states
+
+---
+
+## Phase 9: Home Page Dashboard
+**Goal**: Build dashboard-style home page that pulls from collections
+
+### Tasks
+- [ ] Design home page layout (reference inspiration images)
+- [ ] Create hero section with name, tagline, CTA
+- [ ] Add "Quick Stats" component (Active Projects, Apps Shipped, etc.)
+- [ ] Add "Services & Focus" component
+- [ ] Add "Recent Work" tile (queries Work collection)
+- [ ] Add "Latest Content" tile (queries Content collection)
+- [ ] Add "Featured Resources" tile (queries Resources collection)
+- [ ] Implement responsive layout
+- [ ] Add entrance animations
 
 ---
 
@@ -145,6 +141,7 @@ Basic site navigation works, all pages accessible, consistent layout
 - [ ] Final responsive testing
 - [ ] Cross-browser testing
 - [ ] Analytics setup (if desired)
+- [ ] Push to GitHub and deploy to Cloudflare Pages
 - [ ] Launch!
 
 ---

@@ -19,26 +19,31 @@ const getActiveIndex = (path) => {
   });
 };
 
+// Check if line should show for a given active index
+const shouldShowLineForIndex = (lineIndex, activeIdx) => {
+  if (lineIndex === activeIdx - 1) return true;
+  if (lineIndex === activeIdx && activeIdx < menuItems.length - 1) return true;
+  return false;
+};
+
 const FluidSpineMenu = ({ children, initialPath = '/' }) => {
+  // Calculate initial active index from server-provided path
+  const initialActiveIndex = getActiveIndex(initialPath);
+
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isClient, setIsClient] = useState(false);
   const [currentPath, setCurrentPath] = useState(initialPath);
-  const [isReady, setIsReady] = useState(false);
-  const mountedRef = useRef(false);
+  // Check sessionStorage to see if user has navigated in this session
+  const [hasNavigated, setHasNavigated] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('hasNavigated') === 'true';
+    }
+    return false;
+  });
 
   const activeIndex = getActiveIndex(currentPath);
 
-  // Determine if line segment should be visible
-  const shouldShowLine = (afterIndex) => {
-    if (afterIndex === activeIndex - 1) return true;
-    if (afterIndex === activeIndex && activeIndex < menuItems.length - 1) return true;
-    return false;
-  };
-
   // Handle hydration and load preferences
   useEffect(() => {
-    setIsClient(true);
-
     // Load dark mode preference
     const stored = localStorage.getItem('darkMode');
     if (stored !== null) {
@@ -48,28 +53,23 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
       setIsDarkMode(prefersDark);
     }
 
-    // Sync path with URL
-    setCurrentPath(window.location.pathname);
-
-    // Check if already mounted before (skip entrance animation)
-    if (sessionStorage.getItem('menuMounted')) {
-      setIsReady(true);
-    } else {
-      sessionStorage.setItem('menuMounted', 'true');
-      // Delay to let initial render complete without animation
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setIsReady(true);
-        });
-      });
+    // Sync path with actual URL (may differ from initialPath after navigation)
+    const actualPath = window.location.pathname;
+    if (actualPath !== initialPath) {
+      setCurrentPath(actualPath);
     }
 
-    mountedRef.current = true;
-  }, []);
+    // Check if we've navigated before in this session
+    if (sessionStorage.getItem('hasNavigated') === 'true') {
+      setHasNavigated(true);
+    }
+  }, [initialPath]);
 
   // Listen for View Transitions navigation
   useEffect(() => {
     const handleNavigation = () => {
+      setHasNavigated(true);
+      sessionStorage.setItem('hasNavigated', 'true');
       setCurrentPath(window.location.pathname);
     };
 
@@ -84,33 +84,31 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
 
   // Persist dark mode preference
   useEffect(() => {
-    if (isClient) {
-      localStorage.setItem('darkMode', String(isDarkMode));
-      document.documentElement.style.backgroundColor = isDarkMode ? '#1A1714' : '#F3EEE7';
-    }
-  }, [isDarkMode, isClient]);
+    localStorage.setItem('darkMode', String(isDarkMode));
+    document.documentElement.style.backgroundColor = isDarkMode ? '#1A1714' : '#F3EEE7';
+  }, [isDarkMode]);
 
   const currentTheme = isDarkMode ? themeConfig.dark : themeConfig.light;
 
   const handleNavClick = (path) => {
-    setCurrentPath(path);
+    if (path !== currentPath) {
+      setHasNavigated(true);
+      sessionStorage.setItem('hasNavigated', 'true');
+      setCurrentPath(path);
+    }
   };
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-  // Spring config matching MVP
-  const springConfig = {
+  // Spring config
+  const springTransition = {
     type: 'spring',
     stiffness: 400,
     damping: 35,
   };
 
-  // No animation on initial load
-  const getTransition = (property) => {
-    if (!isReady) return { duration: 0 };
-    if (property === 'opacity') return { duration: 0.2 };
-    return springConfig;
-  };
+  // Only animate after user has navigated
+  const shouldAnimate = hasNavigated;
 
   return (
     <div
@@ -240,7 +238,7 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
             marginLeft: '10px',
           }}
         >
-          {/* Menu Container - flex: 1 fills the space, items stack inside */}
+          {/* Menu Container */}
           <LayoutGroup>
             <div
               style={{
@@ -251,103 +249,112 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
                 minHeight: 0,
               }}
             >
-              {menuItems.map((item, index) => (
-                <React.Fragment key={item.id}>
-                  {/* Menu Item - no flex-grow, just natural size */}
-                  <motion.a
-                    href={item.path}
-                    onClick={() => handleNavClick(item.path)}
-                    layout
-                    style={{
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flex: '0 0 auto',
-                      paddingLeft: '20px',
-                      paddingRight: '20px',
-                      textDecoration: 'none',
-                    }}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  >
-                    <motion.span
-                      animate={{
-                        color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
-                        fontWeight: index === activeIndex ? 500 : 400,
-                      }}
-                      transition={{ duration: isReady ? 0.3 : 0 }}
-                      style={{
-                        fontSize: '14px',
-                        letterSpacing: '0.2px',
-                        whiteSpace: 'nowrap',
-                        paddingTop: '4px',
-                        paddingBottom: '4px',
-                      }}
-                    >
-                      {item.label}
-                    </motion.span>
-                  </motion.a>
+              {menuItems.map((item, index) => {
+                const isActive = index === activeIndex;
+                const lineVisible = shouldShowLineForIndex(index, activeIndex);
 
-                  {/* Line Segment - flexGrow animates to push items apart */}
-                  {index < menuItems.length - 1 && (
-                    <motion.div
-                      layout
+                return (
+                  <React.Fragment key={item.id}>
+                    {/* Menu Item */}
+                    <motion.a
+                      href={item.path}
+                      onClick={() => handleNavClick(item.path)}
+                      layout={shouldAnimate}
                       style={{
+                        cursor: 'pointer',
+                        userSelect: 'none',
                         display: 'flex',
-                        flexDirection: 'column',
+                        flexDirection: 'row',
                         alignItems: 'center',
-                        overflow: 'hidden',
+                        justifyContent: 'center',
+                        flex: '0 0 auto',
+                        paddingLeft: '20px',
+                        paddingRight: '20px',
+                        textDecoration: 'none',
                       }}
-                      animate={{
-                        flexGrow: shouldShowLine(index) ? 1 : 0,
-                        opacity: shouldShowLine(index) ? 1 : 0,
-                        marginTop: shouldShowLine(index) ? 10 : 0,
-                        marginBottom: shouldShowLine(index) ? 10 : 0,
-                      }}
-                      transition={{
-                        flexGrow: getTransition('flexGrow'),
-                        opacity: getTransition('opacity'),
-                        marginTop: getTransition('marginTop'),
-                        marginBottom: getTransition('marginBottom'),
-                        layout: getTransition('layout'),
-                      }}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                     >
-                      {/* Top dot */}
-                      <div
+                      <span
                         style={{
-                          width: '4px',
-                          height: '4px',
-                          backgroundColor: currentTheme.dot,
-                          borderRadius: '50%',
+                          fontSize: '14px',
+                          letterSpacing: '0.2px',
+                          whiteSpace: 'nowrap',
+                          paddingTop: '4px',
+                          paddingBottom: '4px',
+                          color: isActive ? currentTheme.activeText : currentTheme.inactiveText,
+                          fontWeight: isActive ? 500 : 400,
+                          transition: shouldAnimate ? 'color 0.3s, font-weight 0.3s' : 'none',
                         }}
-                      />
+                      >
+                        {item.label}
+                      </span>
+                    </motion.a>
 
-                      {/* Line */}
-                      <div
+                    {/* Line Segment - render with correct initial state */}
+                    {index < menuItems.length - 1 && (
+                      <motion.div
+                        layout={shouldAnimate}
+                        initial={false}
+                        animate={shouldAnimate ? {
+                          flexGrow: lineVisible ? 1 : 0,
+                          opacity: lineVisible ? 1 : 0,
+                          marginTop: lineVisible ? 10 : 0,
+                          marginBottom: lineVisible ? 10 : 0,
+                        } : undefined}
+                        transition={shouldAnimate ? {
+                          flexGrow: springTransition,
+                          opacity: { duration: 0.2 },
+                          marginTop: springTransition,
+                          marginBottom: springTransition,
+                          layout: springTransition,
+                        } : undefined}
                         style={{
-                          width: '1px',
-                          flex: 1,
-                          minHeight: '8px',
-                          backgroundColor: currentTheme.line,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          overflow: 'hidden',
+                          // Set inline styles for SSR - these are the "truth"
+                          flexGrow: lineVisible ? 1 : 0,
+                          opacity: lineVisible ? 1 : 0,
+                          marginTop: lineVisible ? 10 : 0,
+                          marginBottom: lineVisible ? 10 : 0,
                         }}
-                      />
+                      >
+                        {/* Top dot */}
+                        <div
+                          style={{
+                            width: '4px',
+                            height: '4px',
+                            backgroundColor: currentTheme.dot,
+                            borderRadius: '50%',
+                          }}
+                        />
 
-                      {/* Bottom dot */}
-                      <div
-                        style={{
-                          width: '4px',
-                          height: '4px',
-                          backgroundColor: currentTheme.dot,
-                          borderRadius: '50%',
-                        }}
-                      />
-                    </motion.div>
-                  )}
-                </React.Fragment>
-              ))}
+                        {/* Line */}
+                        <div
+                          style={{
+                            width: '1px',
+                            flex: 1,
+                            minHeight: '8px',
+                            backgroundColor: currentTheme.line,
+                          }}
+                        />
+
+                        {/* Bottom dot */}
+                        <div
+                          style={{
+                            width: '4px',
+                            height: '4px',
+                            backgroundColor: currentTheme.dot,
+                            borderRadius: '50%',
+                          }}
+                        />
+                      </motion.div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </div>
           </LayoutGroup>
 

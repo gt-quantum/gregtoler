@@ -1,6 +1,6 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
-import FluidSpineMenu from '../components/layout/FluidSpineMenu.jsx';
+import SpineNavigation from '../components/layout/SpineNavigation.jsx';
 import '../styles/global.css';
 
 interface Props {
@@ -27,19 +27,66 @@ const currentPath = Astro.url.pathname;
         const stored = localStorage.getItem('darkMode');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const isDark = stored !== null ? stored === 'true' : prefersDark;
-        if (isDark) {
-          document.documentElement.style.backgroundColor = '#1A1714';
-        } else {
-          document.documentElement.style.backgroundColor = '#F3EEE7';
-        }
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        document.documentElement.style.backgroundColor = isDark ? '#1A1714' : '#F3EEE7';
       })();
     </script>
+    <style>
+      .shell-layout {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        transition: background-color 0.3s ease;
+      }
+
+      [data-theme="dark"] .shell-layout {
+        background-color: #1A1714;
+        color: #E8E3DC;
+      }
+
+      [data-theme="light"] .shell-layout {
+        background-color: #F3EEE7;
+        color: #2C2824;
+      }
+
+      .main-container {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .content-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 24px 64px 64px 24px;
+        overflow: auto;
+        margin-left: 147px; /* sidebar width + padding */
+      }
+
+      [data-theme="dark"] .content-area {
+        color: #E8E3DC;
+      }
+
+      [data-theme="light"] .content-area {
+        color: #2C2824;
+      }
+    </style>
   </head>
   <body>
-    <FluidSpineMenu client:load initialPath={currentPath}>
-      <div transition:animate="fade">
-        <slot />
+    <div class="shell-layout">
+      <!-- Navigation shell - PERSISTED across page transitions -->
+      <div transition:persist="spine-nav">
+        <SpineNavigation client:load initialPath={currentPath} />
       </div>
-    </FluidSpineMenu>
+
+      <!-- Content area - TRANSITIONS on navigation -->
+      <div class="main-container">
+        <main class="content-area" transition:animate="fade">
+          <slot />
+        </main>
+      </div>
+    </div>
   </body>
 </html>
