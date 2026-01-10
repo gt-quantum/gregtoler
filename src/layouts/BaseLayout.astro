@@ -36,12 +36,10 @@ const currentPath = Astro.url.pathname;
     </script>
   </head>
   <body>
-    <div transition:persist="shell">
-      <FluidSpineMenu client:load initialPath={currentPath}>
-        <div transition:animate="fade" transition:name="content">
-          <slot />
-        </div>
-      </FluidSpineMenu>
-    </div>
+    <FluidSpineMenu client:load initialPath={currentPath}>
+      <div transition:animate="fade">
+        <slot />
+      </div>
+    </FluidSpineMenu>
   </body>
 </html>
