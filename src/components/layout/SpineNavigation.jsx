@@ -1,5 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Menu item icons for mobile
+const MenuIcons = {
+  home: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  about: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+  work: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  ),
+  content: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
+    </svg>
+  ),
+  resources: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  ),
+};
 
 const menuItems = [
   { id: 'home', label: 'Home', path: '/' },
@@ -29,8 +66,20 @@ const SpineNavigation = ({ initialPath = '/' }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentPath, setCurrentPath] = useState(initialPath);
   const [hasNavigated, setHasNavigated] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const activeIndex = getActiveIndex(currentPath);
+
+  // Check for mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Handle hydration and load preferences
   useEffect(() => {
@@ -125,6 +174,14 @@ const SpineNavigation = ({ initialPath = '/' }) => {
         header > * {
           pointer-events: auto;
         }
+        .mobile-menu-item:hover {
+          background: ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'};
+        }
+        @media (max-width: 768px) {
+          header {
+            padding: 16px 16px 16px 8px !important;
+          }
+        }
       `}</style>
         <a
           href="/"
@@ -148,6 +205,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
         </a>
 
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          {/* Dark mode toggle - always visible */}
           <button
             onClick={toggleDarkMode}
             className="header-btn"
@@ -185,52 +243,164 @@ const SpineNavigation = ({ initialPath = '/' }) => {
             </svg>
           </button>
 
-          <button
-            className="header-btn"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--nav-header-button)',
-              fontSize: '14px',
-              cursor: 'pointer',
-              padding: '8px 12px',
-              opacity: 0.6,
-              fontFamily: 'inherit',
-              transition: 'opacity 0.2s',
-            }}
-          >
-            Services
-          </button>
+          {/* Desktop: Services and Contact buttons */}
+          {!isMobile && (
+            <>
+              <button
+                className="header-btn"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--nav-header-button)',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  padding: '8px 12px',
+                  opacity: 0.6,
+                  fontFamily: 'inherit',
+                  transition: 'opacity 0.2s',
+                }}
+              >
+                Services
+              </button>
 
-          <a
-            href="/contact"
-            className="header-btn"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--nav-header-button)',
-              fontSize: '14px',
-              cursor: 'pointer',
-              padding: '8px 12px',
-              opacity: 0.6,
-              fontFamily: 'inherit',
-              transition: 'opacity 0.2s',
-              textDecoration: 'none',
-            }}
-          >
-            Contact
-          </a>
+              <a
+                href="/contact"
+                className="header-btn"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--nav-header-button)',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  padding: '8px 12px',
+                  opacity: 0.6,
+                  fontFamily: 'inherit',
+                  transition: 'opacity 0.2s',
+                  textDecoration: 'none',
+                }}
+              >
+                Contact
+              </a>
+            </>
+          )}
+
+          {/* Mobile: Hamburger menu */}
+          {isMobile && (
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="header-btn"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--nav-header-button)',
+                cursor: 'pointer',
+                padding: '8px',
+                opacity: 0.6,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'opacity 0.2s',
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {isMobileMenuOpen ? (
+                  <>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </>
+                ) : (
+                  <>
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                  </>
+                )}
+              </svg>
+            </button>
+          )}
         </div>
       </header>
+
+      {/* Mobile dropdown menu */}
+      <AnimatePresence>
+        {isMobile && isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed',
+              top: '77px',
+              right: '16px',
+              background: isDarkMode
+                ? 'rgba(30, 27, 23, 0.95)'
+                : 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              borderRadius: '12px',
+              padding: '8px',
+              boxShadow: isDarkMode
+                ? '0 4px 20px rgba(0, 0, 0, 0.3)'
+                : '0 4px 20px rgba(0, 0, 0, 0.1)',
+              border: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}`,
+              zIndex: 150,
+              minWidth: '160px',
+            }}
+          >
+            <button
+              className="mobile-menu-item"
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '12px 16px',
+                background: 'none',
+                border: 'none',
+                color: isDarkMode ? '#E8E3DC' : '#2C2824',
+                fontSize: '14px',
+                textAlign: 'left',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                transition: 'background 0.2s',
+                fontFamily: 'inherit',
+              }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Services
+            </button>
+            <a
+              href="/contact"
+              className="mobile-menu-item"
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '12px 16px',
+                background: 'none',
+                border: 'none',
+                color: isDarkMode ? '#E8E3DC' : '#2C2824',
+                fontSize: '14px',
+                textAlign: 'left',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                transition: 'background 0.2s',
+                textDecoration: 'none',
+              }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Contact
+            </a>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Sidebar */}
       <aside
         style={{
-          width: '100px',
-          padding: '24px 20px 40px 37px',
+          width: isMobile ? '60px' : '100px',
+          padding: isMobile ? '16px 8px 24px 8px' : '24px 20px 40px 37px',
           display: 'flex',
           flexDirection: 'column',
-          marginLeft: '10px',
+          marginLeft: isMobile ? '0' : '10px',
           position: 'fixed',
           left: 0,
           top: '77px',
@@ -246,6 +416,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
             flex: 1,
             alignItems: 'center',
             minHeight: 0,
+            gap: isMobile ? '8px' : '0',
           }}
         >
           {menuItems.map((item, index) => {
@@ -267,32 +438,52 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     flex: '0 0 auto',
-                    paddingLeft: '20px',
-                    paddingRight: '20px',
+                    padding: isMobile ? '10px' : '4px 20px',
                     textDecoration: 'none',
+                    borderRadius: isMobile ? '10px' : '0',
+                    background: isMobile && isActive
+                      ? (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)')
+                      : 'transparent',
                   }}
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 >
-                  <span
-                    className={isActive ? '' : 'nav-item-inactive'}
-                    style={{
-                      fontSize: '14px',
-                      letterSpacing: '0.2px',
-                      whiteSpace: 'nowrap',
-                      paddingTop: '4px',
-                      paddingBottom: '4px',
-                      color: isActive ? 'var(--nav-active-text)' : 'var(--nav-inactive-text)',
-                      fontWeight: isActive ? 500 : 400,
-                      transition: 'color 0.2s, font-weight 0.3s',
-                    }}
-                  >
-                    {item.label}
-                  </span>
+                  {isMobile ? (
+                    /* Mobile: Show icon */
+                    <span
+                      style={{
+                        color: isActive ? 'var(--nav-active-text)' : 'var(--nav-inactive-text)',
+                        opacity: isActive ? 1 : 0.6,
+                        transition: 'color 0.2s, opacity 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {MenuIcons[item.id]}
+                    </span>
+                  ) : (
+                    /* Desktop: Show text */
+                    <span
+                      className={isActive ? '' : 'nav-item-inactive'}
+                      style={{
+                        fontSize: '14px',
+                        letterSpacing: '0.2px',
+                        whiteSpace: 'nowrap',
+                        paddingTop: '4px',
+                        paddingBottom: '4px',
+                        color: isActive ? 'var(--nav-active-text)' : 'var(--nav-inactive-text)',
+                        fontWeight: isActive ? 500 : 400,
+                        transition: 'color 0.2s, font-weight 0.3s',
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  )}
                 </motion.a>
 
-                {/* Line Segment - flexGrow animates to push items apart */}
-                {index < menuItems.length - 1 && (
+                {/* Line Segment - only show on desktop */}
+                {!isMobile && index < menuItems.length - 1 && (
                   <motion.div
                     initial={false}
                     style={{
@@ -353,11 +544,11 @@ const SpineNavigation = ({ initialPath = '/' }) => {
         {/* Divider */}
         <div
           style={{
-            width: '40px',
+            width: isMobile ? '30px' : '40px',
             height: '1px',
             backgroundColor: 'var(--nav-divider)',
-            marginTop: '20px',
-            marginBottom: '28px',
+            marginTop: isMobile ? '12px' : '20px',
+            marginBottom: isMobile ? '16px' : '28px',
             marginLeft: 'auto',
             marginRight: 'auto',
             transition: 'background-color 0.3s ease',
@@ -369,7 +560,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '24px',
+            gap: isMobile ? '16px' : '24px',
             alignItems: 'center',
           }}
         >

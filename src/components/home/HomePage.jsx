@@ -125,20 +125,25 @@ export default function HomePage({ latestProject, latestApp, latestContent }) {
   const styles = {
     container: {
       width: '100%',
-      height: 'calc(100vh - 120px)', // Account for header
-      minHeight: '500px',
+      // Account for: margin-top 77px + padding-top 48px + padding-bottom 64px = 189px
+      height: 'calc(100vh - 189px)',
+      maxHeight: 'calc(100vh - 189px)',
+      minHeight: '350px',
       fontFamily: "'Source Serif 4', Georgia, serif",
       display: 'flex',
       flexDirection: 'column',
+      overflow: 'hidden',
     },
 
     grid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(12, 1fr)',
-      gridTemplateRows: 'auto 1fr auto', // 3 rows that flex
-      gap: '16px',
+      gridTemplateRows: '1fr 1.5fr 1fr', // 3 rows with proportional heights
+      gap: '12px',
       flex: 1,
       minHeight: 0,
+      maxHeight: '100%',
+      overflow: 'hidden',
     },
 
     // Row 1: Hero (8) + Contact (4)
@@ -205,8 +210,18 @@ export default function HomePage({ latestProject, latestApp, latestContent }) {
       alignItems: 'center',
       justifyContent: 'space-between',
       textDecoration: 'none',
-      background: currentTheme.text,
+      background: isDarkMode
+        ? 'rgba(227, 224, 219, 0.85)'  // Light text color with transparency in dark mode
+        : 'rgba(45, 42, 38, 0.85)',     // Dark text color with transparency in light mode
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
       borderRadius: '16px',
+      border: isDarkMode
+        ? '1px solid rgba(255, 255, 255, 0.1)'
+        : '1px solid rgba(0, 0, 0, 0.05)',
+      boxShadow: isDarkMode
+        ? '0 8px 32px rgba(0, 0, 0, 0.2)'
+        : '0 8px 32px rgba(0, 0, 0, 0.08)',
       color: isDarkMode ? 'rgba(45, 42, 38, 0.5)' : 'rgba(250,249,247,0.5)',
     },
     availabilityBadge: {
@@ -219,8 +234,8 @@ export default function HomePage({ latestProject, latestApp, latestContent }) {
       marginBottom: '10px',
     },
     contactTitle: {
-      fontSize: '1rem',
-      fontWeight: '500',
+      fontSize: '1.125rem',
+      fontWeight: '600',
       color: currentTheme.bg,
       margin: '0 0 4px 0',
     },
@@ -309,9 +324,10 @@ export default function HomePage({ latestProject, latestApp, latestContent }) {
       ...glassCard,
       gridColumn: 'span 7',
       gridRow: '3',
-      padding: '20px',
+      padding: '16px 20px',
       display: 'flex',
       flexDirection: 'column',
+      overflow: 'hidden',
     },
     focusLabel: {
       display: 'block',
@@ -321,17 +337,19 @@ export default function HomePage({ latestProject, latestApp, latestContent }) {
       color: currentTheme.textMuted,
       textTransform: 'uppercase',
       letterSpacing: '0.08em',
-      marginBottom: '16px',
+      marginBottom: '10px',
+      flexShrink: 0,
     },
     focusItems: {
       display: 'flex',
       flexDirection: 'column',
-      gap: '12px',
+      gap: '8px',
+      overflow: 'hidden',
     },
     focusItem: {
       display: 'flex',
       flexDirection: 'column',
-      gap: '2px',
+      gap: '1px',
     },
     focusArea: {
       fontSize: '0.9375rem',
@@ -351,7 +369,7 @@ export default function HomePage({ latestProject, latestApp, latestContent }) {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'flex-end',
-      padding: '20px',
+      padding: '16px 20px',
       position: 'relative',
       overflow: 'hidden',
       backgroundImage: homeConfig.photographyImage ? `url(${homeConfig.photographyImage})` : 'none',
@@ -593,70 +611,68 @@ export default function HomePage({ latestProject, latestApp, latestContent }) {
 
       {/* Responsive styles */}
       <style>{`
-        @media (max-width: 1000px) {
+        /* Desktop: ensure no scroll */
+        @media (min-width: 1001px) {
+          .home-container {
+            height: calc(100vh - 189px) !important;
+            max-height: calc(100vh - 189px) !important;
+            overflow: hidden !important;
+          }
           .home-grid {
-            grid-template-columns: repeat(8, 1fr) !important;
-            grid-template-rows: auto 1fr auto !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
           }
-          .hero-card {
-            grid-column: span 8 !important;
-            grid-row: 1 !important;
+        }
+        @media (max-width: 1200px) and (min-width: 769px) {
+          .home-container {
+            /* padding: 40px top + 48px bottom + 77px margin = 165px */
+            height: calc(100vh - 165px) !important;
+            max-height: calc(100vh - 165px) !important;
           }
-          .contact-card {
-            grid-column: span 8 !important;
-            grid-row: 2 !important;
+        }
+        @media (max-width: 1000px) and (min-width: 769px) {
+          .home-container {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
           }
-          .cms-card {
-            grid-column: span 4 !important;
-            grid-row: auto !important;
+          .home-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            overflow: visible !important;
           }
-          .focus-card {
-            grid-column: span 8 !important;
-            grid-row: auto !important;
-          }
+          .hero-card,
+          .contact-card,
+          .cms-card,
+          .focus-card,
           .photo-card {
-            grid-column: span 8 !important;
-            grid-row: auto !important;
+            min-height: 100px !important;
           }
         }
         @media (max-width: 768px) {
           .home-container {
             height: auto !important;
+            max-height: none !important;
             min-height: auto !important;
             padding-bottom: 40px !important;
+            overflow: visible !important;
           }
           .home-grid {
             display: flex !important;
             flex-direction: column !important;
             gap: 16px !important;
+            overflow: visible !important;
           }
           .hero-card,
           .contact-card,
           .focus-card,
           .photo-card {
-            min-height: 120px !important;
+            min-height: 100px !important;
           }
           .cms-card {
-            min-height: 140px !important;
-          }
-          .mobile-scroll-row {
-            display: flex !important;
-            flex-direction: row !important;
-            gap: 12px !important;
-            overflow-x: auto !important;
-            scroll-snap-type: x mandatory !important;
-            -webkit-overflow-scrolling: touch !important;
-            padding-bottom: 8px !important;
-            margin: 0 -16px !important;
-            padding-left: 16px !important;
-            padding-right: 16px !important;
-          }
-          .mobile-scroll-row > * {
-            flex: 0 0 280px !important;
-            scroll-snap-align: start !important;
-          }
-          .mobile-scroll-row::-webkit-scrollbar {
-            display: none !important;
+            min-height: 120px !important;
           }
         }
       `}</style>
