@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, LayoutGroup } from 'framer-motion';
 import { theme as themeConfig } from '../../lib/theme';
 
 const menuItems = [
@@ -10,10 +10,6 @@ const menuItems = [
   { id: 'resources', label: 'Resources', path: '/resources' },
 ];
 
-const ITEM_HEIGHT = 28; // Fixed height for each menu item
-const LINE_HEIGHT = 80; // Height of connecting line when visible
-const DOT_SIZE = 4;
-
 const getActiveIndex = (path) => {
   return menuItems.findIndex((item) => {
     if (item.path === '/') {
@@ -23,37 +19,27 @@ const getActiveIndex = (path) => {
   });
 };
 
-// GPU-accelerated spring config
-const smoothSpring = {
-  type: 'spring',
-  stiffness: 300,
-  damping: 30,
-  mass: 1,
-};
-
 const FluidSpineMenu = ({ children, initialPath = '/' }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [currentPath, setCurrentPath] = useState(initialPath);
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
-  const prevActiveIndex = useRef(getActiveIndex(initialPath));
+  const [isReady, setIsReady] = useState(false);
+  const mountedRef = useRef(false);
 
   const activeIndex = getActiveIndex(currentPath);
 
-  // Precompute which lines should be visible
-  const lineVisibility = useMemo(() => {
-    return menuItems.slice(0, -1).map((_, index) => {
-      if (index === activeIndex - 1) return true;
-      if (index === activeIndex && activeIndex < menuItems.length - 1) return true;
-      return false;
-    });
-  }, [activeIndex]);
+  // Determine if line segment should be visible
+  const shouldShowLine = (afterIndex) => {
+    if (afterIndex === activeIndex - 1) return true;
+    if (afterIndex === activeIndex && activeIndex < menuItems.length - 1) return true;
+    return false;
+  };
 
   // Handle hydration and load preferences
   useEffect(() => {
     setIsClient(true);
 
+    // Load dark mode preference
     const stored = localStorage.getItem('darkMode');
     if (stored !== null) {
       setIsDarkMode(stored === 'true');
@@ -62,39 +48,41 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
       setIsDarkMode(prefersDark);
     }
 
-    const wasInitialized = sessionStorage.getItem('menuInitialized');
-    if (wasInitialized) {
-      setHasInitialized(true);
+    // Sync path with URL
+    setCurrentPath(window.location.pathname);
+
+    // Check if already mounted before (skip entrance animation)
+    if (sessionStorage.getItem('menuMounted')) {
+      setIsReady(true);
     } else {
-      sessionStorage.setItem('menuInitialized', 'true');
-      // Use double RAF for smoother initial state
+      sessionStorage.setItem('menuMounted', 'true');
+      // Delay to let initial render complete without animation
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          setHasInitialized(true);
+          setIsReady(true);
         });
       });
     }
 
-    setCurrentPath(window.location.pathname);
+    mountedRef.current = true;
   }, []);
 
-  // Listen for navigation events
+  // Listen for View Transitions navigation
   useEffect(() => {
-    const handlePageLoad = () => {
-      prevActiveIndex.current = activeIndex;
+    const handleNavigation = () => {
       setCurrentPath(window.location.pathname);
     };
 
-    document.addEventListener('astro:page-load', handlePageLoad);
-    window.addEventListener('popstate', handlePageLoad);
+    document.addEventListener('astro:page-load', handleNavigation);
+    window.addEventListener('popstate', handleNavigation);
 
     return () => {
-      document.removeEventListener('astro:page-load', handlePageLoad);
-      window.removeEventListener('popstate', handlePageLoad);
+      document.removeEventListener('astro:page-load', handleNavigation);
+      window.removeEventListener('popstate', handleNavigation);
     };
-  }, [activeIndex]);
+  }, []);
 
-  // Persist dark mode
+  // Persist dark mode preference
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('darkMode', String(isDarkMode));
@@ -102,26 +90,27 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
     }
   }, [isDarkMode, isClient]);
 
-  // Update previous index after animation
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      prevActiveIndex.current = activeIndex;
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [activeIndex]);
-
   const currentTheme = isDarkMode ? themeConfig.dark : themeConfig.light;
 
-  const handleNavClick = (e, path) => {
-    prevActiveIndex.current = activeIndex;
+  const handleNavClick = (path) => {
     setCurrentPath(path);
   };
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-  // Determine animation behavior
-  const shouldAnimate = hasInitialized && !prefersReducedMotion;
-  const instantTransition = { duration: 0 };
+  // Spring config matching MVP
+  const springConfig = {
+    type: 'spring',
+    stiffness: 400,
+    damping: 35,
+  };
+
+  // No animation on initial load
+  const getTransition = (property) => {
+    if (!isReady) return { duration: 0 };
+    if (property === 'opacity') return { duration: 0.2 };
+    return springConfig;
+  };
 
   return (
     <div
@@ -146,8 +135,8 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
       >
         <a
           href="/"
+          onClick={() => handleNavClick('/')}
           style={{ textDecoration: 'none' }}
-          onClick={(e) => handleNavClick(e, '/')}
         >
           <img
             src="/logo.png"
@@ -178,11 +167,11 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              opacity: 0.6,
               fontFamily: 'inherit',
             }}
-            initial={{ opacity: 0.6 }}
             whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.2 }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               {isDarkMode ? (
@@ -211,11 +200,11 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
               fontSize: '14px',
               cursor: 'pointer',
               padding: '8px 12px',
+              opacity: 0.6,
               fontFamily: 'inherit',
             }}
-            initial={{ opacity: 0.6 }}
             whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.2 }}
           >
             Services
           </motion.button>
@@ -228,11 +217,11 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
               fontSize: '14px',
               cursor: 'pointer',
               padding: '8px 12px',
+              opacity: 0.6,
               fontFamily: 'inherit',
             }}
-            initial={{ opacity: 0.6 }}
             whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.2 }}
           >
             Contact
           </motion.button>
@@ -251,102 +240,89 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
             marginLeft: '10px',
           }}
         >
-          {/* Menu Container */}
-          <nav
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              flex: 1,
-              alignItems: 'center',
-              minHeight: 0,
-            }}
-          >
-            {menuItems.map((item, index) => (
-              <React.Fragment key={item.id}>
-                {/* Menu Item */}
-                <motion.a
-                  href={item.path}
-                  onClick={(e) => handleNavClick(e, item.path)}
-                  style={{
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: ITEM_HEIGHT,
-                    paddingLeft: '20px',
-                    paddingRight: '20px',
-                    textDecoration: 'none',
-                    willChange: 'transform',
-                  }}
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                >
-                  <motion.span
+          {/* Menu Container - flex: 1 fills the space, items stack inside */}
+          <LayoutGroup>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                alignItems: 'center',
+                minHeight: 0,
+              }}
+            >
+              {menuItems.map((item, index) => (
+                <React.Fragment key={item.id}>
+                  {/* Menu Item - no flex-grow, just natural size */}
+                  <motion.a
+                    href={item.path}
+                    onClick={() => handleNavClick(item.path)}
+                    layout
                     style={{
-                      fontSize: '14px',
-                      letterSpacing: '0.2px',
-                      whiteSpace: 'nowrap',
-                      willChange: 'opacity',
-                    }}
-                    initial={!shouldAnimate ? {
-                      color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
-                      fontWeight: index === activeIndex ? 500 : 400,
-                    } : false}
-                    animate={{
-                      color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
-                      fontWeight: index === activeIndex ? 500 : 400,
-                    }}
-                    transition={shouldAnimate ? { duration: 0.2 } : instantTransition}
-                  >
-                    {item.label}
-                  </motion.span>
-                </motion.a>
-
-                {/* Line Segment - GPU accelerated */}
-                {index < menuItems.length - 1 && (
-                  <div
-                    style={{
-                      position: 'relative',
-                      width: '20px',
+                      cursor: 'pointer',
+                      userSelect: 'none',
                       display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
                       justifyContent: 'center',
-                      overflow: 'hidden',
+                      flex: '0 0 auto',
+                      paddingLeft: '20px',
+                      paddingRight: '20px',
+                      textDecoration: 'none',
                     }}
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                   >
+                    <motion.span
+                      animate={{
+                        color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
+                        fontWeight: index === activeIndex ? 500 : 400,
+                      }}
+                      transition={{ duration: isReady ? 0.3 : 0 }}
+                      style={{
+                        fontSize: '14px',
+                        letterSpacing: '0.2px',
+                        whiteSpace: 'nowrap',
+                        paddingTop: '4px',
+                        paddingBottom: '4px',
+                      }}
+                    >
+                      {item.label}
+                    </motion.span>
+                  </motion.a>
+
+                  {/* Line Segment - flexGrow animates to push items apart */}
+                  {index < menuItems.length - 1 && (
                     <motion.div
+                      layout
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        transformOrigin: 'center top',
-                        willChange: 'transform, opacity',
+                        overflow: 'hidden',
                       }}
-                      initial={!shouldAnimate ? {
-                        opacity: lineVisibility[index] ? 1 : 0,
-                        scaleY: lineVisibility[index] ? 1 : 0,
-                        height: lineVisibility[index] ? LINE_HEIGHT : 0,
-                      } : false}
                       animate={{
-                        opacity: lineVisibility[index] ? 1 : 0,
-                        scaleY: lineVisibility[index] ? 1 : 0,
-                        height: lineVisibility[index] ? LINE_HEIGHT : 0,
+                        flexGrow: shouldShowLine(index) ? 1 : 0,
+                        opacity: shouldShowLine(index) ? 1 : 0,
+                        marginTop: shouldShowLine(index) ? 10 : 0,
+                        marginBottom: shouldShowLine(index) ? 10 : 0,
                       }}
-                      transition={shouldAnimate ? smoothSpring : instantTransition}
+                      transition={{
+                        flexGrow: getTransition('flexGrow'),
+                        opacity: getTransition('opacity'),
+                        marginTop: getTransition('marginTop'),
+                        marginBottom: getTransition('marginBottom'),
+                        layout: getTransition('layout'),
+                      }}
                     >
                       {/* Top dot */}
-                      <motion.div
+                      <div
                         style={{
-                          width: DOT_SIZE,
-                          height: DOT_SIZE,
+                          width: '4px',
+                          height: '4px',
                           backgroundColor: currentTheme.dot,
                           borderRadius: '50%',
-                          flexShrink: 0,
-                          willChange: 'transform',
                         }}
-                        initial={!shouldAnimate ? { scale: lineVisibility[index] ? 1 : 0 } : false}
-                        animate={{ scale: lineVisibility[index] ? 1 : 0 }}
-                        transition={shouldAnimate ? { ...smoothSpring, delay: lineVisibility[index] ? 0.05 : 0 } : instantTransition}
                       />
 
                       {/* Line */}
@@ -360,25 +336,20 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
                       />
 
                       {/* Bottom dot */}
-                      <motion.div
+                      <div
                         style={{
-                          width: DOT_SIZE,
-                          height: DOT_SIZE,
+                          width: '4px',
+                          height: '4px',
                           backgroundColor: currentTheme.dot,
                           borderRadius: '50%',
-                          flexShrink: 0,
-                          willChange: 'transform',
                         }}
-                        initial={!shouldAnimate ? { scale: lineVisibility[index] ? 1 : 0 } : false}
-                        animate={{ scale: lineVisibility[index] ? 1 : 0 }}
-                        transition={shouldAnimate ? { ...smoothSpring, delay: lineVisibility[index] ? 0.1 : 0 } : instantTransition}
                       />
                     </motion.div>
-                  </div>
-                )}
-              </React.Fragment>
-            ))}
-          </nav>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </LayoutGroup>
 
           {/* Divider */}
           <div
@@ -413,10 +384,9 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
-                willChange: 'opacity',
               }}
               whileHover={{ color: currentTheme.text }}
-              transition={{ duration: 0.15 }}
+              transition={{ duration: 0.2 }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
@@ -433,10 +403,9 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
-                willChange: 'opacity',
               }}
               whileHover={{ color: currentTheme.text }}
-              transition={{ duration: 0.15 }}
+              transition={{ duration: 0.2 }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
