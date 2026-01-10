@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { theme as themeConfig, animation } from '../../lib/theme';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { theme as themeConfig } from '../../lib/theme';
 
 const menuItems = [
   { id: 'home', label: 'Home', path: '/' },
@@ -9,6 +9,10 @@ const menuItems = [
   { id: 'content', label: 'Content', path: '/content' },
   { id: 'resources', label: 'Resources', path: '/resources' },
 ];
+
+const ITEM_HEIGHT = 28; // Fixed height for each menu item
+const LINE_HEIGHT = 80; // Height of connecting line when visible
+const DOT_SIZE = 4;
 
 const getActiveIndex = (path) => {
   return menuItems.findIndex((item) => {
@@ -19,20 +23,37 @@ const getActiveIndex = (path) => {
   });
 };
 
+// GPU-accelerated spring config
+const smoothSpring = {
+  type: 'spring',
+  stiffness: 300,
+  damping: 30,
+  mass: 1,
+};
+
 const FluidSpineMenu = ({ children, initialPath = '/' }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [currentPath, setCurrentPath] = useState(initialPath);
   const [hasInitialized, setHasInitialized] = useState(false);
-  const isFirstRender = useRef(true);
+  const prefersReducedMotion = useReducedMotion();
+  const prevActiveIndex = useRef(getActiveIndex(initialPath));
 
   const activeIndex = getActiveIndex(currentPath);
+
+  // Precompute which lines should be visible
+  const lineVisibility = useMemo(() => {
+    return menuItems.slice(0, -1).map((_, index) => {
+      if (index === activeIndex - 1) return true;
+      if (index === activeIndex && activeIndex < menuItems.length - 1) return true;
+      return false;
+    });
+  }, [activeIndex]);
 
   // Handle hydration and load preferences
   useEffect(() => {
     setIsClient(true);
 
-    // Load dark mode preference
     const stored = localStorage.getItem('darkMode');
     if (stored !== null) {
       setIsDarkMode(stored === 'true');
@@ -41,101 +62,66 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
       setIsDarkMode(prefersDark);
     }
 
-    // Check if we've already initialized (persisted component)
     const wasInitialized = sessionStorage.getItem('menuInitialized');
     if (wasInitialized) {
       setHasInitialized(true);
-      isFirstRender.current = false;
     } else {
       sessionStorage.setItem('menuInitialized', 'true');
-      // Small delay to allow initial render, then mark as initialized
+      // Use double RAF for smoother initial state
       requestAnimationFrame(() => {
-        setHasInitialized(true);
+        requestAnimationFrame(() => {
+          setHasInitialized(true);
+        });
       });
     }
 
-    // Sync current path with actual URL (in case component was persisted)
     setCurrentPath(window.location.pathname);
   }, []);
 
-  // Listen for View Transitions navigation
+  // Listen for navigation events
   useEffect(() => {
     const handlePageLoad = () => {
+      prevActiveIndex.current = activeIndex;
       setCurrentPath(window.location.pathname);
     };
 
-    // Astro View Transitions events
     document.addEventListener('astro:page-load', handlePageLoad);
-
-    // Also listen for popstate (browser back/forward)
     window.addEventListener('popstate', handlePageLoad);
 
     return () => {
       document.removeEventListener('astro:page-load', handlePageLoad);
       window.removeEventListener('popstate', handlePageLoad);
     };
-  }, []);
+  }, [activeIndex]);
 
-  // Persist dark mode preference
+  // Persist dark mode
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('darkMode', String(isDarkMode));
-      // Update document background for theme
       document.documentElement.style.backgroundColor = isDarkMode ? '#1A1714' : '#F3EEE7';
     }
   }, [isDarkMode, isClient]);
 
-  // Mark first render complete after mount
+  // Update previous index after animation
   useEffect(() => {
-    if (isFirstRender.current) {
-      const timer = setTimeout(() => {
-        isFirstRender.current = false;
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+    const timer = setTimeout(() => {
+      prevActiveIndex.current = activeIndex;
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [activeIndex]);
 
   const currentTheme = isDarkMode ? themeConfig.dark : themeConfig.light;
 
-  // Determine if line segment should be visible
-  const shouldShowLine = useCallback((afterIndex) => {
-    if (afterIndex === activeIndex - 1) return true;
-    if (afterIndex === activeIndex && activeIndex < menuItems.length - 1) return true;
-    return false;
-  }, [activeIndex]);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  // Handle navigation click - update state immediately for smooth animation
   const handleNavClick = (e, path) => {
-    // Update path state immediately to trigger menu animation
+    prevActiveIndex.current = activeIndex;
     setCurrentPath(path);
-    // Let View Transitions handle the actual navigation
   };
 
-  // Animation variants - skip initial animation if already initialized
-  const getLineAnimation = (index) => {
-    const isVisible = shouldShowLine(index);
+  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-    // On first render, start at final position (no animation)
-    if (!hasInitialized) {
-      return {
-        flexGrow: isVisible ? 1 : 0,
-        opacity: isVisible ? 1 : 0,
-        marginTop: isVisible ? 10 : 0,
-        marginBottom: isVisible ? 10 : 0,
-      };
-    }
-
-    return {
-      flexGrow: isVisible ? 1 : 0,
-      opacity: isVisible ? 1 : 0,
-      marginTop: isVisible ? 10 : 0,
-      marginBottom: isVisible ? 10 : 0,
-    };
-  };
+  // Determine animation behavior
+  const shouldAnimate = hasInitialized && !prefersReducedMotion;
+  const instantTransition = { duration: 0 };
 
   return (
     <div
@@ -158,7 +144,6 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
           backgroundColor: 'transparent',
         }}
       >
-        {/* Logo */}
         <a
           href="/"
           style={{ textDecoration: 'none' }}
@@ -180,15 +165,7 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
           />
         </a>
 
-        {/* Header Actions */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '24px',
-            alignItems: 'center',
-          }}
-        >
-          {/* Dark Mode Toggle */}
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
           <motion.button
             onClick={toggleDarkMode}
             style={{
@@ -201,11 +178,11 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              opacity: 0.6,
               fontFamily: 'inherit',
             }}
+            initial={{ opacity: 0.6 }}
             whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               {isDarkMode ? (
@@ -226,7 +203,6 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
             </svg>
           </motion.button>
 
-          {/* Services Button */}
           <motion.button
             style={{
               background: 'none',
@@ -235,16 +211,15 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
               fontSize: '14px',
               cursor: 'pointer',
               padding: '8px 12px',
-              opacity: 0.6,
               fontFamily: 'inherit',
             }}
+            initial={{ opacity: 0.6 }}
             whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           >
             Services
           </motion.button>
 
-          {/* Contact Button */}
           <motion.button
             style={{
               background: 'none',
@@ -253,11 +228,11 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
               fontSize: '14px',
               cursor: 'pointer',
               padding: '8px 12px',
-              opacity: 0.6,
               fontFamily: 'inherit',
             }}
+            initial={{ opacity: 0.6 }}
             whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           >
             Contact
           </motion.button>
@@ -265,13 +240,7 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
       </header>
 
       {/* Main Container */}
-      <div
-        style={{
-          display: 'flex',
-          flex: 1,
-          overflow: 'hidden',
-        }}
-      >
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Sidebar */}
         <aside
           style={{
@@ -283,7 +252,7 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
           }}
         >
           {/* Menu Container */}
-          <div
+          <nav
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -302,91 +271,114 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
                     cursor: 'pointer',
                     userSelect: 'none',
                     display: 'flex',
-                    flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    flex: '0 0 auto',
+                    height: ITEM_HEIGHT,
                     paddingLeft: '20px',
                     paddingRight: '20px',
                     textDecoration: 'none',
+                    willChange: 'transform',
                   }}
                   whileHover={{ scale: 1.02 }}
-                  transition={animation.spring}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 >
                   <motion.span
-                    animate={{
-                      color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
-                      fontWeight: index === activeIndex ? 500 : 400,
-                    }}
-                    initial={!hasInitialized ? {
-                      color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
-                      fontWeight: index === activeIndex ? 500 : 400,
-                    } : false}
-                    transition={{ duration: 0.3 }}
                     style={{
                       fontSize: '14px',
                       letterSpacing: '0.2px',
                       whiteSpace: 'nowrap',
-                      paddingTop: '4px',
-                      paddingBottom: '4px',
+                      willChange: 'opacity',
                     }}
+                    initial={!shouldAnimate ? {
+                      color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
+                      fontWeight: index === activeIndex ? 500 : 400,
+                    } : false}
+                    animate={{
+                      color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
+                      fontWeight: index === activeIndex ? 500 : 400,
+                    }}
+                    transition={shouldAnimate ? { duration: 0.2 } : instantTransition}
                   >
                     {item.label}
                   </motion.span>
                 </motion.a>
 
-                {/* Line Segment */}
+                {/* Line Segment - GPU accelerated */}
                 {index < menuItems.length - 1 && (
-                  <motion.div
+                  <div
                     style={{
+                      position: 'relative',
+                      width: '20px',
                       display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
+                      justifyContent: 'center',
                       overflow: 'hidden',
                     }}
-                    initial={!hasInitialized ? getLineAnimation(index) : false}
-                    animate={getLineAnimation(index)}
-                    transition={hasInitialized ? {
-                      flexGrow: animation.spring,
-                      opacity: animation.fade,
-                      marginTop: animation.spring,
-                      marginBottom: animation.spring,
-                    } : { duration: 0 }}
                   >
-                    {/* Top dot */}
-                    <div
+                    <motion.div
                       style={{
-                        width: '4px',
-                        height: '4px',
-                        backgroundColor: currentTheme.dot,
-                        borderRadius: '50%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        transformOrigin: 'center top',
+                        willChange: 'transform, opacity',
                       }}
-                    />
+                      initial={!shouldAnimate ? {
+                        opacity: lineVisibility[index] ? 1 : 0,
+                        scaleY: lineVisibility[index] ? 1 : 0,
+                        height: lineVisibility[index] ? LINE_HEIGHT : 0,
+                      } : false}
+                      animate={{
+                        opacity: lineVisibility[index] ? 1 : 0,
+                        scaleY: lineVisibility[index] ? 1 : 0,
+                        height: lineVisibility[index] ? LINE_HEIGHT : 0,
+                      }}
+                      transition={shouldAnimate ? smoothSpring : instantTransition}
+                    >
+                      {/* Top dot */}
+                      <motion.div
+                        style={{
+                          width: DOT_SIZE,
+                          height: DOT_SIZE,
+                          backgroundColor: currentTheme.dot,
+                          borderRadius: '50%',
+                          flexShrink: 0,
+                          willChange: 'transform',
+                        }}
+                        initial={!shouldAnimate ? { scale: lineVisibility[index] ? 1 : 0 } : false}
+                        animate={{ scale: lineVisibility[index] ? 1 : 0 }}
+                        transition={shouldAnimate ? { ...smoothSpring, delay: lineVisibility[index] ? 0.05 : 0 } : instantTransition}
+                      />
 
-                    {/* Line */}
-                    <div
-                      style={{
-                        width: '1px',
-                        flex: 1,
-                        minHeight: '8px',
-                        backgroundColor: currentTheme.line,
-                      }}
-                    />
+                      {/* Line */}
+                      <div
+                        style={{
+                          width: '1px',
+                          flex: 1,
+                          minHeight: '8px',
+                          backgroundColor: currentTheme.line,
+                        }}
+                      />
 
-                    {/* Bottom dot */}
-                    <div
-                      style={{
-                        width: '4px',
-                        height: '4px',
-                        backgroundColor: currentTheme.dot,
-                        borderRadius: '50%',
-                      }}
-                    />
-                  </motion.div>
+                      {/* Bottom dot */}
+                      <motion.div
+                        style={{
+                          width: DOT_SIZE,
+                          height: DOT_SIZE,
+                          backgroundColor: currentTheme.dot,
+                          borderRadius: '50%',
+                          flexShrink: 0,
+                          willChange: 'transform',
+                        }}
+                        initial={!shouldAnimate ? { scale: lineVisibility[index] ? 1 : 0 } : false}
+                        animate={{ scale: lineVisibility[index] ? 1 : 0 }}
+                        transition={shouldAnimate ? { ...smoothSpring, delay: lineVisibility[index] ? 0.1 : 0 } : instantTransition}
+                      />
+                    </motion.div>
+                  </div>
                 )}
               </React.Fragment>
             ))}
-          </div>
+          </nav>
 
           {/* Divider */}
           <div
@@ -411,7 +403,6 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
               alignItems: 'center',
             }}
           >
-            {/* LinkedIn */}
             <motion.a
               href="https://linkedin.com/in/gregtoler"
               target="_blank"
@@ -422,16 +413,16 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
+                willChange: 'opacity',
               }}
               whileHover={{ color: currentTheme.text }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15 }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
               </svg>
             </motion.a>
 
-            {/* YouTube */}
             <motion.a
               href="https://youtube.com/@gregtoler"
               target="_blank"
@@ -442,9 +433,10 @@ const FluidSpineMenu = ({ children, initialPath = '/' }) => {
                 textDecoration: 'none',
                 display: 'flex',
                 alignItems: 'center',
+                willChange: 'opacity',
               }}
               whileHover={{ color: currentTheme.text }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15 }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
