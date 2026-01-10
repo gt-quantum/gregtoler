@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
 import FluidSpineMenu from '../components/layout/FluidSpineMenu.jsx';
 import '../styles/global.css';
 
@@ -19,6 +20,7 @@ const currentPath = Astro.url.pathname;
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title} | GT Strategies</title>
+    <ViewTransitions />
     <script is:inline>
       // Prevent flash of wrong theme
       (function() {
@@ -34,8 +36,12 @@ const currentPath = Astro.url.pathname;
     </script>
   </head>
   <body>
-    <FluidSpineMenu client:load currentPath={currentPath}>
-      <slot />
-    </FluidSpineMenu>
+    <div transition:persist="shell">
+      <FluidSpineMenu client:load initialPath={currentPath}>
+        <div transition:animate="fade" transition:name="content">
+          <slot />
+        </div>
+      </FluidSpineMenu>
+    </div>
   </body>
 </html>

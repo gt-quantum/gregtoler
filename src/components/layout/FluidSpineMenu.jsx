@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { theme as themeConfig, animation } from '../../lib/theme';
 
@@ -10,50 +10,131 @@ const menuItems = [
   { id: 'resources', label: 'Resources', path: '/resources' },
 ];
 
-const FluidSpineMenu = ({ children, currentPath = '/' }) => {
+const getActiveIndex = (path) => {
+  return menuItems.findIndex((item) => {
+    if (item.path === '/') {
+      return path === '/' || path === '';
+    }
+    return path.startsWith(item.path);
+  });
+};
+
+const FluidSpineMenu = ({ children, initialPath = '/' }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [currentPath, setCurrentPath] = useState(initialPath);
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const isFirstRender = useRef(true);
 
-  // Get active index based on current path
-  const activeIndex = menuItems.findIndex((item) => {
-    if (item.path === '/') {
-      return currentPath === '/';
-    }
-    return currentPath.startsWith(item.path);
-  });
+  const activeIndex = getActiveIndex(currentPath);
 
-  // Handle hydration and load dark mode preference
+  // Handle hydration and load preferences
   useEffect(() => {
     setIsClient(true);
+
+    // Load dark mode preference
     const stored = localStorage.getItem('darkMode');
     if (stored !== null) {
       setIsDarkMode(stored === 'true');
     } else {
-      // Check system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDarkMode(prefersDark);
     }
+
+    // Check if we've already initialized (persisted component)
+    const wasInitialized = sessionStorage.getItem('menuInitialized');
+    if (wasInitialized) {
+      setHasInitialized(true);
+      isFirstRender.current = false;
+    } else {
+      sessionStorage.setItem('menuInitialized', 'true');
+      // Small delay to allow initial render, then mark as initialized
+      requestAnimationFrame(() => {
+        setHasInitialized(true);
+      });
+    }
+
+    // Sync current path with actual URL (in case component was persisted)
+    setCurrentPath(window.location.pathname);
+  }, []);
+
+  // Listen for View Transitions navigation
+  useEffect(() => {
+    const handlePageLoad = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    // Astro View Transitions events
+    document.addEventListener('astro:page-load', handlePageLoad);
+
+    // Also listen for popstate (browser back/forward)
+    window.addEventListener('popstate', handlePageLoad);
+
+    return () => {
+      document.removeEventListener('astro:page-load', handlePageLoad);
+      window.removeEventListener('popstate', handlePageLoad);
+    };
   }, []);
 
   // Persist dark mode preference
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('darkMode', String(isDarkMode));
+      // Update document background for theme
+      document.documentElement.style.backgroundColor = isDarkMode ? '#1A1714' : '#F3EEE7';
     }
   }, [isDarkMode, isClient]);
+
+  // Mark first render complete after mount
+  useEffect(() => {
+    if (isFirstRender.current) {
+      const timer = setTimeout(() => {
+        isFirstRender.current = false;
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const currentTheme = isDarkMode ? themeConfig.dark : themeConfig.light;
 
   // Determine if line segment should be visible
-  // Lines appear IMMEDIATELY ADJACENT to active item (both above AND below)
-  const shouldShowLine = (afterIndex) => {
+  const shouldShowLine = useCallback((afterIndex) => {
     if (afterIndex === activeIndex - 1) return true;
     if (afterIndex === activeIndex && activeIndex < menuItems.length - 1) return true;
     return false;
-  };
+  }, [activeIndex]);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  // Handle navigation click - update state immediately for smooth animation
+  const handleNavClick = (e, path) => {
+    // Update path state immediately to trigger menu animation
+    setCurrentPath(path);
+    // Let View Transitions handle the actual navigation
+  };
+
+  // Animation variants - skip initial animation if already initialized
+  const getLineAnimation = (index) => {
+    const isVisible = shouldShowLine(index);
+
+    // On first render, start at final position (no animation)
+    if (!hasInitialized) {
+      return {
+        flexGrow: isVisible ? 1 : 0,
+        opacity: isVisible ? 1 : 0,
+        marginTop: isVisible ? 10 : 0,
+        marginBottom: isVisible ? 10 : 0,
+      };
+    }
+
+    return {
+      flexGrow: isVisible ? 1 : 0,
+      opacity: isVisible ? 1 : 0,
+      marginTop: isVisible ? 10 : 0,
+      marginBottom: isVisible ? 10 : 0,
+    };
   };
 
   return (
@@ -78,7 +159,11 @@ const FluidSpineMenu = ({ children, currentPath = '/' }) => {
         }}
       >
         {/* Logo */}
-        <a href="/" style={{ textDecoration: 'none' }}>
+        <a
+          href="/"
+          style={{ textDecoration: 'none' }}
+          onClick={(e) => handleNavClick(e, '/')}
+        >
           <img
             src="/logo.png"
             alt="GT Strategies"
@@ -212,6 +297,7 @@ const FluidSpineMenu = ({ children, currentPath = '/' }) => {
                 {/* Menu Item */}
                 <motion.a
                   href={item.path}
+                  onClick={(e) => handleNavClick(e, item.path)}
                   style={{
                     cursor: 'pointer',
                     userSelect: 'none',
@@ -232,6 +318,10 @@ const FluidSpineMenu = ({ children, currentPath = '/' }) => {
                       color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
                       fontWeight: index === activeIndex ? 500 : 400,
                     }}
+                    initial={!hasInitialized ? {
+                      color: index === activeIndex ? currentTheme.activeText : currentTheme.inactiveText,
+                      fontWeight: index === activeIndex ? 500 : 400,
+                    } : false}
                     transition={{ duration: 0.3 }}
                     style={{
                       fontSize: '14px',
@@ -254,18 +344,14 @@ const FluidSpineMenu = ({ children, currentPath = '/' }) => {
                       alignItems: 'center',
                       overflow: 'hidden',
                     }}
-                    animate={{
-                      flexGrow: shouldShowLine(index) ? 1 : 0,
-                      opacity: shouldShowLine(index) ? 1 : 0,
-                      marginTop: shouldShowLine(index) ? 10 : 0,
-                      marginBottom: shouldShowLine(index) ? 10 : 0,
-                    }}
-                    transition={{
+                    initial={!hasInitialized ? getLineAnimation(index) : false}
+                    animate={getLineAnimation(index)}
+                    transition={hasInitialized ? {
                       flexGrow: animation.spring,
                       opacity: animation.fade,
                       marginTop: animation.spring,
                       marginBottom: animation.spring,
-                    }}
+                    } : { duration: 0 }}
                   >
                     {/* Top dot */}
                     <div
@@ -375,20 +461,10 @@ const FluidSpineMenu = ({ children, currentPath = '/' }) => {
             flexDirection: 'column',
             padding: '24px 64px 64px 24px',
             overflow: 'auto',
+            color: currentTheme.text,
           }}
         >
-          <motion.div
-            key={currentPath}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={animation.spring}
-            style={{
-              flex: 1,
-              color: currentTheme.text,
-            }}
-          >
-            {children}
-          </motion.div>
+          {children}
         </main>
       </div>
     </div>
