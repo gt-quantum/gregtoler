@@ -65,7 +65,7 @@
   padding-left: 24px;
   margin: 32px 0;
   font-style: italic;
-  color: var(--prose-muted, #6B6560);
+  color: var(--prose-muted, #5C5752);
 }
 
 .prose-content blockquote p {
@@ -162,7 +162,7 @@
 
 .prose-content figcaption {
   font-size: 0.875rem;
-  color: var(--prose-muted, #6B6560);
+  color: var(--prose-muted, #5C5752);
   text-align: center;
   margin-top: 12px;
 }
@@ -184,7 +184,7 @@
 
 .prose-content th {
   font-weight: 500;
-  color: var(--prose-muted, #6B6560);
+  color: var(--prose-muted, #5C5752);
   font-size: 0.8125rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
