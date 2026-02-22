@@ -248,17 +248,19 @@ const SpineNavigation = ({ initialPath = '/' }) => {
           {!isMobile && (
             <a
               href="/contact"
-              className="header-btn"
+              className="start-project-cta"
               style={{
                 background: 'none',
-                border: 'none',
-                color: 'var(--nav-header-button)',
-                fontSize: '14px',
+                border: '1.5px solid var(--accent-color)',
+                color: 'var(--accent-color)',
+                fontSize: '13px',
+                fontWeight: '500',
                 cursor: 'pointer',
-                padding: '8px 12px',
-                opacity: 0.6,
+                padding: '6px 16px',
+                borderRadius: '6px',
                 fontFamily: 'inherit',
-                transition: 'opacity 0.2s',
+                letterSpacing: '0.02em',
+                transition: 'background 0.2s, color 0.2s',
                 textDecoration: 'none',
               }}
             >

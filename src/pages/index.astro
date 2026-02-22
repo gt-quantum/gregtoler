@@ -3,13 +3,11 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomePage from '../components/home/HomePage.jsx';
 
-// Get latest project (prefer active status)
+// Get featured/latest project for the featured work section
 const projectEntries = await getCollection('projects');
 const sortedProjects = projectEntries.sort((a, b) => {
-  // Prefer active projects
   if (a.data.status === 'active' && b.data.status !== 'active') return -1;
   if (b.data.status === 'active' && a.data.status !== 'active') return 1;
-  // Then sort by date
   return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
 });
 const latestProject = sortedProjects[0] ? {
@@ -17,41 +15,12 @@ const latestProject = sortedProjects[0] ? {
   title: sortedProjects[0].data.title,
   subtitle: sortedProjects[0].data.subtitle,
   status: sortedProjects[0].data.status,
-  coverImage: sortedProjects[0].data.coverImage || '',
-} : null;
-
-// Get latest app
-const appEntries = await getCollection('apps');
-const sortedApps = appEntries.sort((a, b) =>
-  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-);
-const latestApp = sortedApps[0] ? {
-  slug: sortedApps[0].slug,
-  name: sortedApps[0].data.name,
-  tagline: sortedApps[0].data.tagline,
-  videoUrl: sortedApps[0].data.videoUrl,
-  previewImage: sortedApps[0].data.previewImage || '',
-} : null;
-
-// Get latest content
-const contentEntries = await getCollection('content');
-const sortedContent = contentEntries.sort((a, b) =>
-  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-);
-const latestContent = sortedContent[0] ? {
-  slug: sortedContent[0].slug,
-  title: sortedContent[0].data.title,
-  contentType: sortedContent[0].data.contentType,
-  date: sortedContent[0].data.date,
-  coverImage: sortedContent[0].data.coverImage || '',
 } : null;
 ---
 
-<BaseLayout title="Greg Toler - GTM Strategy & Operations">
+<BaseLayout title="Greg Toler - Operations & AI Strategy">
   <HomePage
     client:load
     latestProject={latestProject}
-    latestApp={latestApp}
-    latestContent={latestContent}
   />
 </BaseLayout>

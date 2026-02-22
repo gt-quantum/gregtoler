@@ -209,7 +209,7 @@ export default function ResourceListing({ items = [] }) {
       display: 'flex',
       alignItems: 'center',
       gap: '16px',
-      padding: '12px 0',
+      padding: '12px 8px',
       borderBottom: `1px solid ${currentTheme.divider}`,
       fontSize: '11px',
       fontWeight: '500',
@@ -256,11 +256,13 @@ export default function ResourceListing({ items = [] }) {
       display: 'flex',
       alignItems: 'center',
       gap: '16px',
-      padding: '16px 0',
+      padding: '16px 8px',
       borderBottom: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.13)' : 'rgba(0,0,0,0.12)'}`,
       textDecoration: 'none',
       color: 'inherit',
       cursor: 'pointer',
+      borderRadius: '4px',
+      transition: 'background 0.15s ease',
     },
     itemIcon: {
       width: '20px',
@@ -441,7 +443,7 @@ export default function ResourceListing({ items = [] }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, delay: index * 0.03 }}
-              whileHover={{ x: 4 }}
+              whileHover={{ x: 4, backgroundColor: currentTheme.hoverBg }}
               layout
             >
               <div style={styles.itemIcon}>

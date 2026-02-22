@@ -383,12 +383,24 @@ export default function WorkPage({ projects = [], apps = [] }) {
       display: 'flex',
       flexDirection: 'column',
     },
+    projectTableHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '24px',
+      padding: '12px 8px',
+      borderBottom: `1px solid ${currentTheme.divider}`,
+      fontSize: '11px',
+      fontWeight: '500',
+      color: currentTheme.textMuted,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+    },
     projectRow: {
       display: 'flex',
       alignItems: 'center',
       gap: '24px',
-      padding: '20px 8px',
-      borderBottom: `1px solid ${borderColor}`,
+      padding: '16px 8px',
+      borderBottom: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.13)' : 'rgba(0,0,0,0.12)'}`,
       textDecoration: 'none',
       color: 'inherit',
       cursor: 'pointer',
@@ -661,6 +673,12 @@ export default function WorkPage({ projects = [], apps = [] }) {
 
               {filteredProjects.length > 0 ? (
                 <div style={styles.projectList}>
+                  <div style={styles.projectTableHeader}>
+                    <span style={{ flex: 1 }}>Project</span>
+                    <span style={{ minWidth: '120px', textAlign: 'right' }}>Tags</span>
+                    <span style={{ minWidth: '100px', textAlign: 'right' }}>Status</span>
+                    <span style={{ width: '12px' }}></span>
+                  </div>
                   {filteredProjects.map((project, index) => (
                     <motion.a
                       key={project.slug}

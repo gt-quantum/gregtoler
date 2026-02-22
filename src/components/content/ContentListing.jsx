@@ -174,7 +174,7 @@ export default function ContentListing({ items = [] }) {
       background: 'none',
       border: 'none',
       padding: '4px 8px',
-      fontSize: '15px',
+      fontSize: '0.875rem',
       fontFamily: 'inherit',
       color: currentTheme.text,
       cursor: 'pointer',
@@ -191,7 +191,7 @@ export default function ContentListing({ items = [] }) {
       display: 'flex',
       alignItems: 'center',
       gap: '16px',
-      padding: '12px 0',
+      padding: '12px 8px',
       borderBottom: `1px solid ${currentTheme.divider}`,
       fontSize: '11px',
       fontWeight: '500',
@@ -238,11 +238,13 @@ export default function ContentListing({ items = [] }) {
       display: 'flex',
       alignItems: 'center',
       gap: '16px',
-      padding: '16px 0',
+      padding: '16px 8px',
       borderBottom: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.13)' : 'rgba(0,0,0,0.12)'}`,
       textDecoration: 'none',
       color: 'inherit',
       cursor: 'pointer',
+      borderRadius: '4px',
+      transition: 'background 0.15s ease',
     },
     itemIcon: {
       width: '20px',
@@ -275,7 +277,7 @@ export default function ContentListing({ items = [] }) {
       padding: '48px 0',
       textAlign: 'center',
       color: currentTheme.textMuted,
-      fontSize: '15px',
+      fontSize: '0.875rem',
     },
     resetLink: {
       marginTop: '12px',
@@ -422,7 +424,7 @@ export default function ContentListing({ items = [] }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, delay: index * 0.03 }}
-              whileHover={{ x: 4 }}
+              whileHover={{ x: 4, backgroundColor: currentTheme.hoverBg }}
               layout
             >
               <div style={styles.itemIcon}>

@@ -211,7 +211,7 @@ export default function AppDetail({ app, children }) {
       position: 'absolute',
       bottom: '16px',
       left: '16px',
-      fontSize: '0.6875rem',
+      fontSize: '0.75rem',
       fontWeight: '500',
       textTransform: 'uppercase',
       letterSpacing: '0.1em',
@@ -226,7 +226,7 @@ export default function AppDetail({ app, children }) {
       marginBottom: '56px',
     },
     sectionLabel: {
-      fontSize: '0.6875rem',
+      fontSize: '0.75rem',
       fontWeight: '500',
       textTransform: 'uppercase',
       letterSpacing: '0.1em',
@@ -291,7 +291,7 @@ export default function AppDetail({ app, children }) {
       gap: '48px',
     },
     detailsLabel: {
-      fontSize: '0.6875rem',
+      fontSize: '0.75rem',
       fontWeight: '500',
       color: currentTheme.textMuted,
       textTransform: 'uppercase',

@@ -40,10 +40,10 @@
   --nav-social-icon: #7A756E;
   --nav-header-button: #6B6560;
   --nav-text: #2C2824;
-  --accent-color: #8B6F4E;
-  --accent-muted: #A68B6B;
-  --accent-subtle: rgba(139, 111, 78, 0.08);
-  --focus-ring: rgba(139, 111, 78, 0.4);
+  --accent-color: #5E8C61;
+  --accent-muted: #7BA37E;
+  --accent-subtle: rgba(94, 140, 97, 0.08);
+  --focus-ring: rgba(94, 140, 97, 0.4);
 }
 
 [data-theme="dark"] {
@@ -55,10 +55,10 @@
   --nav-social-icon: #908C86;
   --nav-header-button: #A8A49E;
   --nav-text: #E3E0DB;
-  --accent-color: #C4A47A;
-  --accent-muted: #A68B6B;
-  --accent-subtle: rgba(196, 164, 122, 0.1);
-  --focus-ring: rgba(196, 164, 122, 0.4);
+  --accent-color: #7DB880;
+  --accent-muted: #9CCAA0;
+  --accent-subtle: rgba(125, 184, 128, 0.1);
+  --focus-ring: rgba(125, 184, 128, 0.4);
 }
 
 /* Focus visible ring - accent-colored for accessibility */
@@ -70,6 +70,15 @@
 /* Navigation hover styles */
 .header-btn:hover {
   opacity: 1 !important;
+}
+
+.start-project-cta:hover {
+  background: var(--accent-color) !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] .start-project-cta:hover {
+  color: #1A1714 !important;
 }
 
 .social-icon:hover {

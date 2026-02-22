@@ -14,7 +14,7 @@ const aboutData = {
   headline: "I build the systems that make businesses run.",
   bio: [
     "For the past decade, I've helped B2B companies build the systems, processes, and tooling that turn strategy into execution. I sit at the intersection of marketing, sales, and operations, designing the connective tissue that makes revenue teams work.",
-    "My approach is hands-on. I don't just advise. I build. Whether it's architecting a territory model, designing an ABM program, shipping internal tools, or building AI systems that replace manual workflows, the best strategy is one you can actually implement.",
+    "My approach is hands-on. I don't just advise. I build. Whether it's architecting a territory model, designing a GTM program, shipping internal tools, or building AI systems that replace manual workflows, the best strategy is one you can actually implement.",
     "I started in go-to-market operations, spending years deep in the systems and politics of getting marketing and sales teams working together. Territory planning, pipeline optimization, tech stack architecture, revenue operations. The work taught me that most operational problems aren't technology problems. They're design problems.",
     "That perspective led me to broader operational work: serving as an embedded COO for an agency, productizing service delivery for consulting firms, building AI-powered automation systems, and designing custom tools that replace expensive enterprise software at a fraction of the cost.",
     "Today, I work with businesses that need someone who can think strategically and get their hands dirty. Not one or the other. Fix what's broken, build what's missing, scale what works.",
@@ -104,6 +104,7 @@ export default function AboutSection() {
       gap: '80px',
       width: '100%',
       alignItems: 'start',
+      gridTemplateRows: 'auto',
     },
 
     main: {
@@ -214,10 +215,11 @@ export default function AboutSection() {
     // Sidebar
     sidebar: {
       position: 'sticky',
-      top: '125px',
+      top: 'calc(var(--header-height) + var(--content-top-padding))',
       display: 'flex',
       flexDirection: 'column',
       gap: '24px',
+      alignSelf: 'start',
     },
 
     photoWrapper: {

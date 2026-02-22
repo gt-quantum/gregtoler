@@ -23,10 +23,10 @@ export const theme = {
     socialIcon: '#7A756E',
     headerButton: '#6B6560',
 
-    // Accent colors (warm-compatible)
-    accent: '#8B6F4E',
-    accentMuted: '#A68B6B',
-    accentSubtle: 'rgba(139, 111, 78, 0.08)',
+    // Accent colors (warm sage green)
+    accent: '#5E8C61',
+    accentMuted: '#7BA37E',
+    accentSubtle: 'rgba(94, 140, 97, 0.08)',
 
     // Semantic colors (warm-toned)
     success: '#5E8C61',
@@ -44,7 +44,7 @@ export const theme = {
     borderSubtle: 'rgba(44, 40, 36, 0.04)',
     hoverBg: 'rgba(44, 40, 36, 0.05)',
     activeBg: 'rgba(44, 40, 36, 0.08)',
-    focusRing: 'rgba(139, 111, 78, 0.4)',
+    focusRing: 'rgba(94, 140, 97, 0.4)',
   },
   dark: {
     // Core backgrounds - warm dark browns, cinematic
@@ -67,10 +67,10 @@ export const theme = {
     socialIcon: '#908C86',
     headerButton: '#A8A49E',
 
-    // Accent colors (warm-compatible)
-    accent: '#C4A47A',
-    accentMuted: '#A68B6B',
-    accentSubtle: 'rgba(196, 164, 122, 0.1)',
+    // Accent colors (warm sage green)
+    accent: '#7DB880',
+    accentMuted: '#9CCAA0',
+    accentSubtle: 'rgba(125, 184, 128, 0.1)',
 
     // Semantic colors
     success: '#7DB880',
@@ -88,7 +88,7 @@ export const theme = {
     borderSubtle: 'rgba(227, 224, 219, 0.05)',
     hoverBg: 'rgba(227, 224, 219, 0.06)',
     activeBg: 'rgba(227, 224, 219, 0.1)',
-    focusRing: 'rgba(196, 164, 122, 0.4)',
+    focusRing: 'rgba(125, 184, 128, 0.4)',
   },
 };
 

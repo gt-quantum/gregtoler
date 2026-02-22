@@ -104,32 +104,41 @@ export default function ContactSection() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    const payload = {
+      situation: situations.find(s => s.value === formState.situation)?.label || formState.situation,
+      involvement: formState.involvement.join(', '),
+      message: formState.message,
+      name: formState.name,
+      email: formState.email,
+      contactMethod: formState.contactMethod,
+      phone: formState.phone,
+      phoneType: formState.contactMethod === 'phone' ? formState.phoneType : '',
+      bookingLink: formState.bookingLink,
+    };
+
     try {
-      const response = await fetch('https://formspree.io/f/xpwzgqkr', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          situation: situations.find(s => s.value === formState.situation)?.label || formState.situation,
-          involvement: formState.involvement.join(', '),
-          message: formState.message,
-          name: formState.name,
-          email: formState.email,
-          contactMethod: formState.contactMethod,
-          phone: formState.phone,
-          phoneType: formState.contactMethod === 'phone' ? formState.phoneType : '',
-          bookingLink: formState.bookingLink,
+      // Send to both Formspree and Slack in parallel
+      const [formspreeRes] = await Promise.allSettled([
+        fetch('https://formspree.io/f/xpwzgqkr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
         }),
-      });
-      if (response.ok) {
+        fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }),
+      ]);
+
+      if (formspreeRes.status === 'fulfilled' && formspreeRes.value.ok) {
         setSubmitted(true);
       } else {
-        // Fallback: still show success but log error
-        console.error('Form submission failed:', response.status);
+        console.error('Form submission failed');
         setSubmitted(true);
       }
     } catch (err) {
       console.error('Form submission error:', err);
-      // Still show success to not block the user
       setSubmitted(true);
     }
     setSubmitting(false);
@@ -335,10 +344,10 @@ export default function ContactSection() {
       padding: '12px 24px',
       fontSize: '0.9375rem',
       fontWeight: '500',
-      color: isDarkMode ? currentTheme.background : '#faf9f7',
-      background: currentTheme.text,
+      color: '#fff',
+      background: currentTheme.accent,
       border: 'none',
-      borderRadius: '4px',
+      borderRadius: '6px',
       cursor: 'pointer',
       fontFamily: 'inherit',
       transition: 'opacity 0.2s',
@@ -395,7 +404,7 @@ export default function ContactSection() {
       width: '48px',
       height: '48px',
       borderRadius: '50%',
-      background: '#4ade80',
+      background: currentTheme.accent,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -437,9 +446,9 @@ export default function ContactSection() {
     },
     emailLink: {
       fontSize: '1rem',
-      color: currentTheme.text,
+      color: currentTheme.accent,
       textDecoration: 'none',
-      borderBottom: `1px solid ${borderColor}`,
+      borderBottom: `1px solid ${currentTheme.accentMuted}`,
       paddingBottom: '2px',
       width: 'fit-content',
       fontFamily: "'Source Serif 4', Georgia, serif",
@@ -596,12 +605,12 @@ export default function ContactSection() {
                     fontWeight: '600',
                     fontFamily: 'inherit',
                     transition: 'all 0.3s ease',
-                    background: currentStep >= step ? currentTheme.text : 'transparent',
+                    background: currentStep >= step ? currentTheme.accent : 'transparent',
                     color: currentStep >= step
-                      ? (isDarkMode ? currentTheme.background : '#faf9f7')
+                      ? '#fff'
                       : currentTheme.textMuted,
                     border: currentStep >= step
-                      ? `2px solid ${currentTheme.text}`
+                      ? `2px solid ${currentTheme.accent}`
                       : `2px solid ${borderColor}`,
                   }}
                 >
@@ -616,7 +625,7 @@ export default function ContactSection() {
                     style={{
                       flex: 1,
                       height: '2px',
-                      background: currentStep > step ? currentTheme.text : borderColor,
+                      background: currentStep > step ? currentTheme.accent : borderColor,
                       transition: 'background 0.3s ease',
                     }}
                   />
@@ -657,10 +666,10 @@ export default function ContactSection() {
                         style={{
                           ...styles.situationCard,
                           background: formState.situation === s.value
-                            ? (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)')
+                            ? currentTheme.accentSubtle
                             : 'transparent',
                           borderColor: formState.situation === s.value
-                            ? (isDarkMode ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.2)')
+                            ? currentTheme.accent
                             : borderColor,
                         }}
                         onClick={() => selectSituation(s.value)}
@@ -697,11 +706,12 @@ export default function ContactSection() {
                           style={{
                             ...styles.chip,
                             background: isSelected
-                              ? (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)')
+                              ? currentTheme.accentSubtle
                               : 'transparent',
                             borderColor: isSelected
-                              ? (isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)')
+                              ? currentTheme.accent
                               : borderColor,
+                            color: isSelected ? currentTheme.accent : currentTheme.text,
                             fontWeight: isSelected ? 500 : 400,
                           }}
                           onClick={() => toggleInvolvement(area)}
@@ -731,7 +741,7 @@ export default function ContactSection() {
                       whileHover={{ opacity: 0.9 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Continue <ArrowRight color={isDarkMode ? currentTheme.background : '#faf9f7'} />
+                      Continue <ArrowRight color="#fff" />
                     </motion.button>
                   </div>
                 </motion.div>
@@ -776,7 +786,7 @@ export default function ContactSection() {
                       whileHover={{ opacity: 0.9 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Continue <ArrowRight color={isDarkMode ? currentTheme.background : '#faf9f7'} />
+                      Continue <ArrowRight color="#fff" />
                     </motion.button>
                   </div>
                 </motion.div>
@@ -840,11 +850,12 @@ export default function ContactSection() {
                             style={{
                               ...styles.contactMethodBtn,
                               background: formState.contactMethod === method.value
-                                ? (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)')
+                                ? currentTheme.accentSubtle
                                 : 'transparent',
                               borderColor: formState.contactMethod === method.value
-                                ? (isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)')
+                                ? currentTheme.accent
                                 : borderColor,
+                              color: formState.contactMethod === method.value ? currentTheme.accent : currentTheme.text,
                               fontWeight: formState.contactMethod === method.value ? 500 : 400,
                             }}
                             onClick={() => setFormState(prev => ({ ...prev, contactMethod: method.value }))}
@@ -886,11 +897,12 @@ export default function ContactSection() {
                                     style={{
                                       ...styles.contactMethodBtn,
                                       background: formState.phoneType === pt.value
-                                        ? (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)')
+                                        ? currentTheme.accentSubtle
                                         : 'transparent',
                                       borderColor: formState.phoneType === pt.value
-                                        ? (isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)')
+                                        ? currentTheme.accent
                                         : borderColor,
+                                      color: formState.phoneType === pt.value ? currentTheme.accent : currentTheme.text,
                                       fontWeight: formState.phoneType === pt.value ? 500 : 400,
                                     }}
                                     onClick={() => setFormState(prev => ({ ...prev, phoneType: pt.value }))}
@@ -965,7 +977,7 @@ export default function ContactSection() {
                       whileTap={{ scale: 0.98 }}
                     >
                       {submitting ? 'Sending...' : 'Send'}{' '}
-                      <SendIcon color={isDarkMode ? currentTheme.background : '#faf9f7'} />
+                      <SendIcon color="#fff" />
                     </motion.button>
                   </div>
                 </motion.div>

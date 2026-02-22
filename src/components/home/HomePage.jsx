@@ -711,12 +711,6 @@ export default function HomePage({ latestProject }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
-          style={{
-            padding: '40px 32px',
-            margin: '0 -32px',
-            borderRadius: '16px',
-            background: currentTheme.accentSubtle,
-          }}
         >
           <span style={styles.sectionLabel}>AI & Automation</span>
           <div style={styles.aiCard}>
