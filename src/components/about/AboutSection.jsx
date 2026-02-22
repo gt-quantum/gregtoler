@@ -3,23 +3,31 @@ import { motion } from 'framer-motion';
 import { theme } from '../../lib/theme';
 
 // ============================================
-// ABOUT PAGE DATA - Edit this object to update content
+// ABOUT PAGE DATA
 // ============================================
 const aboutData = {
   name: "Greg Toler",
-  role: "Designer / Developer / Operator",
+  role: "Operations Strategy & AI Architecture",
   location: "South Carolina",
   status: "Available for projects",
   statusActive: true,
-  headline: "Building revenue systems that scale.",
+  headline: "I build the systems that make businesses run.",
   bio: [
-    "For the past decade, I've helped B2B companies build the systems, processes, and tooling that turn strategy into execution. I sit at the intersection of marketing, sales, and customer success — designing the connective tissue that makes revenue teams work.",
-    "My approach is hands-on. I don't just advise — I build. Whether it's architecting a territory model, designing an ABM program, or shipping internal tools, I believe the best strategy is one you can actually implement.",
+    "For the past decade, I've helped B2B companies build the systems, processes, and tooling that turn strategy into execution. I sit at the intersection of marketing, sales, and operations, designing the connective tissue that makes revenue teams work.",
+    "My approach is hands-on. I don't just advise. I build. Whether it's architecting a territory model, designing an ABM program, shipping internal tools, or building AI systems that replace manual workflows, the best strategy is one you can actually implement.",
+    "I started in go-to-market operations, spending years deep in the systems and politics of getting marketing and sales teams working together. Territory planning, pipeline optimization, tech stack architecture, revenue operations. The work taught me that most operational problems aren't technology problems. They're design problems.",
+    "That perspective led me to broader operational work: serving as an embedded COO for an agency, productizing service delivery for consulting firms, building AI-powered automation systems, and designing custom tools that replace expensive enterprise software at a fraction of the cost.",
+    "Today, I work with businesses that need someone who can think strategically and get their hands dirty. Not one or the other. Fix what's broken, build what's missing, scale what works.",
   ],
   focus: [
-    { area: "GTM Strategy", description: "Market segmentation, positioning, go-to-market architecture" },
-    { area: "Revenue Operations", description: "Process design, tooling, cross-functional alignment" },
-    { area: "Systems & Tooling", description: "Internal tools and workflows that scale" },
+    { area: "Operations & Process Design", description: "Workflow design, system architecture, cross-functional alignment, operational efficiency" },
+    { area: "AI & Automation", description: "AI system architecture, MCP development, RAG systems, AI agents, intelligent automation" },
+    { area: "GTM Strategy", description: "Go-to-market architecture, territory planning, pipeline optimization, revenue operations" },
+    { area: "Custom Tools & Systems", description: "Internal tools, dashboards, integrations, purpose-built applications" },
+  ],
+  interests: [
+    { area: "Photography", description: "Landscape and street photography. A creative outlet that exercises a completely different part of my brain." },
+    { area: "Building Things", description: "Side projects, prototypes, tools I wish existed. Most of my best ideas for client work started as experiments." },
   ],
   stats: [
     { value: "10+", label: "Years experience" },
@@ -29,7 +37,7 @@ const aboutData = {
   links: [
     { label: "Email", href: "mailto:greg@gregtoler.com" },
     { label: "LinkedIn", href: "https://linkedin.com/in/gregtoler" },
-    { label: "Twitter", href: "https://twitter.com/gregtoler" },
+    { label: "YouTube", href: "https://youtube.com/@gregtolerops" },
   ],
 };
 
@@ -60,23 +68,18 @@ const StatusDot = ({ active }) => (
 export default function AboutSection() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Sync with document theme
   useEffect(() => {
     const checkTheme = () => {
       setIsDarkMode(document.documentElement.getAttribute('data-theme') === 'dark');
     };
-
     checkTheme();
-
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
     return () => observer.disconnect();
   }, []);
 
   const currentTheme = isDarkMode ? theme.dark : theme.light;
 
-  // Animation variants
   const fadeInUp = {
     initial: { opacity: 0, y: 24 },
     animate: { opacity: 1, y: 0 },
@@ -92,7 +95,8 @@ export default function AboutSection() {
     ease: [0.33, 1, 0.68, 1],
   };
 
-  // Styles
+  const borderColor = isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+
   const styles = {
     container: {
       display: 'grid',
@@ -102,7 +106,6 @@ export default function AboutSection() {
       alignItems: 'start',
     },
 
-    // Main content (left)
     main: {
       display: 'flex',
       flexDirection: 'column',
@@ -130,8 +133,6 @@ export default function AboutSection() {
       letterSpacing: '-0.02em',
       fontFamily: "'Source Serif 4', Georgia, serif",
     },
-
-    bioContent: {},
 
     bioParagraph: {
       fontSize: '1.0625rem',
@@ -167,7 +168,50 @@ export default function AboutSection() {
       margin: 0,
     },
 
-    // Sidebar (right)
+    // Interests section
+    interestsList: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '20px',
+    },
+
+    // CTA section
+    ctaSection: {
+      padding: '32px',
+      borderRadius: '12px',
+      background: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+      border: `1px solid ${borderColor}`,
+      borderLeft: `3px solid ${currentTheme.warning}`,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+    },
+    ctaTitle: {
+      fontSize: '1.25rem',
+      fontWeight: '400',
+      color: currentTheme.text,
+      margin: 0,
+      fontFamily: "'Source Serif 4', Georgia, serif",
+    },
+    ctaText: {
+      fontSize: '0.9375rem',
+      color: currentTheme.textMuted,
+      margin: 0,
+      lineHeight: '1.6',
+      fontFamily: "'Source Serif 4', Georgia, serif",
+    },
+    ctaLink: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px',
+      fontSize: '0.9375rem',
+      fontWeight: '500',
+      color: currentTheme.accent,
+      textDecoration: 'none',
+      transition: 'opacity 0.2s',
+    },
+
+    // Sidebar
     sidebar: {
       position: 'sticky',
       top: '125px',
@@ -182,7 +226,6 @@ export default function AboutSection() {
       borderRadius: '4px',
       overflow: 'hidden',
     },
-
     photoImage: {
       width: '100%',
       height: '100%',
@@ -196,7 +239,6 @@ export default function AboutSection() {
       flexDirection: 'column',
       gap: '4px',
     },
-
     name: {
       fontSize: '1.25rem',
       fontWeight: '500',
@@ -204,7 +246,6 @@ export default function AboutSection() {
       margin: 0,
       fontFamily: "'Source Serif 4', Georgia, serif",
     },
-
     role: {
       fontSize: '0.875rem',
       color: currentTheme.textMuted,
@@ -219,7 +260,6 @@ export default function AboutSection() {
       borderTop: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
       borderBottom: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
     },
-
     statusText: {
       fontSize: '0.8125rem',
       color: currentTheme.text,
@@ -230,21 +270,18 @@ export default function AboutSection() {
       gridTemplateColumns: 'repeat(3, 1fr)',
       gap: '8px',
     },
-
     stat: {
       display: 'flex',
       flexDirection: 'column',
       gap: '2px',
     },
-
     statValue: {
       fontSize: '1.25rem',
       fontWeight: '500',
       color: currentTheme.text,
     },
-
     statLabel: {
-      fontSize: '0.6875rem',
+      fontSize: '0.75rem',
       color: currentTheme.textMuted,
       textTransform: 'uppercase',
       letterSpacing: '0.05em',
@@ -254,7 +291,6 @@ export default function AboutSection() {
       display: 'flex',
       flexDirection: 'column',
     },
-
     link: {
       display: 'flex',
       alignItems: 'center',
@@ -272,24 +308,10 @@ export default function AboutSection() {
       color: currentTheme.textMuted,
       margin: 0,
     },
-
-    // Sidebar sections for mobile reordering
-    sidebarSection: {
-      display: 'contents',
-    },
   };
 
   return (
     <div style={styles.container} className="about-container">
-      {/*
-        Mobile order:
-        1. Identity (name/role)
-        2. Photo
-        3. Headline
-        4. Focus
-        5. Bio
-        6. Status, Stats, Links, Location
-      */}
       <style>{`
         @media (max-width: 900px) {
           .about-container {
@@ -304,17 +326,17 @@ export default function AboutSection() {
             display: contents !important;
             position: relative !important;
           }
-
-          /* Mobile order */
           .about-identity { order: 1; }
           .about-photo { order: 2; max-width: 280px; }
           .about-headline { order: 3; }
-          .about-focus { order: 4; }
-          .about-bio { order: 5; }
-          .about-status { order: 6; max-width: 320px; }
-          .about-stats { order: 7; max-width: 320px; }
-          .about-links { order: 8; max-width: 320px; }
-          .about-location { order: 9; }
+          .about-bio { order: 4; }
+          .about-focus { order: 5; }
+          .about-interests { order: 6; }
+          .about-cta { order: 7; }
+          .about-status { order: 8; max-width: 320px; }
+          .about-stats { order: 9; max-width: 320px; }
+          .about-links { order: 10; max-width: 320px; }
+          .about-location { order: 11; }
         }
       `}</style>
 
@@ -342,7 +364,7 @@ export default function AboutSection() {
           transition={{ ...transition, delay: 0.2 }}
         >
           <span style={styles.sectionLabel}>About</span>
-          <div style={styles.bioContent}>
+          <div>
             {aboutData.bio.map((p, i) => (
               <p key={i} style={styles.bioParagraph}>{p}</p>
             ))}
@@ -366,6 +388,53 @@ export default function AboutSection() {
                 <p style={styles.focusDescription}>{item.description}</p>
               </div>
             ))}
+          </div>
+        </motion.section>
+
+        {/* Interests */}
+        <motion.section
+          style={styles.section}
+          className="about-interests"
+          variants={fadeInUp}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ ...transition }}
+        >
+          <span style={styles.sectionLabel}>Beyond Work</span>
+          <div style={styles.interestsList}>
+            {aboutData.interests.map((item, i) => (
+              <div key={i} style={styles.focusItem}>
+                <h3 style={styles.focusTitle}>{item.area}</h3>
+                <p style={styles.focusDescription}>{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* CTA */}
+        <motion.section
+          style={styles.section}
+          className="about-cta"
+          variants={fadeInUp}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ ...transition }}
+        >
+          <div style={styles.ctaSection}>
+            <h3 style={styles.ctaTitle}>Want to work together?</h3>
+            <p style={styles.ctaText}>
+              I help businesses fix, build, and scale their operations. Tell me what's going on and we'll figure out the right approach.
+            </p>
+            <a
+              href="/contact"
+              style={styles.ctaLink}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              Start a project <ArrowRight color={currentTheme.accent} />
+            </a>
           </div>
         </motion.section>
       </main>
