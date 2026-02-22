@@ -597,7 +597,13 @@ export default function ServicesPage() {
       {/* AI & Automation */}
       <motion.section
         id="ai"
-        style={styles.pillarSection}
+        style={{
+          ...styles.pillarSection,
+          padding: '40px 32px',
+          margin: '0 -32px',
+          borderRadius: '16px',
+          background: currentTheme.infoSubtle,
+        }}
         variants={fadeInUp}
         initial="initial"
         whileInView="animate"
@@ -700,7 +706,13 @@ export default function ServicesPage() {
 
       {/* Who I Work With */}
       <motion.section
-        style={styles.pillarSection}
+        style={{
+          ...styles.pillarSection,
+          padding: '40px 32px',
+          margin: '0 -32px',
+          borderRadius: '16px',
+          background: currentTheme.accentSubtle,
+        }}
         variants={fadeInUp}
         initial="initial"
         whileInView="animate"
@@ -718,7 +730,7 @@ export default function ServicesPage() {
           <div style={styles.audienceCard}>
             <h3 style={styles.audienceTitle}>GTM Teams & Revenue Leaders</h3>
             <p style={styles.audienceBody}>
-              Strategy, operations, and execution for go-to-market. Territory planning, pipeline optimization, marketing and sales alignment, tech stack architecture, ABM programs, revenue operations. I've spent over a decade in this space. I know the systems, the processes, and the politics of getting marketing and sales teams working together.
+              Strategy, operations, and execution for go-to-market. Territory planning, pipeline optimization, marketing and sales alignment, tech stack architecture, GTM programs, revenue operations. I've spent over a decade in this space. I know the systems, the processes, and the politics of getting marketing and sales teams working together.
             </p>
           </div>
 
