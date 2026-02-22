@@ -10,9 +10,9 @@ export const theme = {
 
     // Typography - warm browns
     text: '#2C2824',
-    textMuted: '#6B6560',
+    textMuted: '#5C5752',
     activeText: '#2C2824',
-    inactiveText: '#A09A94',
+    inactiveText: '#8A857E',
 
     // Lines & dividers
     line: '#2C2824',
@@ -22,6 +22,29 @@ export const theme = {
     // Interactive elements
     socialIcon: '#7A756E',
     headerButton: '#6B6560',
+
+    // Accent colors (warm-compatible)
+    accent: '#8B6F4E',
+    accentMuted: '#A68B6B',
+    accentSubtle: 'rgba(139, 111, 78, 0.08)',
+
+    // Semantic colors (warm-toned)
+    success: '#5E8C61',
+    successSubtle: 'rgba(94, 140, 97, 0.08)',
+    info: '#6B839E',
+    infoSubtle: 'rgba(107, 131, 158, 0.08)',
+    warning: '#C4935A',
+    warningSubtle: 'rgba(196, 147, 90, 0.08)',
+    error: '#B5726A',
+    errorSubtle: 'rgba(181, 114, 106, 0.08)',
+
+    // Interactive borders & states
+    borderStrong: 'rgba(44, 40, 36, 0.15)',
+    borderDefault: 'rgba(44, 40, 36, 0.08)',
+    borderSubtle: 'rgba(44, 40, 36, 0.04)',
+    hoverBg: 'rgba(44, 40, 36, 0.05)',
+    activeBg: 'rgba(44, 40, 36, 0.08)',
+    focusRing: 'rgba(139, 111, 78, 0.4)',
   },
   dark: {
     // Core backgrounds - warm dark browns, cinematic
@@ -31,9 +54,9 @@ export const theme = {
 
     // Typography - warm off-whites
     text: '#E3E0DB',
-    textMuted: '#A8A49E',
+    textMuted: '#B8B4AE',
     activeText: '#E3E0DB',
-    inactiveText: '#6E6A64',
+    inactiveText: '#807A74',
 
     // Lines & dividers
     line: '#E3E0DB',
@@ -43,14 +66,37 @@ export const theme = {
     // Interactive elements
     socialIcon: '#908C86',
     headerButton: '#A8A49E',
+
+    // Accent colors (warm-compatible)
+    accent: '#C4A47A',
+    accentMuted: '#A68B6B',
+    accentSubtle: 'rgba(196, 164, 122, 0.1)',
+
+    // Semantic colors
+    success: '#7DB880',
+    successSubtle: 'rgba(125, 184, 128, 0.1)',
+    info: '#8EACC4',
+    infoSubtle: 'rgba(142, 172, 196, 0.1)',
+    warning: '#D4A86A',
+    warningSubtle: 'rgba(212, 168, 106, 0.1)',
+    error: '#D4908A',
+    errorSubtle: 'rgba(212, 144, 138, 0.1)',
+
+    // Interactive borders & states
+    borderStrong: 'rgba(227, 224, 219, 0.18)',
+    borderDefault: 'rgba(227, 224, 219, 0.1)',
+    borderSubtle: 'rgba(227, 224, 219, 0.05)',
+    hoverBg: 'rgba(227, 224, 219, 0.06)',
+    activeBg: 'rgba(227, 224, 219, 0.1)',
+    focusRing: 'rgba(196, 164, 122, 0.4)',
   },
 };
 
 // Shadows (light mode only)
 export const shadows = {
-  soft: '0 8px 24px rgba(44, 40, 36, 0.06)',
-  float: '0 12px 40px rgba(44, 40, 36, 0.08)',
-  card: '0 4px 12px rgba(44, 40, 36, 0.04)',
+  soft: '0 8px 24px rgba(44, 40, 36, 0.10)',
+  float: '0 12px 40px rgba(44, 40, 36, 0.14)',
+  card: '0 4px 12px rgba(44, 40, 36, 0.07)',
 };
 
 // Spacing (8px grid)
