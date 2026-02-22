@@ -361,6 +361,7 @@ export default function ResourceListing({ items = [] }) {
                   style={{
                     ...styles.filterLink,
                     opacity: activeTag === tag ? 1 : activeTag ? 0.3 : 0.6,
+                    color: activeTag === tag ? currentTheme.accent : currentTheme.text,
                   }}
                   whileHover={{ opacity: 1 }}
                   transition={animation.fade}
@@ -384,6 +385,7 @@ export default function ResourceListing({ items = [] }) {
                   style={{
                     ...styles.filterLink,
                     opacity: activeType === type ? 1 : activeType ? 0.3 : 0.6,
+                    color: activeType === type ? currentTheme.accent : currentTheme.text,
                   }}
                   whileHover={{ opacity: 1 }}
                   transition={animation.fade}

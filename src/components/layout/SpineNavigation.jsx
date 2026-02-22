@@ -9,16 +9,23 @@ const MenuIcons = {
       <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
   ),
-  about: (
+  services: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
+      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+      <path d="M2 17l10 5 10-5" />
+      <path d="M2 12l10 5 10-5" />
     </svg>
   ),
   work: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
       <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  ),
+  about: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
     </svg>
   ),
   content: (
@@ -30,20 +37,14 @@ const MenuIcons = {
       <polyline points="10 9 9 9 8 9" />
     </svg>
   ),
-  resources: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-    </svg>
-  ),
 };
 
 const menuItems = [
   { id: 'home', label: 'Home', path: '/' },
-  { id: 'about', label: 'About', path: '/about' },
+  { id: 'services', label: 'Services', path: '/services' },
   { id: 'work', label: 'Work', path: '/work' },
+  { id: 'about', label: 'About', path: '/about' },
   { id: 'content', label: 'Content', path: '/content' },
-  { id: 'resources', label: 'Resources', path: '/resources' },
 ];
 
 const getActiveIndex = (path) => {
@@ -243,45 +244,26 @@ const SpineNavigation = ({ initialPath = '/' }) => {
             </svg>
           </button>
 
-          {/* Desktop: Services and Contact buttons */}
+          {/* Desktop: Start a Project CTA */}
           {!isMobile && (
-            <>
-              <button
-                className="header-btn"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--nav-header-button)',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  padding: '8px 12px',
-                  opacity: 0.6,
-                  fontFamily: 'inherit',
-                  transition: 'opacity 0.2s',
-                }}
-              >
-                Services
-              </button>
-
-              <a
-                href="/contact"
-                className="header-btn"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--nav-header-button)',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  padding: '8px 12px',
-                  opacity: 0.6,
-                  fontFamily: 'inherit',
-                  transition: 'opacity 0.2s',
-                  textDecoration: 'none',
-                }}
-              >
-                Contact
-              </a>
-            </>
+            <a
+              href="/contact"
+              className="header-btn"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--nav-header-button)',
+                fontSize: '14px',
+                cursor: 'pointer',
+                padding: '8px 12px',
+                opacity: 0.6,
+                fontFamily: 'inherit',
+                transition: 'opacity 0.2s',
+                textDecoration: 'none',
+              }}
+            >
+              Start a Project
+            </a>
           )}
 
           {/* Mobile: Hamburger menu */}
@@ -348,26 +330,6 @@ const SpineNavigation = ({ initialPath = '/' }) => {
               minWidth: '160px',
             }}
           >
-            <button
-              className="mobile-menu-item"
-              style={{
-                display: 'block',
-                width: '100%',
-                padding: '12px 16px',
-                background: 'none',
-                border: 'none',
-                color: isDarkMode ? '#E8E3DC' : '#2C2824',
-                fontSize: '14px',
-                textAlign: 'left',
-                cursor: 'pointer',
-                borderRadius: '8px',
-                transition: 'background 0.2s',
-                fontFamily: 'inherit',
-              }}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Services
-            </button>
             <a
               href="/contact"
               className="mobile-menu-item"
@@ -387,7 +349,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
               }}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Contact
+              Start a Project
             </a>
           </motion.div>
         )}
@@ -447,7 +409,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                     /* Mobile: Show icon */
                     <span
                       style={{
-                        color: isActive ? 'var(--nav-active-text)' : 'var(--nav-inactive-text)',
+                        color: isActive ? 'var(--accent-color)' : 'var(--nav-inactive-text)',
                         opacity: isActive ? 1 : 0.6,
                         transition: 'color 0.2s, opacity 0.2s',
                         display: 'flex',
@@ -467,7 +429,7 @@ const SpineNavigation = ({ initialPath = '/' }) => {
                         whiteSpace: 'nowrap',
                         paddingTop: '4px',
                         paddingBottom: '4px',
-                        color: isActive ? 'var(--nav-active-text)' : 'var(--nav-inactive-text)',
+                        color: isActive ? 'var(--accent-color)' : 'var(--nav-inactive-text)',
                         fontWeight: isActive ? 500 : 400,
                         transition: 'color 0.2s, font-weight 0.3s',
                       }}

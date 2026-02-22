@@ -124,7 +124,7 @@ const AppBadge = ({ status }) => {
 
   return (
     <span style={{
-      fontSize: '0.6875rem',
+      fontSize: '0.75rem',
       fontWeight: '500',
       color: 'inherit',
       textTransform: 'uppercase',
@@ -216,12 +216,12 @@ export default function WorkPage({ projects = [], apps = [] }) {
       fontSize: '0.9375rem',
       fontWeight: '500',
       color: isActive ? currentTheme.text : currentTheme.textMuted,
-      background: 'none',
+      background: isActive ? currentTheme.accentSubtle : 'none',
       border: 'none',
-      borderBottom: `2px solid ${isActive ? currentTheme.text : 'transparent'}`,
+      borderBottom: `2px solid ${isActive ? currentTheme.accent : 'transparent'}`,
       marginBottom: '-1px',
       cursor: 'pointer',
-      transition: 'color 0.2s ease, border-color 0.2s ease',
+      transition: 'color 0.2s ease, border-color 0.2s ease, background 0.2s ease',
       fontFamily: 'inherit',
     }),
 
@@ -288,7 +288,7 @@ export default function WorkPage({ projects = [], apps = [] }) {
       gap: '6px',
     },
     timelineTag: {
-      fontSize: '0.6875rem',
+      fontSize: '0.75rem',
       color: currentTheme.textMuted,
       textTransform: 'uppercase',
       letterSpacing: '0.05em',
@@ -369,7 +369,7 @@ export default function WorkPage({ projects = [], apps = [] }) {
       opacity: isDarkMode ? 0.85 : 0.75,
     },
     logoPlaceholder: {
-      fontSize: '0.625rem',
+      fontSize: '0.75rem',
       fontWeight: '500',
       color: currentTheme.textMuted,
       textAlign: 'center',
@@ -387,11 +387,13 @@ export default function WorkPage({ projects = [], apps = [] }) {
       display: 'flex',
       alignItems: 'center',
       gap: '24px',
-      padding: '20px 0',
+      padding: '20px 8px',
       borderBottom: `1px solid ${borderColor}`,
       textDecoration: 'none',
       color: 'inherit',
       cursor: 'pointer',
+      borderRadius: '4px',
+      transition: 'background 0.15s ease',
     },
     projectInfo: {
       flex: 1,
@@ -502,6 +504,7 @@ export default function WorkPage({ projects = [], apps = [] }) {
             style={{
               ...styles.filterLink,
               opacity: active === filter ? 1 : 0.4,
+              color: active === filter ? currentTheme.accent : currentTheme.text,
             }}
             whileHover={{ opacity: 1 }}
             transition={animation.fade}
@@ -666,7 +669,7 @@ export default function WorkPage({ projects = [], apps = [] }) {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      whileHover={{ x: 4 }}
+                      whileHover={{ x: 4, backgroundColor: currentTheme.hoverBg }}
                     >
                       <div style={styles.projectInfo}>
                         <h3 style={styles.projectTitle}>{project.title}</h3>
