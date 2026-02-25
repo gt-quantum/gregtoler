@@ -141,6 +141,7 @@ export default function HomePage({ latestProject }) {
     },
     intakeWrapper: {
       gridColumn: 'span 4',
+      display: 'flex',
     },
     heroTop: {
       display: 'flex',
@@ -222,9 +223,11 @@ export default function HomePage({ latestProject }) {
 
     // Intake teaser card
     intakeCard: {
+      flex: 1,
       padding: '24px',
       display: 'flex',
       flexDirection: 'column',
+      justifyContent: 'space-between',
       gap: '16px',
       background: isDarkMode
         ? 'rgba(227, 224, 219, 0.85)'
@@ -248,7 +251,7 @@ export default function HomePage({ latestProject }) {
       fontFamily: "'Inter', -apple-system, sans-serif",
       color: isDarkMode ? 'rgba(45, 42, 38, 0.5)' : 'rgba(250,249,247,0.5)',
       textDecoration: 'none',
-      marginTop: '8px',
+      marginTop: '16px',
       transition: 'opacity 0.2s',
     },
     intakeAvailability: {
