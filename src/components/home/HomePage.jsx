@@ -163,8 +163,8 @@ export default function HomePage({ latestProject }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
+      gap: '16px 24px',
       flexWrap: 'wrap',
-      gap: '8px 0',
     },
     brandLogo: {
       height: '20px',
@@ -697,7 +697,7 @@ export default function HomePage({ latestProject }) {
           <span style={{ ...styles.sectionLabel, marginBottom: '12px' }}>Brands I've worked with</span>
           <div style={styles.logoBar} className="logo-bar">
             {[
-              { name: 'State Farm', src: '/images/brands/state-farm.svg', h: 28 },
+              { name: 'State Farm', src: '/images/brands/state-farm.svg' },
               { name: 'Siemens', src: '/images/brands/siemens.svg', h: 16 },
               { name: 'BambooHR', src: '/images/brands/BambooHR_logo.svg.png' },
               { name: 'Parsable', src: '/images/brands/parsable.png' },
@@ -705,7 +705,6 @@ export default function HomePage({ latestProject }) {
               { name: 'nrev.ai', src: '/images/brands/nrev.svg' },
               { name: 'Medix', src: '/images/brands/medix.svg' },
               { name: 'Sayers', src: '/images/brands/sayers.svg' },
-              { name: 'CRC Group', src: '/images/brands/CRC_logo.svg.png' },
             ].map((brand) => (
               <img
                 key={brand.name}
@@ -715,6 +714,14 @@ export default function HomePage({ latestProject }) {
                 style={{ ...styles.brandLogo, ...(brand.h ? { height: brand.h } : {}) }}
               />
             ))}
+            <span style={{
+              fontSize: '0.875rem',
+              fontFamily: "'Inter', -apple-system, sans-serif",
+              fontWeight: '500',
+              color: currentTheme.textMuted,
+              opacity: 0.5,
+              letterSpacing: '0.02em',
+            }}>CRC Group</span>
           </div>
         </motion.section>
 
@@ -1050,9 +1057,10 @@ export default function HomePage({ latestProject }) {
             justify-content: center !important;
           }
           .logo-bar {
-            flex-wrap: wrap !important;
-            gap: 16px !important;
-            justify-content: center !important;
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 20px 16px !important;
+            justify-items: center !important;
           }
           .hero-photo-wide {
             height: 200px !important;
