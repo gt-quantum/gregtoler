@@ -166,13 +166,11 @@ export default function HomePage({ latestProject }) {
       flexWrap: 'wrap',
       gap: '8px 0',
     },
-    brandName: {
-      fontSize: '0.875rem',
-      fontFamily: "'Inter', -apple-system, sans-serif",
-      fontWeight: '500',
-      color: currentTheme.textMuted,
-      opacity: 0.5,
-      letterSpacing: '0.02em',
+    brandLogo: {
+      height: '20px',
+      objectFit: 'contain',
+      filter: isDarkMode ? 'brightness(0) invert(1)' : 'brightness(0)',
+      opacity: 0.4,
     },
     heroPhotoWrapper: {
       width: '120px',
@@ -698,8 +696,24 @@ export default function HomePage({ latestProject }) {
         >
           <span style={{ ...styles.sectionLabel, marginBottom: '12px' }}>Brands I've worked with</span>
           <div style={styles.logoBar} className="logo-bar">
-            {['State Farm', 'Siemens', 'BambooHR', 'Parsable', 'CertifID', 'nrev.ai', 'Medix', 'Sayers', 'CRC Group'].map((name) => (
-              <span key={name} style={styles.brandName}>{name}</span>
+            {[
+              { name: 'State Farm', src: '/images/brands/state-farm.svg' },
+              { name: 'Siemens', src: '/images/brands/siemens.svg' },
+              { name: 'BambooHR', src: '/images/brands/bamboohr.png' },
+              { name: 'Parsable', src: '/images/brands/parsable.png' },
+              { name: 'CertifID', src: '/images/brands/certifid.svg' },
+              { name: 'nrev.ai', src: '/images/brands/nrev.svg' },
+              { name: 'Medix', src: '/images/brands/medix.svg' },
+              { name: 'Sayers', src: '/images/brands/sayers.svg' },
+              { name: 'CRC Group', src: '/images/brands/crc-group.png' },
+            ].map((brand) => (
+              <img
+                key={brand.name}
+                src={brand.src}
+                alt={brand.name}
+                title={brand.name}
+                style={styles.brandLogo}
+              />
             ))}
           </div>
         </motion.section>
