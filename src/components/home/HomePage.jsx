@@ -166,13 +166,11 @@ export default function HomePage({ latestProject }) {
       flexWrap: 'wrap',
       gap: '8px 0',
     },
-    brandName: {
-      fontSize: '0.9375rem',
-      fontFamily: "'Inter', -apple-system, sans-serif",
-      fontWeight: '500',
-      color: currentTheme.textMuted,
-      opacity: 0.45,
-      letterSpacing: '0.01em',
+    brandLogo: {
+      height: '20px',
+      objectFit: 'contain',
+      filter: isDarkMode ? 'brightness(0) invert(1)' : 'brightness(0)',
+      opacity: 0.4,
     },
     heroPhotoWrapper: {
       width: '120px',
@@ -698,8 +696,24 @@ export default function HomePage({ latestProject }) {
         >
           <span style={{ ...styles.sectionLabel, marginBottom: '12px' }}>Brands I've worked with</span>
           <div style={styles.logoBar} className="logo-bar">
-            {['State Farm', 'Siemens', 'BambooHR', 'Parsable', 'CertifID', 'nrev.ai', 'Medix', 'Sayers', 'CRC Group'].map((name) => (
-              <span key={name} style={styles.brandName}>{name}</span>
+            {[
+              { name: 'State Farm', domain: 'statefarm.com' },
+              { name: 'Siemens', domain: 'siemens.com' },
+              { name: 'BambooHR', domain: 'bamboohr.com' },
+              { name: 'Parsable', domain: 'parsable.com' },
+              { name: 'CertifID', domain: 'certifid.com' },
+              { name: 'nrev.ai', domain: 'nrev.ai' },
+              { name: 'Medix', domain: 'medixteam.com' },
+              { name: 'Sayers', domain: 'sayers.com' },
+              { name: 'CRC Group', domain: 'crcgroup.com' },
+            ].map((brand) => (
+              <img
+                key={brand.name}
+                src={`https://logo.clearbit.com/${brand.domain}`}
+                alt={brand.name}
+                title={brand.name}
+                style={styles.brandLogo}
+              />
             ))}
           </div>
         </motion.section>
