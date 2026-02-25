@@ -690,8 +690,9 @@ export default function HomePage({ latestProject }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
+          style={{ marginTop: '-24px', marginBottom: '-24px' }}
         >
-          <span style={styles.sectionLabel}>Brands I've worked with</span>
+          <span style={{ ...styles.sectionLabel, marginBottom: '12px' }}>Brands I've worked with</span>
           <div style={styles.logoBar} className="logo-bar">
             {[
               { name: 'HubSpot', src: 'https://cdn.worldvectorlogo.com/logos/hubspot.svg' },
@@ -761,14 +762,17 @@ export default function HomePage({ latestProject }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '12px' }} className="audience-grid">
             {[
               {
+                label: 'SaaS',
                 title: 'SaaS teams',
                 body: "Your go-to-market engine isn't converting strategy into pipeline. Marketing and sales are busy but disconnected, the tech stack is sprawling, and nobody owns the operational layer that ties it all together.",
               },
               {
+                label: 'Services',
                 title: 'Services companies',
                 body: "Your delivery still depends on one person's expertise. The work is good but it's manual, inconsistent, and impossible to scale without burning out the team.",
               },
               {
+                label: 'Operators',
                 title: 'Founders and operators',
                 body: "You need someone to come in and actually build, not just advise. You don't need another strategy deck. You need the process, the tooling, and the systems to make things run.",
               },
@@ -782,14 +786,17 @@ export default function HomePage({ latestProject }) {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '8px',
+                  borderLeft: `3px solid ${currentTheme.accent}`,
                 }}
                 className="audience-card"
               >
+                <span style={styles.pillarLabel}>{audience.label}</span>
                 <h4 style={{
                   fontSize: '1.125rem',
                   fontWeight: '500',
                   color: currentTheme.text,
                   margin: 0,
+                  lineHeight: '1.3',
                 }}>{audience.title}</h4>
                 <p style={{
                   fontSize: '0.875rem',
@@ -809,16 +816,45 @@ export default function HomePage({ latestProject }) {
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
         >
-          <div style={styles.finalCta}>
-            <h3 style={styles.finalCtaTitle}>Sound like your situation?</h3>
-            <p style={styles.finalCtaText}>Pick the one that fits and I'll take it from there.</p>
+          <div style={{
+            ...styles.finalCta,
+            textAlign: 'left',
+            alignItems: 'stretch',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '32px',
+          }} className="mid-cta">
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '12px' }}>
+              <h3 style={{ ...styles.finalCtaTitle, textAlign: 'left' }}>Sound like your situation?</h3>
+              <a
+                href="https://calendar.app.google/xjyG2v13KtxkypVm7"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.875rem',
+                  color: isDarkMode ? 'rgba(45, 42, 38, 0.6)' : 'rgba(250,249,247,0.6)',
+                  textDecoration: 'none',
+                  transition: 'opacity 0.2s',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+              >
+                or book a call directly{' '}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </a>
+            </div>
             <div style={{
               display: 'flex',
               flexDirection: 'column',
               gap: '6px',
-              width: '100%',
-              maxWidth: '360px',
-              marginTop: '8px',
             }}>
               {situations.map((s) => (
                 <motion.button
@@ -836,31 +872,6 @@ export default function HomePage({ latestProject }) {
                 </motion.button>
               ))}
             </div>
-            <a
-              href="https://calendar.app.google/xjyG2v13KtxkypVm7"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '0.8125rem',
-                color: isDarkMode ? 'rgba(45, 42, 38, 0.5)' : 'rgba(250,249,247,0.5)',
-                textDecoration: 'none',
-                marginTop: '4px',
-                transition: 'opacity 0.2s',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              or book a call directly{' '}
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-            </a>
           </div>
         </motion.section>
 
@@ -1020,6 +1031,17 @@ export default function HomePage({ latestProject }) {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 16px !important;
+          }
+          .mid-cta {
+            grid-template-columns: 1fr !important;
+            text-align: center !important;
+            gap: 20px !important;
+          }
+          .mid-cta h3 {
+            text-align: center !important;
+          }
+          .mid-cta a {
+            justify-content: center !important;
           }
           .logo-bar {
             flex-wrap: wrap !important;
