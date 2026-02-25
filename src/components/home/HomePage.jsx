@@ -122,7 +122,7 @@ export default function HomePage({ latestProject }) {
     grid: {
       display: 'grid',
       gridTemplateColumns: 'repeat(12, 1fr)',
-      gridTemplateRows: 'auto auto auto',
+      gridTemplateRows: 'auto auto',
       gap: '12px',
       rowGap: '20px',
     },
@@ -139,11 +139,8 @@ export default function HomePage({ latestProject }) {
       position: 'relative',
       overflow: 'hidden',
     },
-    intakeColumn: {
+    intakeWrapper: {
       gridColumn: 'span 4',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '12px',
     },
     heroTop: {
       display: 'flex',
@@ -161,12 +158,10 @@ export default function HomePage({ latestProject }) {
       transition: 'opacity 0.2s',
       whiteSpace: 'nowrap',
     },
-    logoRow: {
-      gridColumn: 'span 12',
+    logoBar: {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '12px 8px',
       opacity: 0.35,
     },
     heroLogoImg: {
@@ -244,34 +239,16 @@ export default function HomePage({ latestProject }) {
         ? '0 8px 32px rgba(0, 0, 0, 0.2)'
         : '0 8px 32px rgba(0, 0, 0, 0.08)',
     },
-    // Direct contact card
-    contactCard: {
-      flex: 1,
-      padding: '24px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '14px',
-      background: isDarkMode
-        ? 'rgba(227, 224, 219, 0.85)'
-        : 'rgba(45, 42, 38, 0.85)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      borderRadius: '16px',
-      border: isDarkMode
-        ? '1px solid rgba(255, 255, 255, 0.1)'
-        : '1px solid rgba(0, 0, 0, 0.05)',
-      boxShadow: isDarkMode
-        ? '0 8px 32px rgba(0, 0, 0, 0.2)'
-        : '0 8px 32px rgba(0, 0, 0, 0.08)',
-    },
-    contactLink: {
-      display: 'flex',
+    // "or book a call" link inside intake card
+    intakeBookCall: {
+      display: 'inline-flex',
       alignItems: 'center',
-      gap: '10px',
-      fontSize: '0.9375rem',
+      gap: '6px',
+      fontSize: '0.8125rem',
       fontFamily: "'Inter', -apple-system, sans-serif",
-      color: isDarkMode ? 'rgba(45, 42, 38, 0.9)' : 'rgba(250,249,247,0.9)',
+      color: isDarkMode ? 'rgba(45, 42, 38, 0.5)' : 'rgba(250,249,247,0.5)',
       textDecoration: 'none',
+      marginTop: '8px',
       transition: 'opacity 0.2s',
     },
     intakeAvailability: {
@@ -620,11 +597,11 @@ export default function HomePage({ latestProject }) {
         </motion.div>
 
         <motion.div
-          style={styles.intakeColumn}
-          className="intake-column"
+          style={styles.intakeWrapper}
+          className="intake-card"
           variants={itemVariants}
         >
-          <div style={styles.intakeCard} className="intake-card">
+          <div style={styles.intakeCard}>
             <div>
               <div style={styles.intakeAvailability}>
                 <span style={{
@@ -660,80 +637,24 @@ export default function HomePage({ latestProject }) {
                   );
                 })}
               </div>
+              <a
+                href="https://calendar.app.google/xjyG2v13KtxkypVm7"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.intakeBookCall}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+              >
+                or book a call directly{' '}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </a>
             </div>
           </div>
-
-          <div style={styles.contactCard} className="contact-card">
-            <span style={{
-              fontSize: '0.75rem',
-              fontFamily: "'Inter', -apple-system, sans-serif",
-              fontWeight: '500',
-              color: isDarkMode ? 'rgba(45, 42, 38, 0.5)' : 'rgba(250,249,247,0.5)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-            }}>Direct contact</span>
-            <a
-              href="mailto:greg@gregtoler.com"
-              style={styles.contactLink}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2" />
-                <path d="M22 4l-10 8L2 4" />
-              </svg>
-              greg@gregtoler.com
-            </a>
-            <a
-              href="https://linkedin.com/in/gregtoler"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.contactLink}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-              LinkedIn
-            </a>
-            <a
-              href="https://calendar.app.google/xjyG2v13KtxkypVm7"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.contactLink}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-              Book a call
-            </a>
-          </div>
-        </motion.div>
-
-        {/* Logo row */}
-        <motion.div style={styles.logoRow} className="logo-row" variants={itemVariants}>
-          {[
-            { name: 'HubSpot', src: 'https://cdn.worldvectorlogo.com/logos/hubspot.svg' },
-            { name: 'Salesforce', src: 'https://cdn.worldvectorlogo.com/logos/salesforce-2.svg' },
-            { name: 'OpenAI', src: 'https://cdn.worldvectorlogo.com/logos/openai-2.svg' },
-            { name: 'Notion', src: 'https://cdn.worldvectorlogo.com/logos/notion-2.svg' },
-            { name: 'Zapier', src: 'https://cdn.worldvectorlogo.com/logos/zapier.svg' },
-            { name: 'Google Cloud', src: 'https://cdn.worldvectorlogo.com/logos/google-cloud-1.svg' },
-          ].map((logo) => (
-            <img
-              key={logo.name}
-              src={logo.src}
-              alt={logo.name}
-              style={styles.heroLogoImg}
-              title={logo.name}
-            />
-          ))}
         </motion.div>
 
         {/* Row 2: Pillar cards */}
@@ -760,6 +681,34 @@ export default function HomePage({ latestProject }) {
 
       {/* Below the fold: Scrollable sections */}
       <div style={styles.belowFold}>
+        {/* Brands I've Worked With */}
+        <motion.section
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+        >
+          <span style={styles.sectionLabel}>Brands I've worked with</span>
+          <div style={styles.logoBar} className="logo-bar">
+            {[
+              { name: 'HubSpot', src: 'https://cdn.worldvectorlogo.com/logos/hubspot.svg' },
+              { name: 'Salesforce', src: 'https://cdn.worldvectorlogo.com/logos/salesforce-2.svg' },
+              { name: 'OpenAI', src: 'https://cdn.worldvectorlogo.com/logos/openai-2.svg' },
+              { name: 'Notion', src: 'https://cdn.worldvectorlogo.com/logos/notion-2.svg' },
+              { name: 'Zapier', src: 'https://cdn.worldvectorlogo.com/logos/zapier.svg' },
+              { name: 'Google Cloud', src: 'https://cdn.worldvectorlogo.com/logos/google-cloud-1.svg' },
+            ].map((logo) => (
+              <img
+                key={logo.name}
+                src={logo.src}
+                alt={logo.name}
+                style={styles.heroLogoImg}
+                title={logo.name}
+              />
+            ))}
+          </div>
+        </motion.section>
+
         {/* AI & Automation Callout */}
         <motion.section
           variants={sectionVariants}
@@ -847,6 +796,68 @@ export default function HomePage({ latestProject }) {
                 }}>{audience.body}</p>
               </div>
             ))}
+          </div>
+        </motion.section>
+
+        {/* Mid-page CTA */}
+        <motion.section
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+        >
+          <div style={styles.finalCta}>
+            <h3 style={styles.finalCtaTitle}>Sound like your situation?</h3>
+            <p style={styles.finalCtaText}>Pick the one that fits and I'll take it from there.</p>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              width: '100%',
+              maxWidth: '360px',
+              marginTop: '8px',
+            }}>
+              {situations.map((s) => (
+                <motion.button
+                  key={s.value}
+                  style={{
+                    ...styles.situationBtn,
+                    background: isDarkMode ? 'rgba(45, 42, 38, 0.3)' : 'rgba(255,255,255,0.15)',
+                    color: isDarkMode ? '#2C2824' : '#faf9f7',
+                  }}
+                  onClick={() => { window.location.href = `/contact?situation=${s.value}`; }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  {s.label}
+                </motion.button>
+              ))}
+            </div>
+            <a
+              href="https://calendar.app.google/xjyG2v13KtxkypVm7"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.8125rem',
+                color: isDarkMode ? 'rgba(45, 42, 38, 0.5)' : 'rgba(250,249,247,0.5)',
+                textDecoration: 'none',
+                marginTop: '4px',
+                transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              or book a call directly{' '}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </a>
           </div>
         </motion.section>
 
@@ -976,16 +987,8 @@ export default function HomePage({ latestProject }) {
           }
           .hero-card,
           .intake-card,
-          .contact-card,
           .pillar-card {
             min-height: 100px !important;
-          }
-          .intake-column {
-            flex-direction: row !important;
-          }
-          .intake-card,
-          .contact-card {
-            flex: 1 !important;
           }
           .hero-top {
             flex-direction: column !important;
@@ -1015,7 +1018,7 @@ export default function HomePage({ latestProject }) {
             align-items: flex-start !important;
             gap: 16px !important;
           }
-          .logo-row {
+          .logo-bar {
             flex-wrap: wrap !important;
             gap: 16px !important;
             justify-content: center !important;
