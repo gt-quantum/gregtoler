@@ -826,7 +826,7 @@ export default function HomePage({ latestProject }) {
           }} className="mid-cta">
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '12px' }}>
               <h3 style={{ ...styles.finalCtaTitle, textAlign: 'left' }}>Sound like your situation?</h3>
-              <p style={{ ...styles.finalCtaText, textAlign: 'left' }}>Pick the one that fits and I'll follow up with next steps.</p>
+              <p style={{ ...styles.finalCtaText, textAlign: 'left' }}>Every week you wait is another week of lost revenue, wasted hours, or a team working around something that should just work.</p>
               <a
                 href="https://calendar.app.google/xjyG2v13KtxkypVm7"
                 target="_blank"
