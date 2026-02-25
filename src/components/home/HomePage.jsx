@@ -697,22 +697,22 @@ export default function HomePage({ latestProject }) {
           <span style={{ ...styles.sectionLabel, marginBottom: '12px' }}>Brands I've worked with</span>
           <div style={styles.logoBar} className="logo-bar">
             {[
-              { name: 'State Farm', src: '/images/brands/state-farm.svg' },
-              { name: 'Siemens', src: '/images/brands/siemens.svg' },
-              { name: 'BambooHR', src: '/images/brands/bamboohr.png' },
+              { name: 'State Farm', src: '/images/brands/state-farm.svg', h: 28 },
+              { name: 'Siemens', src: '/images/brands/siemens.svg', h: 16 },
+              { name: 'BambooHR', src: '/images/brands/BambooHR_logo.svg.png' },
               { name: 'Parsable', src: '/images/brands/parsable.png' },
               { name: 'CertifID', src: '/images/brands/certifid.svg' },
               { name: 'nrev.ai', src: '/images/brands/nrev.svg' },
               { name: 'Medix', src: '/images/brands/medix.svg' },
               { name: 'Sayers', src: '/images/brands/sayers.svg' },
-              { name: 'CRC Group', src: '/images/brands/crc-group.png' },
+              { name: 'CRC Group', src: '/images/brands/CRC_logo.svg.png' },
             ].map((brand) => (
               <img
                 key={brand.name}
                 src={brand.src}
                 alt={brand.name}
                 title={brand.name}
-                style={styles.brandLogo}
+                style={{ ...styles.brandLogo, ...(brand.h ? { height: brand.h } : {}) }}
               />
             ))}
           </div>
