@@ -773,7 +773,7 @@ export default function HomePage({ latestProject }) {
               },
               {
                 label: 'Startup',
-                title: 'Builder-mode leaders',
+                title: 'Founders & operators',
                 body: "You need someone to come in and actually build, not just advise. You don't need another strategy deck. You need the process, the tooling, and the systems to make things run.",
               },
             ].map((audience) => (
