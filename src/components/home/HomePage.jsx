@@ -763,17 +763,17 @@ export default function HomePage({ latestProject }) {
             {[
               {
                 label: 'SaaS',
-                title: 'SaaS teams',
+                title: 'GTM teams',
                 body: "Your go-to-market engine isn't converting strategy into pipeline. Marketing and sales are busy but disconnected, the tech stack is sprawling, and nobody owns the operational layer that ties it all together.",
               },
               {
                 label: 'Services',
-                title: 'Services companies',
+                title: 'B2B agencies',
                 body: "Your delivery still depends on one person's expertise. The work is good but it's manual, inconsistent, and impossible to scale without burning out the team.",
               },
               {
-                label: 'Operators',
-                title: 'Founders and operators',
+                label: 'Startup',
+                title: 'Builder-mode leaders',
                 body: "You need someone to come in and actually build, not just advise. You don't need another strategy deck. You need the process, the tooling, and the systems to make things run.",
               },
             ].map((audience) => (
@@ -826,6 +826,7 @@ export default function HomePage({ latestProject }) {
           }} className="mid-cta">
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '12px' }}>
               <h3 style={{ ...styles.finalCtaTitle, textAlign: 'left' }}>Sound like your situation?</h3>
+              <p style={{ ...styles.finalCtaText, textAlign: 'left' }}>Pick the one that fits and I'll follow up with next steps.</p>
               <a
                 href="https://calendar.app.google/xjyG2v13KtxkypVm7"
                 target="_blank"
