@@ -125,7 +125,6 @@ export default function HomePage({ latestProject }) {
       gridTemplateRows: 'auto auto auto',
       gap: '12px',
       rowGap: '20px',
-      minHeight: '420px',
     },
 
     // Row 1: Hero (8) + Intake column (4)
@@ -134,8 +133,7 @@ export default function HomePage({ latestProject }) {
       gridColumn: 'span 8',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      gap: '28px',
+      gap: '20px',
       padding: '32px',
       textDecoration: 'none',
       position: 'relative',
@@ -168,7 +166,7 @@ export default function HomePage({ latestProject }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '0 8px',
+      padding: '12px 8px',
       opacity: 0.35,
     },
     heroLogoImg: {
@@ -762,40 +760,6 @@ export default function HomePage({ latestProject }) {
 
       {/* Below the fold: Scrollable sections */}
       <div style={styles.belowFold}>
-        {/* Featured Work */}
-        {latestProject && (
-          <motion.section
-            variants={sectionVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
-          >
-            <span style={styles.sectionLabel}>Featured Work</span>
-            <motion.a
-              href={`/work/projects/${latestProject.slug}`}
-              style={styles.featuredCard}
-              whileHover={{ y: -4, boxShadow: isDarkMode ? '0 12px 40px rgba(0, 0, 0, 0.2)' : '0 12px 40px rgba(44, 40, 36, 0.14)' }}
-            >
-              <div style={styles.featuredContent}>
-                <h3 style={styles.featuredTitle}>{latestProject.title}</h3>
-                <p style={styles.featuredMeta}>{latestProject.subtitle}</p>
-                <div style={styles.featuredStatus}>
-                  <span style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    background: latestProject.status === 'active' ? '#4ade80' : currentTheme.textMuted,
-                    opacity: latestProject.status === 'active' ? 1 : 0.4,
-                    display: 'inline-block',
-                  }} />
-                  <span>{latestProject.status === 'active' ? 'Active' : 'Completed'}</span>
-                </div>
-              </div>
-              <ArrowRight color={currentTheme.textMuted} />
-            </motion.a>
-          </motion.section>
-        )}
-
         {/* AI & Automation Callout */}
         <motion.section
           variants={sectionVariants}
@@ -885,6 +849,40 @@ export default function HomePage({ latestProject }) {
             ))}
           </div>
         </motion.section>
+
+        {/* Featured Work */}
+        {latestProject && (
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+          >
+            <span style={styles.sectionLabel}>Featured Work</span>
+            <motion.a
+              href={`/work/projects/${latestProject.slug}`}
+              style={styles.featuredCard}
+              whileHover={{ y: -4, boxShadow: isDarkMode ? '0 12px 40px rgba(0, 0, 0, 0.2)' : '0 12px 40px rgba(44, 40, 36, 0.14)' }}
+            >
+              <div style={styles.featuredContent}>
+                <h3 style={styles.featuredTitle}>{latestProject.title}</h3>
+                <p style={styles.featuredMeta}>{latestProject.subtitle}</p>
+                <div style={styles.featuredStatus}>
+                  <span style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: latestProject.status === 'active' ? '#4ade80' : currentTheme.textMuted,
+                    opacity: latestProject.status === 'active' ? 1 : 0.4,
+                    display: 'inline-block',
+                  }} />
+                  <span>{latestProject.status === 'active' ? 'Active' : 'Completed'}</span>
+                </div>
+              </div>
+              <ArrowRight color={currentTheme.textMuted} />
+            </motion.a>
+          </motion.section>
+        )}
 
         {/* About Teaser */}
         <motion.section
