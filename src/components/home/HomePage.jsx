@@ -163,12 +163,16 @@ export default function HomePage({ latestProject }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      opacity: 0.35,
+      flexWrap: 'wrap',
+      gap: '8px 0',
     },
-    heroLogoImg: {
-      height: '18px',
-      objectFit: 'contain',
-      filter: isDarkMode ? 'invert(1) brightness(2)' : 'brightness(0)',
+    brandName: {
+      fontSize: '0.9375rem',
+      fontFamily: "'Inter', -apple-system, sans-serif",
+      fontWeight: '500',
+      color: currentTheme.textMuted,
+      opacity: 0.45,
+      letterSpacing: '0.01em',
     },
     heroPhotoWrapper: {
       width: '120px',
@@ -694,21 +698,8 @@ export default function HomePage({ latestProject }) {
         >
           <span style={{ ...styles.sectionLabel, marginBottom: '12px' }}>Brands I've worked with</span>
           <div style={styles.logoBar} className="logo-bar">
-            {[
-              { name: 'HubSpot', src: 'https://cdn.worldvectorlogo.com/logos/hubspot.svg' },
-              { name: 'Salesforce', src: 'https://cdn.worldvectorlogo.com/logos/salesforce-2.svg' },
-              { name: 'OpenAI', src: 'https://cdn.worldvectorlogo.com/logos/openai-2.svg' },
-              { name: 'Notion', src: 'https://cdn.worldvectorlogo.com/logos/notion-2.svg' },
-              { name: 'Zapier', src: 'https://cdn.worldvectorlogo.com/logos/zapier.svg' },
-              { name: 'Google Cloud', src: 'https://cdn.worldvectorlogo.com/logos/google-cloud-1.svg' },
-            ].map((logo) => (
-              <img
-                key={logo.name}
-                src={logo.src}
-                alt={logo.name}
-                style={styles.heroLogoImg}
-                title={logo.name}
-              />
+            {['State Farm', 'Siemens', 'BambooHR', 'Parsable', 'CertifID', 'Medix', 'Sayers', 'CRC Group'].map((name) => (
+              <span key={name} style={styles.brandName}>{name}</span>
             ))}
           </div>
         </motion.section>
