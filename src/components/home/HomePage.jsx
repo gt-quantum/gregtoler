@@ -6,9 +6,9 @@ import { theme } from '../../lib/theme';
 // EDITABLE CONTENT
 // ============================================
 const homeConfig = {
-  headline: 'I help B2B businesses fix, build, and scale their operations.',
-  subheadline: "Stop working around broken processes, manual workflows, disconnected systems, or services that don't scale. Whether you need someone to build the solution or help you find it, let's work together.",
-  role: 'Operations & GTM Strategy',
+  headline: 'I help B2B companies fix what\'s broken, build what\'s missing, and scale what works.',
+  subheadline: "Most consultants diagnose problems and hand you a deck. I do the work. I'll fix the process that's costing you time, build the system or tool that doesn't exist yet, and put the structure in place so it holds up without me. If it should be automated, I'll automate it. If it needs AI, I'll build it. If it just needs someone to roll up their sleeves and make it work, that's what I do.",
+  role: 'Strategy & Systems',
   available: true,
   heroImage: '/images/profile.jpg',
 
@@ -16,22 +16,22 @@ const homeConfig = {
     {
       id: 'fix-it',
       label: 'Fix It',
-      tagline: 'Making what exists work better.',
-      examples: 'Broken lead flows, bloated tech stacks, 20-hour manual workflows, pipeline leaks between marketing and sales.',
+      tagline: "Something isn't working and it's costing you time, money, or both.",
+      examples: 'Leaking pipelines, bloated tech stacks, manual workflows eating 20+ hours a week, and processes that worked at 10 people but are breaking at 50.',
       href: '/services#fix-it',
     },
     {
       id: 'build-it',
       label: 'Build It',
-      tagline: 'Making something new that needs to exist.',
-      examples: 'AI-powered newsletter systems, custom territory mapping apps, RAG architectures, automated data pipelines.',
+      tagline: 'You have a gap and nothing off the shelf fills it.',
+      examples: 'Custom internal tools, automation systems, AI-powered workflows, data pipelines, and the integrations that connect your stack into something that actually works together.',
       href: '/services#build-it',
     },
     {
       id: 'scale-it',
       label: 'Scale It',
-      tagline: 'Making what works repeatable.',
-      examples: 'Service delivery frameworks, SOPs and training programs, customer onboarding systems, productized offerings.',
+      tagline: "It works today but it won't survive growth.",
+      examples: "Service delivery frameworks, SOPs and training programs, customer onboarding systems, and repeatable processes that don't depend on one person's brain.",
       href: '/services#scale-it',
     },
   ],
@@ -714,12 +714,12 @@ export default function HomePage({ latestProject }) {
         >
           <span style={styles.sectionLabel}>AI & Automation</span>
           <div style={styles.aiCard}>
-            <h3 style={styles.aiTitle}>AI is built into how I work</h3>
+            <h3 style={styles.aiTitle}>AI and automation that actually helps</h3>
             <p style={styles.aiBody}>
-              Every engagement gets evaluated through an AI lens. Where can automation create leverage? Where does a custom AI system replace a $35/seat SaaS license? Where does an AI agent handle the repetitive work so your team focuses on judgment calls?
+              Everyone is trying to use AI right now. Most are spending more time on the AI itself than the job it's supposed to do. I help you figure out where AI and automation actually make things better and where they don't. That means architecting AI into processes where it creates real leverage, building agents and automations that make delivery easier over time, and knowing when to leave it alone. No slop. No AI for the sake of AI. I also coach teams on how to use it well so it works for them instead of becoming another thing to manage.
             </p>
             <div style={styles.aiTags}>
-              {['MCP Development', 'RAG Architecture', 'AI Agents', 'Custom Automation', 'AI-Forward Ops'].map((tag) => (
+              {['AI Architecture', 'Agents & Automation', 'Process Automation', 'Tool Integration', 'AI Coaching'].map((tag) => (
                 <span key={tag} style={styles.aiTag}>{tag}</span>
               ))}
             </div>
@@ -743,6 +743,58 @@ export default function HomePage({ latestProject }) {
           </div>
         </motion.section>
 
+        {/* Who I Work With */}
+        <motion.section
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+        >
+          <span style={styles.sectionLabel}>Who I work with</span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '12px' }} className="audience-grid">
+            {[
+              {
+                title: 'SaaS teams',
+                body: "Your go-to-market engine isn't converting strategy into pipeline. Marketing and sales are busy but disconnected, the tech stack is sprawling, and nobody owns the operational layer that ties it all together.",
+              },
+              {
+                title: 'Services companies',
+                body: "Your delivery still depends on one person's expertise. The work is good but it's manual, inconsistent, and impossible to scale without burning out the team.",
+              },
+              {
+                title: 'Founders and operators',
+                body: "You need someone to come in and actually build, not just advise. You don't need another strategy deck. You need the process, the tooling, and the systems to make things run.",
+              },
+            ].map((audience) => (
+              <div
+                key={audience.title}
+                style={{
+                  ...glassCard,
+                  gridColumn: 'span 4',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+                className="audience-card"
+              >
+                <h4 style={{
+                  fontSize: '1.125rem',
+                  fontWeight: '500',
+                  color: currentTheme.text,
+                  margin: 0,
+                }}>{audience.title}</h4>
+                <p style={{
+                  fontSize: '0.875rem',
+                  color: currentTheme.textMuted,
+                  margin: 0,
+                  lineHeight: '1.6',
+                }}>{audience.body}</p>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+
         {/* About Teaser */}
         <motion.section
           variants={sectionVariants}
@@ -761,7 +813,7 @@ export default function HomePage({ latestProject }) {
             </div>
             <div style={styles.aboutContent}>
               <p style={styles.aboutBio}>
-                For the past decade, I've helped B2B companies build the systems, processes, and tooling that turn strategy into execution. I sit at the intersection of marketing, sales, and operations, designing the connective tissue that makes revenue teams work.
+                I've spent the last decade helping B2B companies build the systems, processes, and tools that turn strategy into execution. I came up on the GTM side of the house, which means I understand how marketing, sales, and revenue teams actually work. But what I'm best at is the operational layer underneath: figuring out how things should work, building the systems to make them work, and putting the structure in place so they keep working as the business grows.
               </p>
               <div style={styles.statsBar} className="stats-bar">
                 {homeConfig.stats.map((stat, i) => (
@@ -792,7 +844,7 @@ export default function HomePage({ latestProject }) {
         >
           <div style={styles.finalCta}>
             <h3 style={styles.finalCtaTitle}>Start a Project</h3>
-            <p style={styles.finalCtaText}>Tell me what's going on. We'll figure out the right approach together.</p>
+            <p style={styles.finalCtaText}>Tell me what's going on. I'll get to work and we'll figure out the right approach together.</p>
             <div style={styles.finalCtaAvailability}>
               <span style={{
                 width: '6px',
@@ -842,6 +894,13 @@ export default function HomePage({ latestProject }) {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 16px !important;
+          }
+        }
+        @media (max-width: 1000px) {
+          .audience-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
           }
         }
         @media (max-width: 768px) {
