@@ -698,7 +698,7 @@ export default function HomePage({ latestProject }) {
         >
           <span style={{ ...styles.sectionLabel, marginBottom: '12px' }}>Brands I've worked with</span>
           <div style={styles.logoBar} className="logo-bar">
-            {['State Farm', 'Siemens', 'BambooHR', 'Parsable', 'CertifID', 'Medix', 'Sayers', 'CRC Group'].map((name) => (
+            {['State Farm', 'Siemens', 'BambooHR', 'Parsable', 'CertifID', 'nrev.ai', 'Medix', 'Sayers', 'CRC Group'].map((name) => (
               <span key={name} style={styles.brandName}>{name}</span>
             ))}
           </div>
