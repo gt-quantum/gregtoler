@@ -1,0 +1,160 @@
+---
+/**
+ * V2 preview route. V1 stays live and untouched until cutover.
+ * Scope right now: hero → framework morph only. See v2/START-HERE.md.
+ */
+import V2Layout from "../../layouts/V2Layout.astro";
+import HeroFramework from "../../components/v2/HeroFramework.astro";
+import GTMark from "../../components/v2/GTMark.astro";
+import SpineNav from "../../components/v2/SpineNav.astro";
+---
+
+<V2Layout>
+  <header class="v2-head">
+    <a class="v2-brand" href="/v2" aria-label="Greg Toler, GT Strategies">
+      <GTMark height={40} />
+    </a>
+    <SpineNav />
+    <!-- day/night parked: dark-only for now. The theme mechanism stays in the code. -->
+    <a
+      class="v2-linkedin"
+      href="https://linkedin.com/in/gregtoler"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Greg Toler on LinkedIn"
+    >
+      <!-- same mark V1 uses (FluidSpineMenu.jsx), recoloured to the nav's ink -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+      </svg>
+    </a>
+  </header>
+
+  <main>
+    <!-- id lives on this wrapper: the stage keeps its own id for its scroll JS, and the
+         nav needs a real #framework target spanning the whole pinned section -->
+    <div id="framework">
+      <HeroFramework />
+    </div>
+
+    <!-- Placeholder sections: real content comes later. They exist so the spine nav's
+         section-follow + connector-stretch motion can be seen end to end. -->
+    <section class="v2-wrap v2-ph" id="approach" aria-label="Approach (placeholder)">
+      <p class="v2-mono">02 · Approach</p>
+      <h2>[Placeholder] Fix it. Build it. Scale it.</h2>
+      <p class="body">[Three-beat sequence lands here. Watch the nav connector while scrolling.]</p>
+    </section>
+
+    <section class="v2-wrap v2-ph" id="work" aria-label="Work (placeholder)">
+      <p class="v2-mono">03 · Work</p>
+      <h2>[Placeholder] Plotted on the same map.</h2>
+      <p class="body">[Case studies, plotted by coordinate on the framework. Placeholders in v2/content/case-studies/.]</p>
+    </section>
+
+    <section class="v2-wrap v2-ph" id="about" aria-label="About (placeholder)">
+      <p class="v2-mono">04 · About</p>
+      <h2>[Placeholder] The operator behind the map.</h2>
+      <p class="body">[About copy lands here.]</p>
+    </section>
+
+    <section class="v2-wrap v2-ph" id="contact" aria-label="Contact (placeholder)">
+      <p class="v2-mono">05 · Contact</p>
+      <h2>[Placeholder] Tell me what's going on.</h2>
+      <p class="body">[Contact flow lands here.]</p>
+    </section>
+  </main>
+</V2Layout>
+
+<style>
+
+  .v2-head {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 40px;
+    background: transparent;
+    gap: 36px;
+  }
+  /* blur layer: taller than the header, faded out with a mask so there is no hard
+     bottom edge where the blur stops */
+  .v2-head::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0;
+    height: 150%;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .v2-brand { display: flex; align-items: center; padding: 4px; position: relative; }
+  /* Softened: solid shapes outshout the thin mono nav. Opacity lives on the WRAPPER —
+     .v2-gtmark is scoped inside the GTMark component, so a page-scoped rule targeting
+     it never matches (why earlier attempts silently did nothing). */
+  .v2-brand { opacity: .72; transition: opacity .3s var(--v2-ease-out); }
+  .v2-brand:hover { opacity: .95; }
+  .v2-head nav { display: flex; align-items: center; gap: 26px; }
+  .v2-navlink {
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--v2-ink-dim);
+    transition: color .3s var(--v2-ease-out);
+  }
+  .v2-navlink .n { color: var(--v2-ink-faint); margin-right: 6px; }
+  .v2-navlink:hover { color: var(--v2-ink); }
+  .v2-navlink:hover .n { color: var(--v2-light); }
+
+  .v2-toggle {
+    font-family: var(--v2-mono); font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--v2-ink-dim);
+    background: transparent; border: 1px solid var(--v2-line);
+    border-radius: 100px; padding: 7px 13px; cursor: pointer;
+    transition: border-color .3s var(--v2-ease-out), color .3s var(--v2-ease-out);
+  }
+  .v2-toggle:hover { border-color: var(--v2-light); color: var(--v2-ink); }
+
+  .v2-linkedin {
+    display: flex; align-items: center; flex: none;
+    padding: 8px;
+    color: var(--v2-ink-dim);
+    opacity: .65;               /* solid glyph vs thin mono nav text — needs the handicap */
+    transition: color .25s var(--v2-ease-out), opacity .25s var(--v2-ease-out);
+  }
+  .v2-linkedin:hover { color: var(--v2-ink); opacity: .95; }
+
+  /* Small screens: the vertical spine occupies a fixed 76px rail on the LEFT, under
+     the logo — V1's sidebar layout. Content pads off it; LinkedIn sits at the rail's
+     foot under a divider, exactly like the original. */
+  @media (max-width: 860px) {
+    main { padding-left: 94px; }   /* rail inset 18 + rail 76 */
+    .v2-head { padding-right: 20px; }
+    .v2-linkedin {
+      position: fixed;
+      left: 39px; bottom: 16px;    /* centred on the rail's column */
+      z-index: 70;
+      padding: 8px;
+    }
+    /* the small divider V1's sidebar draws above its socials */
+    .v2-linkedin::before {
+      content: ""; position: absolute;
+      top: -12px; left: 50%; transform: translateX(-50%);
+      width: 26px; height: 1px; background: var(--v2-line);
+    }
+  }
+
+  .v2-ph { min-height: 72vh; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+  .v2-ph h2 { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.6rem, 3.2vw, 2.6rem); margin: 0; color: var(--v2-ink); }
+  .v2-ph .body { color: var(--v2-ink-dim); max-width: 56ch; margin: 0; }
+
+  @media (max-width: 720px) {
+    .v2-head { padding: 16px 22px; }
+  }
+</style>
+
+<script>
+  // dark-only: clear any stored day preference so nobody is stuck in the parked theme
+  document.documentElement.removeAttribute("data-v2-theme");
+  try { localStorage.removeItem("v2-theme"); } catch (e) {}
+
+  // accent audition retired — clear any stored pick so the locked token wins
+  try { localStorage.removeItem("v2-accent"); } catch (e) {}
+</script>

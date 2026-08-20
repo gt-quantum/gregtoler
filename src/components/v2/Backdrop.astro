@@ -1,0 +1,293 @@
+---
+/**
+ * V2 — global backdrop. ONE canvas for the whole site.
+ *
+ * Back to front:
+ *   1. SILK LAYERS — filled bezier sheets, ported from V1's SilkFabricBackground.jsx.
+ *      Charcoal GREY, deliberately not an amber fill: the ground is grey and the warmth
+ *      comes from light landing on it.
+ *   2. LAMP BLOOMS — two huge, very soft warm gradients drifting slowly. This is the
+ *      "warm light" in the room. It is light, not surface colour.
+ *   3. DOTTED GRID across the whole viewport, always present. Each dot is a soft radial
+ *      sprite, not a hard disc, so it reads as glow rather than paint.
+ *   4. CURSOR BULGE — a tight dome. Dots displace outward and light up as if a ball
+ *      under the grid is pushing it up.
+ *
+ * Sections bias it via window.v2Backdrop.setFocus(0..1).
+ */
+---
+
+<canvas class="v2-backdrop" id="v2-backdrop" aria-hidden="true"></canvas>
+
+<style>
+  .v2-backdrop {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
+
+<script>
+  (() => {
+    const canvas = document.getElementById("v2-backdrop") as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const SPACING = 24;          // tighter lattice — 34 read as too coarse a pattern
+    const BULGE_R = 88;           // 210 → 132 → 88. The dome kept reading as a spotlight.
+    const BULGE_STRENGTH = 0.30;  // subtler push, so it suggests a ball rather than announcing one
+
+    let dpr = 1, W = 0, H = 0, cols = 0, rows = 0, offX = 0, offY = 0;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // clientWidth/Height, NOT innerWidth/Height: innerWidth includes the scrollbar,
+      // so the bitmap came out wider than the element and left an uncovered strip.
+      W = canvas!.clientWidth || document.documentElement.clientWidth;
+      H = canvas!.clientHeight || document.documentElement.clientHeight;
+      canvas!.width = Math.floor(W * dpr);
+      canvas!.height = Math.floor(H * dpr);
+      cols = Math.ceil(W / SPACING) + 2;
+      rows = Math.ceil(H / SPACING) + 2;
+      offX = (W - (cols - 1) * SPACING) / 2;
+      offY = (H - (rows - 1) * SPACING) / 2;
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    /* Explicit, evenly-stepped colours per sheet — the lum-multiplier version produced
+       bunched steps (layers 1-3 near-identical, then a cliff to the bg). Sheets are
+       drawn TOP-most first and BOTTOM-most last at near-full alpha, so each band's
+       visible colour is exactly its own fill: bg #17181A, then a ~5-point step per
+       layer down to the lightest sheet nearest the viewer at the bottom.
+       `dot` still scales that band's lattice dots. */
+    const layers = [
+      { points: 5, baseY: 0.27, amp:  78, freq: 1.1, speed: 0.106, phase: 4, col: "27 28 31", a: 0.96, dot: 0.60 },
+      { points: 4, baseY: 0.42, amp:  92, freq: 0.9, speed: 0.084, phase: 3, col: "32 33 37", a: 0.96, dot: 0.70 },
+      { points: 5, baseY: 0.58, amp: 116, freq: 0.7, speed: 0.064, phase: 2, col: "38 40 44", a: 0.96, dot: 0.80 },
+      { points: 6, baseY: 0.74, amp: 110, freq: 1.0, speed: 0.046, phase: 1, col: "45 47 52", a: 0.96, dot: 0.90 },
+      { points: 5, baseY: 0.90, amp: 132, freq: 0.8, speed: 0.030, phase: 0, col: "53 55 61", a: 0.96, dot: 1.00 },
+    ];
+
+    let silkRGB = "56 54 51", lampRGB = "214 158 92", dotColor = "#4A4640", lightColor = "#C89257";
+    let dotSprite: HTMLCanvasElement | null = null;
+    let hotSprite: HTMLCanvasElement | null = null;
+
+    function toRGB(hex: string) {
+      const h = hex.replace("#", "").trim();
+      const n = h.length === 3
+        ? h.split("").map((c) => c + c).join("")
+        : h;
+      return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)];
+    }
+
+    /* A radial gradient MUST fade to its own colour at alpha 0.
+       Fading to "rgba(0,0,0,0)" interpolates toward black and leaves a dark ring around
+       every dot — which is exactly the "hollow / dark outer circle" artefact. */
+    function makeSprite(color: string, size = 64) {
+      const [r, g_, b] = toRGB(color);
+      const c = document.createElement("canvas");
+      c.width = c.height = size;
+      const g = c.getContext("2d")!;
+      const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+      grad.addColorStop(0.00, `rgba(${r},${g_},${b},1)`);
+      grad.addColorStop(0.14, `rgba(${r},${g_},${b},0.92)`);
+      grad.addColorStop(0.34, `rgba(${r},${g_},${b},0.30)`);
+      grad.addColorStop(0.62, `rgba(${r},${g_},${b},0.06)`);
+      grad.addColorStop(1.00, `rgba(${r},${g_},${b},0)`);
+      g.fillStyle = grad;
+      g.fillRect(0, 0, size, size);
+      return c;
+    }
+
+    function readColors() {
+      const cs = getComputedStyle(document.documentElement);
+      silkRGB = cs.getPropertyValue("--v2-silk").trim() || silkRGB;
+      lampRGB = cs.getPropertyValue("--v2-lamp").trim() || lampRGB;
+      dotColor = cs.getPropertyValue("--v2-dot").trim() || dotColor;
+      lightColor = cs.getPropertyValue("--v2-light").trim() || lightColor;
+      dotSprite = makeSprite(dotColor);
+      hotSprite = makeSprite(lightColor);
+    }
+    // watch inline style too — the accent audition widget re-tints via
+    // root.style.setProperty, not via the theme attribute
+    new MutationObserver(readColors).observe(document.documentElement, {
+      attributes: true, attributeFilter: ["data-v2-theme", "style"],
+    });
+
+    function drawSheet(L: any, time: number) {
+      {
+        const pts: { x: number; y: number }[] = [];
+        for (let i = 0; i <= L.points; i++) {
+          const x = (i / L.points) * W;
+          const y =
+            H * L.baseY +
+            Math.sin(i * L.freq + time * L.speed + L.phase) * L.amp +
+            Math.sin(i * L.freq * 0.5 + time * L.speed * 0.7 + L.phase) * L.amp * 0.4;
+          pts.push({ x, y });
+        }
+        ctx!.beginPath();
+        ctx!.moveTo(0, H);
+        ctx!.lineTo(pts[0].x, pts[0].y);
+        for (let i = 0; i < pts.length - 1; i++) {
+          const c = pts[i], n = pts[i + 1];
+          const cpX = (c.x + n.x) / 2;
+          ctx!.bezierCurveTo(cpX, c.y, cpX, n.y, n.x, n.y);
+        }
+        ctx!.lineTo(W, H);
+        ctx!.closePath();
+        const g = ctx!.createLinearGradient(0, H * L.baseY - L.amp, 0, H);
+        g.addColorStop(0, `rgba(${L.col} / ${L.a})`);
+        g.addColorStop(1, `rgba(${L.col} / ${L.a})`);
+        ctx!.fillStyle = g;
+        ctx!.fill();
+      }
+    }
+
+    /* ---- warm light in the room: two slow drifting blooms ---- */
+    function drawLamps(time: number) {
+      const lamps = [
+        { x: 0.28 + Math.sin(time * 0.035) * 0.08, y: 0.30 + Math.cos(time * 0.028) * 0.07, r: 0.62, a: 0.040 },
+        { x: 0.74 + Math.cos(time * 0.026) * 0.07, y: 0.68 + Math.sin(time * 0.032) * 0.06, r: 0.52, a: 0.028 },
+      ];
+      for (const L of lamps) {
+        const R = Math.max(W, H) * L.r;
+        const g = ctx!.createRadialGradient(L.x * W, L.y * H, 0, L.x * W, L.y * H, R);
+        g.addColorStop(0, `rgba(${lampRGB} / ${L.a})`);
+        g.addColorStop(1, `rgba(${lampRGB} / 0)`);
+        ctx!.fillStyle = g;
+        ctx!.fillRect(0, 0, W, H);
+      }
+    }
+
+    /* ---- pointer ---- */
+    let px = -9999, py = -9999, hasPointer = false;
+    window.addEventListener("pointermove", (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      px = e.clientX; py = e.clientY; hasPointer = true;
+    }, { passive: true });
+    document.addEventListener("mouseleave", () => { hasPointer = false; });
+
+    let focus = 0;
+    (window as any).v2Backdrop = {
+      setFocus(v: number) { focus = Math.max(0, Math.min(1, v)); },
+    };
+
+    /* Evaluate a layer's surface at an arbitrary x — same formula drawSilk uses for its
+       control points, but continuous, so dots can ride the sheet they belong to. */
+    function layerWave(L: any, x: number, time: number) {
+      const i = (x / W) * L.points;
+      return (
+        Math.sin(i * L.freq + time * L.speed + L.phase) * L.amp +
+        Math.sin(i * L.freq * 0.5 + time * L.speed * 0.7 + L.phase) * L.amp * 0.4
+      );
+    }
+
+    /* Dots are computed per depth band, then PAINTED INTERLEAVED with the sheets:
+       sheet 0, its dots, sheet 1 (partly covering them), its dots, ... so each row of
+       dots genuinely lives ON its layer and is occluded by nearer sheets, instead of
+       the whole lattice floating on top of the stack. */
+    function computeDots(time: number) {
+      const cxv = W / 2, cyv = H / 2;
+      const focusR = Math.min(W, H) * 0.58;
+      const bands: number[][] = layers.map(() => []);
+      const hot: number[] = [];
+
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          let x = offX + i * SPACING;
+          let y = offY + j * SPACING;
+          let heat = 0;
+
+          /* The lattice stays a PERFECTLY EVEN grid — displacing dots by each band's
+             wave just warped it into looking broken (Greg). Depth now comes purely from
+             paint order: deeper dots get veiled by the translucent sheets drawn over
+             them, so the layering follows the sheets' wavy edges while every dot stays
+             exactly on its intersection. */
+          // region bounds sit between adjacent sheets' baselines
+          const fy = y / H;
+          const band = fy < 0.34 ? 0 : fy < 0.50 ? 1 : fy < 0.66 ? 2 : fy < 0.82 ? 3 : 4;
+
+          if (hasPointer) {
+            const dx = x - px, dy = y - py;
+            const d = Math.hypot(dx, dy);
+            if (d < BULGE_R && d > 0.001) {
+              const f = 1 - d / BULGE_R;
+              const sc = 1 + BULGE_STRENGTH * f * f;
+              x = px + dx * sc;
+              y = py + dy * sc;
+              heat = f * f;
+            }
+          }
+          if (focus > 0) {
+            const d = Math.hypot(x - cxv, y - cyv);
+            if (d < focusR) heat = Math.max(heat, (1 - d / focusR) * focus * 0.5);
+          }
+
+          bands[band].push(x, y, heat);
+          if (heat > 0.04) hot.push(x, y, heat);
+        }
+      }
+      return { bands, hot };
+    }
+
+    function paintBand(pts: number[], _depth: number) {
+      // uniform size and alpha everywhere — the sheets painted over deeper bands do
+      // the depth work, the dots themselves stay consistent
+      for (let k = 0; k < pts.length; k += 3) {
+        const heat = pts[k + 2];
+        const gr = 2.6 + heat * 3.0;
+        ctx!.globalAlpha = 0.55 + heat * 0.25;
+        ctx!.drawImage(dotSprite!, pts[k] - gr, pts[k + 1] - gr, gr * 2, gr * 2);
+      }
+      ctx!.globalAlpha = 1;
+    }
+
+    function paintHot(hot: number[]) {
+      // additive, on top of everything — lit dots ADD light, which cannot produce the
+      // hollow-ring artefact a stacked disc would
+      ctx!.globalCompositeOperation = "lighter";
+      for (let k = 0; k < hot.length; k += 3) {
+        const heat = hot[k + 2];
+        const hr = 3 + heat * 9;
+        ctx!.globalAlpha = heat * 0.42;
+        ctx!.drawImage(hotSprite!, hot[k] - hr, hot[k + 1] - hr, hr * 2, hr * 2);
+      }
+      ctx!.globalCompositeOperation = "source-over";
+      ctx!.globalAlpha = 1;
+    }
+
+    let start0: number | null = null;
+    function frame(ts: number) {
+      if (start0 === null) start0 = ts;
+      const time = (ts - start0) / 1000;
+      ctx!.clearRect(0, 0, W, H);
+      const { bands, hot } = computeDots(time);
+      for (let i = 0; i < layers.length; i++) {
+        drawSheet(layers[i], time);
+        paintBand(bands[i], layers[i].dot);
+      }
+      drawLamps(time);
+      paintHot(hot);
+    }
+
+    let running = false, rafId = 0;
+    const loop = (ts: number) => { if (!running) return; frame(ts); rafId = requestAnimationFrame(loop); };
+    const start = () => { if (running) return; running = true; rafId = requestAnimationFrame(loop); };
+    const stop = () => { running = false; cancelAnimationFrame(rafId); };
+
+    readColors();
+    resize();
+    window.addEventListener("resize", () => { resize(); frame(performance.now()); });
+
+    if (reduce) {
+      frame(performance.now());
+    } else {
+      start();
+      document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    }
+  })();
+</script>

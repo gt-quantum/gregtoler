@@ -1,0 +1,168 @@
+/* ============================================================
+   gregtoler.com V2 — design tokens
+   Provisional palette: carried from the V02 mockup per Greg (2026-08-20).
+   Display face is a single swappable token (--v2-display).
+   See v2/build/02-type-candidates.md before changing it.
+   ============================================================ */
+
+/* --- self-hosted, subset, no CDN. See v2/build/03-anti-ai-tells.md --- */
+@font-face {
+  font-family: "Barlow";
+  src: url("/fonts/v2/barlow-500.woff2") format("woff2");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Barlow";
+  src: url("/fonts/v2/barlow-600.woff2") format("woff2");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Martian Mono";
+  src: url("/fonts/v2/martian-mono-400.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Hanken Grotesk";
+  src: url("/fonts/v2/hanken-400.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/v2/plex-mono-400.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/v2/plex-mono-500.woff2") format("woff2");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+
+/* Fallback with adjusted metrics so the font swap does not reflow.
+   Shipping `swap` alone and letting the layout jump is itself an AI tell. */
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local("Arial Bold"), local("Helvetica Bold");
+  size-adjust: 105%; ascent-override: 92%; descent-override: 24%; line-gap-override: 0%;
+}
+
+:root {
+  /* Ground + ink — DEAD-NEUTRAL charcoal. No blue lean, no brown lean: hue-free greys,
+     so an accent of either temperature can sit on it and Greg can play both sides. */
+  --v2-base:       #17181A;
+  --v2-surface:    #1E1F22;
+  --v2-line:       #2A2B2E;
+  --v2-line-soft:  #212225;
+  --v2-dot:        #45474B;
+  --v2-silk:       38 39 42;
+  --v2-lamp:       205 207 210;
+  --v2-ink:        #D8DADC;
+  --v2-ink-dim:    #909297;
+  --v2-ink-faint:  #66686D;
+
+
+  /* ACCENT — locked (Greg, 2026-08-20): dark olive. Chosen from the researched
+     audition (v2/build/06-accent-research.md); the widget is retired. */
+  --v2-light:      #8A9166;
+  --v2-light-soft: rgba(138, 145, 102, 0.11);
+
+  /* type roles */
+  /* Display: Barlow (DIN-influenced — the lettering heritage of technical drawings,
+     which IS this site's concept). Researched, not instinct: Inter/Geist/Space Grotesk/
+     Instrument Serif are documented AI-slop tells; Clash Display is template-fatigued;
+     Archivo Black was too heavy. Hanken (body) is research-validated as NOT a tell.
+     Mono: Martian, from Greg's #3 reference (nicoborja.com). All self-hosted. */
+  --v2-display: "Barlow", "Archivo Fallback", system-ui, sans-serif;
+  --v2-sans:    "Hanken Grotesk", system-ui, sans-serif;
+  --v2-mono:    "Martian Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* geometry — deliberately NOT a uniform 16px radius everywhere */
+  --v2-radius: 2px;
+  --v2-maxw: 1440px;
+
+  /* the plane's grid: 12 x 8 cells, so node coordinates snap to real
+     intersections at any viewport width. Percentage-based, not fixed px. */
+  --v2-grid-cols: 12;
+  --v2-grid-rows: 8;
+
+  /* motion — varied, not one shared 0.3s ease */
+  --v2-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --v2-ease-io:  cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root[data-v2-theme="day"] {
+  --v2-base:       #E8E8E6;
+  --v2-surface:    #DDDDDA;
+  --v2-line:       #C4C4C0;
+  --v2-line-soft:  #D2D2CE;
+  --v2-dot:        #A9A9A4;
+  --v2-silk:       201 201 197;
+  --v2-lamp:       90 91 94;
+  --v2-ink:        #1B1C1E;
+  --v2-ink-dim:    #4E5054;
+  --v2-ink-faint:  #737578;
+  --v2-light:      #3A3C40;
+  --v2-light-soft: rgba(27, 28, 30, 0.10);
+}
+
+/* ---------- base ---------- */
+.v2 {
+  background: var(--v2-base);
+  color: var(--v2-ink);
+  font-family: var(--v2-sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  transition: background .5s var(--v2-ease-io), color .5s var(--v2-ease-io);
+}
+.v2 ::selection { background: var(--v2-light-soft); color: var(--v2-ink); }
+
+.v2 a { color: inherit; text-decoration: none; }
+
+/* everything real sits above the fixed backdrop canvas (z-index 0) */
+.v2 > *:not(.v2-backdrop) { position: relative; z-index: 1; }
+
+/* focus is visible on everything interactive — the most common a11y miss */
+.v2 :focus-visible {
+  outline: 2px solid var(--v2-light);
+  outline-offset: 3px;
+  border-radius: var(--v2-radius);
+}
+
+.v2-wrap { max-width: var(--v2-maxw); margin: 0 auto; padding: 0 32px; }
+
+.v2-mono {
+  font-family: var(--v2-mono);
+  font-size: 10px;      /* Martian runs wide; 11px Plex ≈ 10px Martian */
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--v2-ink-faint);
+}
+
+/* skip link — keyboard users land here first */
+.v2-skip {
+  position: absolute; left: -9999px; top: 0; z-index: 200;
+  background: var(--v2-surface); color: var(--v2-ink);
+  padding: 12px 18px; font-family: var(--v2-mono); font-size: 12px;
+  border: 1px solid var(--v2-line);
+}
+.v2-skip:focus { left: 12px; top: 12px; }
+
+/* film grain — inline SVG turbulence, zero image payload */
+.v2-grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 90; opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+:root[data-v2-theme="day"] .v2-grain { mix-blend-mode: multiply; opacity: .38; }
+
+/* headlines get typeset, not dumped */
+.v2 h1, .v2 h2, .v2 h3 { text-wrap: balance; font-weight: 600; }
+.v2 p { text-wrap: pretty; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v2, .v2 * {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

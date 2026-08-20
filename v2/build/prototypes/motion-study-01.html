@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GT — Motion Study 01: name → mark → framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Anybody:wdth,wght@75..125,400..900&family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --base:#14110D; --surface:#1C1813; --line:#2E2820;
+    --ink:#EDE6D8; --ink-dim:#B4A996; --ink-faint:#7C7264;
+    --light:#EBB668; --light-soft:rgba(235,182,104,0.16);
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --display:"Archivo Black",sans-serif;
+  }
+  html[data-theme="day"]{
+    --base:#F2ECE0; --surface:#E9E1D2; --line:#D3C7B2;
+    --ink:#20190F; --ink-dim:#5E5445; --ink-faint:#8B8171;
+    --light:#B87A1E; --light-soft:rgba(184,122,30,0.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--base);color:var(--ink);font-family:var(--mono);
+       min-height:100vh;display:flex;flex-direction:column;transition:background .5s,color .5s;overflow:hidden}
+
+  /* film grain — see 03-anti-ai-tells.md */
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.55;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+    mix-blend-mode:overlay}
+  html[data-theme="day"] .grain{mix-blend-mode:multiply;opacity:.4}
+
+  /* ---------- stage ---------- */
+  .stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .plane{position:relative;width:min(78vw,780px);aspect-ratio:1.55/1;
+         display:flex;align-items:center;justify-content:center}
+
+  /* the name */
+  .wordline{position:absolute;display:flex;align-items:baseline;white-space:nowrap;
+            font-family:var(--display);font-size:clamp(2rem,5.4vw,4.2rem);line-height:1;
+            letter-spacing:-0.015em;will-change:opacity,transform;z-index:6}
+  .seg{display:inline-block;overflow:hidden;max-width:12em;will-change:max-width,opacity}
+  .cap{display:inline-block}
+
+  /* the bar — connector, then X axis */
+  .bar{position:absolute;left:50%;top:50%;height:2px;background:var(--light);
+       box-shadow:0 0 18px -3px var(--light);transform-origin:center;z-index:7;
+       will-change:transform,width,opacity}
+  .stem{position:absolute;left:50%;top:50%;width:2px;background:var(--light);
+        box-shadow:0 0 18px -3px var(--light);transform-origin:center;z-index:7;
+        will-change:transform,opacity;opacity:0}
+
+  .strat{position:absolute;font-family:var(--mono);font-size:clamp(9px,1.15vw,13px);
+         letter-spacing:.34em;text-transform:uppercase;color:var(--ink-dim);
+         opacity:0;white-space:nowrap;z-index:6;will-change:opacity,transform}
+
+  /* the framework */
+  .grid{position:absolute;inset:-3%;z-index:2;opacity:0;
+     background-image:radial-gradient(var(--line) 1.4px,transparent 1.5px);background-size:34px 34px;
+     -webkit-mask:radial-gradient(circle at center,#000 0,#000 var(--r,0%),transparent calc(var(--r,0%) + 15%));
+     mask:radial-gradient(circle at center,#000 0,#000 var(--r,0%),transparent calc(var(--r,0%) + 15%))}
+  .axlab{position:absolute;font-family:var(--mono);font-size:10px;letter-spacing:.17em;
+         text-transform:uppercase;color:var(--ink-dim);opacity:0;white-space:nowrap;z-index:8}
+  .l-top{top:-26px;left:50%;transform:translateX(-50%)}
+  .l-bot{bottom:-26px;left:50%;transform:translateX(-50%)}
+  .l-left{left:-10px;top:50%;transform:translateY(-50%) rotate(-90deg)}
+  .l-right{right:-10px;top:50%;transform:translateY(-50%) rotate(90deg)}
+
+  .node{position:absolute;transform:translate(-50%,-50%);opacity:0;text-align:center;z-index:8;
+        will-change:opacity,transform}
+  .node .nt{font-family:var(--display);font-size:clamp(.72rem,1.15vw,.95rem);color:var(--ink);
+            line-height:1.05;text-shadow:0 0 22px var(--base),0 0 8px var(--base)}
+  .node.faint .nt{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+                  color:var(--ink-faint);font-weight:400}
+  .node .halo{position:absolute;left:50%;top:calc(100% + 7px);width:3px;height:3px;border-radius:50%;
+              background:var(--light);box-shadow:0 0 0 3px var(--light-soft),0 0 20px 3px var(--light);
+              transform:translateX(-50%);opacity:.75}
+  .node.faint .halo{display:none}
+
+  /* ---------- controls ---------- */
+  .ctl{position:relative;z-index:60;border-top:1px solid var(--line);background:var(--surface);
+       padding:14px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;
+       font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint)}
+  .ctl label{display:flex;align-items:center;gap:8px}
+  select,button{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+    background:transparent;border:1px solid var(--line);color:var(--ink);padding:6px 11px;
+    border-radius:2px;cursor:pointer;transition:border-color .25s}
+  select:hover,button:hover{border-color:var(--light)}
+  select:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--light);outline-offset:2px}
+  input[type=range]{width:min(42vw,380px);accent-color:var(--light);cursor:pointer}
+  .tval{color:var(--light);min-width:3.2em;display:inline-block}
+  .phase{color:var(--ink-dim);min-width:15em;display:inline-block}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="stage">
+  <div class="plane" id="plane">
+    <div class="grid" id="grid"></div>
+
+    <span class="axlab l-top"   id="lT">Strategy</span>
+    <span class="axlab l-bot"   id="lB">Execution</span>
+    <span class="axlab l-left"  id="lL">Go-to-market</span>
+    <span class="axlab l-right" id="lR">Operations</span>
+
+    <div class="wordline" id="word">
+      <span class="cap" id="capG">G</span><span class="seg" id="segReg">reg</span><span class="seg" id="segSp">&nbsp;</span><span class="cap" id="capT">T</span><span class="seg" id="segOler">oler</span>
+    </div>
+
+    <div class="bar"  id="bar"></div>
+    <div class="stem" id="stem"></div>
+    <div class="strat" id="strat">Strategies</div>
+
+    <!-- capability nodes (loud) + texture nodes (quiet) — two tiers, per seunghyuk -->
+    <div class="node" data-x="24" data-y="26" data-t="0.90"><div class="nt">GTM strategy</div><span class="halo"></span></div>
+    <div class="node" data-x="77" data-y="28" data-t="0.92"><div class="nt">RevOps design</div><span class="halo"></span></div>
+    <div class="node" data-x="26" data-y="76" data-t="0.94"><div class="nt">GTM execution</div><span class="halo"></span></div>
+    <div class="node" data-x="79" data-y="78" data-t="0.96"><div class="nt">Systems &amp; agents</div><span class="halo"></span></div>
+    <div class="node faint" data-x="52" data-y="16" data-t="0.95"><div class="nt">Diagnoses first</div></div>
+    <div class="node faint" data-x="15" data-y="52" data-t="0.96"><div class="nt">Came up in GTM</div></div>
+    <div class="node faint" data-x="88" data-y="55" data-t="0.97"><div class="nt">Builds it himself</div></div>
+    <div class="node faint" data-x="50" data-y="90" data-t="0.98"><div class="nt">Ships, not decks</div></div>
+  </div>
+</div>
+
+<div class="ctl">
+  <button id="play">Replay</button>
+  <label>Scrub <input type="range" id="scrub" min="0" max="1000" value="0"></label>
+  <span class="tval" id="tval">0.00</span>
+  <span class="phase" id="phase">—</span>
+  <label>Face
+    <select id="font">
+      <option value='"Archivo Black",sans-serif'>Archivo Black</option>
+      <option value='"Clash Display",sans-serif'>Clash Display</option>
+      <option value='"Bricolage Grotesque",sans-serif'>Bricolage Grotesque</option>
+      <option value='"Cabinet Grotesk",sans-serif'>Cabinet Grotesk</option>
+      <option value='"Anybody",sans-serif'>Anybody</option>
+      <option value='"Space Grotesk",sans-serif'>Space Grotesk</option>
+    </select>
+  </label>
+  <button id="theme">Day</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var clamp=function(v,a,b){return v<a?a:v>b?b:v;};
+  var seg=function(p,a,b){return clamp((p-a)/(b-a),0,1);};
+  var ease=function(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;};
+  var easeOut=function(t){return 1-Math.pow(1-t,3);};
+
+  var word=$("word"),capG=$("capG"),capT=$("capT"),
+      segReg=$("segReg"),segSp=$("segSp"),segOler=$("segOler"),
+      bar=$("bar"),stem=$("stem"),strat=$("strat"),grid=$("grid"),plane=$("plane"),
+      labs=[$("lT"),$("lB"),$("lL"),$("lR")],
+      nodes=[].slice.call(document.querySelectorAll(".node"));
+
+  nodes.forEach(function(n){n.style.left=n.dataset.x+"%";n.style.top=n.dataset.y+"%";});
+
+  var PHASES=[
+    [0.00,"01 · name appears"],
+    [0.12,"02 · connector draws G→T"],
+    [0.26,"03 · name collapses to initials"],
+    [0.44,"04 · Strategies resolves"],
+    [0.60,"05 · mark dissolves, bar drops"],
+    [0.70,"06 · bar stretches → X axis"],
+    [0.78,"07 · stem grows → Y axis"],
+    [0.86,"08 · grid blooms"],
+    [0.92,"09 · work plots on the plane"]
+  ];
+
+  function render(p){
+    var pw=plane.clientWidth, ph=plane.clientHeight;
+
+    // 01 name in
+    var a=seg(p,0.00,0.10);
+    // 05 mark out
+    var out=seg(p,0.60,0.70);
+    word.style.opacity=(a*(1-out)).toFixed(3);
+    word.style.transform="translateY("+((1-easeOut(a))*18).toFixed(2)+"px)";
+
+    // 03 collapse "reg" / " " / "oler"
+    // opacity falls off ~2.4x faster than width so glyphs are gone before the clip edge
+    // reaches them — otherwise letters visibly chop in half and it reads as broken text.
+    var c=ease(seg(p,0.26,0.44));
+    [segReg,segSp,segOler].forEach(function(el){
+      var nat=parseFloat(el.dataset.nat)||0;
+      el.style.maxWidth=((1-c)*nat).toFixed(2)+"px";
+      el.style.opacity=(1-Math.min(1,c*2.4)).toFixed(3);
+    });
+    capG.style.letterSpacing=(-0.015-c*0.02).toFixed(4)+"em";
+
+    // 02/03 bar: spans the word, narrows onto GT
+    var draw=ease(seg(p,0.12,0.26));
+    var wordW=word.getBoundingClientRect().width||1;
+    // the bar always spans the current word; once the name collapses it sits on GT
+    var barW=wordW*draw;
+    // 06 bar stretches to full plane → X axis
+    var stretch=ease(seg(p,0.70,0.84));
+    var targetW=pw;
+    var wNow=barW+(targetW-barW)*stretch;
+    bar.style.width=Math.max(0,wNow).toFixed(1)+"px";
+    bar.style.opacity=(draw>0?1:0);
+
+    // bar vertical position: above the word → dead centre
+    var wordH=word.getBoundingClientRect().height||1;
+    var above=-(wordH*0.72);
+    var drop=ease(seg(p,0.60,0.74));
+    var by=above+(0-above)*drop;
+    bar.style.transform="translate(-50%,calc(-50% + "+by.toFixed(1)+"px))";
+
+    // 07 stem → Y axis
+    var sy=ease(seg(p,0.78,0.90));
+    stem.style.opacity=sy>0?1:0;
+    stem.style.height=(ph*sy).toFixed(1)+"px";
+    stem.style.transform="translate(-50%,-50%)";
+
+    // 04 Strategies
+    var st=seg(p,0.44,0.56);
+    strat.style.opacity=(st*(1-out)).toFixed(3);
+    strat.style.transform="translateY("+(wordH*0.78+(1-easeOut(st))*10).toFixed(1)+"px)";
+
+    // 08 grid
+    var g=ease(seg(p,0.86,1.0));
+    grid.style.opacity=g.toFixed(3);
+    grid.style.setProperty("--r",(g*80).toFixed(1)+"%");
+
+    // axis labels
+    var la=seg(p,0.84,0.94);
+    labs.forEach(function(l){l.style.opacity=la.toFixed(3);});
+
+    // 09 nodes
+    nodes.forEach(function(n){
+      var t=parseFloat(n.dataset.t);
+      var o=seg(p,t,Math.min(1,t+0.06));
+      n.style.opacity=o.toFixed(3);
+      n.style.transform="translate(-50%,calc(-50% + "+((1-o)*8).toFixed(1)+"px))";
+    });
+
+    // readout
+    $("tval").textContent=p.toFixed(2);
+    var ph2="—";
+    for(var i=0;i<PHASES.length;i++){ if(p>=PHASES[i][0]) ph2=PHASES[i][1]; }
+    $("phase").textContent=ph2;
+  }
+
+  // scrub
+  var scrub=$("scrub"), playing=false, t0=0, DUR=5200;
+  scrub.addEventListener("input",function(){playing=false;render(scrub.value/1000);});
+
+  function loop(ts){
+    if(!playing)return;
+    if(!t0)t0=ts;
+    var p=clamp((ts-t0)/DUR,0,1);
+    scrub.value=p*1000; render(p);
+    if(p<1){requestAnimationFrame(loop);}else{playing=false;}
+  }
+  function play(){playing=true;t0=0;requestAnimationFrame(loop);}
+  $("play").addEventListener("click",play);
+
+  // font switch
+  $("font").addEventListener("change",function(e){
+    document.documentElement.style.setProperty("--display",e.target.value);
+    render(scrub.value/1000);
+  });
+
+  // theme
+  var root=document.documentElement, tb=$("theme");
+  tb.addEventListener("click",function(){
+    var n=root.getAttribute("data-theme")==="night";
+    root.setAttribute("data-theme",n?"day":"night");
+    tb.textContent=n?"Night":"Day";
+    render(scrub.value/1000);
+  });
+
+  window.addEventListener("resize",function(){render(scrub.value/1000);});
+
+  // measure natural segment widths once fonts are in, so the collapse is per-segment
+  // accurate instead of a shared em guess (which leaves dead space on the shorter one)
+  function measure(){
+    [segReg,segSp,segOler].forEach(function(el){
+      el.style.maxWidth="none"; el.style.opacity=1;
+      el.dataset.nat=el.getBoundingClientRect().width;
+    });
+  }
+
+  document.fonts.ready.then(function(){
+    measure();
+    render(0);
+    if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){setTimeout(play,400);}
+    else{scrub.value=1000;render(1);}
+  });
+})();
+</script>
+</body>
+</html>

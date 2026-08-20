@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Greg Toler — GT Strategies (V02 scroll-morph)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --base:#14110D;--surface:#1C1813;--line:#2E2820;--line-soft:#241F19;
+    --ink:#EDE6D8;--ink-dim:#B4A996;--ink-faint:#7C7264;
+    --light:#EBB668;--light-soft:rgba(235,182,104,0.16);
+    --radius:2px;--maxw:1180px;
+    --serif:"Instrument Serif",Georgia,serif;
+    --sans:"Hanken Grotesk",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  html[data-theme="day"]{
+    --base:#F2ECE0;--surface:#E9E1D2;--line:#D3C7B2;--line-soft:#DED4C2;
+    --ink:#20190F;--ink-dim:#5E5445;--ink-faint:#8B8171;
+    --light:#B87A1E;--light-soft:rgba(184,122,30,0.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--base);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .5s,color .5s}
+  ::selection{background:var(--light-soft)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  .mono{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
+
+  header{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;background:linear-gradient(to bottom,var(--base) 45%,transparent);transition:background .5s}
+  .brand{font-family:var(--serif);font-size:22px;display:flex;align-items:baseline;gap:7px}
+  .brand span{font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--ink-faint);text-transform:uppercase;position:relative;top:-1px}
+  nav{display:flex;align-items:center;gap:26px}
+  nav a{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);transition:color .25s}
+  nav a .n{color:var(--ink-faint);margin-right:6px}
+  nav a:hover{color:var(--ink)}nav a:hover .n{color:var(--light)}
+  .toggle{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);background:transparent;border:1px solid var(--line);border-radius:100px;padding:7px 13px;cursor:pointer;transition:all .25s}
+  .toggle:hover{border-color:var(--light);color:var(--ink)}
+  @media(max-width:760px){nav .navlink{display:none}}
+
+  /* ---------- SCROLL STAGE ---------- */
+  .stage{position:relative;height:340vh}
+  .pin{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  #contour{position:absolute;inset:0;width:100%;height:100%;opacity:.5;pointer-events:none;z-index:0}
+
+  /* hero layer */
+  .hero-layer{position:absolute;z-index:5;width:100%;max-width:var(--maxw);padding:0 32px;will-change:opacity,transform}
+  .hero-eyebrow{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:30px}
+  .hero-eyebrow .ax{color:var(--light);opacity:.85}
+  h1.thesis{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,6vw,5rem);line-height:1.02;letter-spacing:-0.01em;max-width:16ch;margin-bottom:26px}
+  h1.thesis em{font-style:italic;color:var(--light)}
+  .lede{font-size:clamp(1rem,1.6vw,1.18rem);color:var(--ink-dim);max-width:54ch;line-height:1.6}
+  .scrollcue{margin-top:40px;display:flex;align-items:center;gap:12px}
+  .scrollcue .mono{letter-spacing:.16em}
+  .cueline{width:1px;height:34px;background:linear-gradient(var(--light),transparent);animation:drop 1.8s ease-in-out infinite}
+  @keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* plane / framework layer */
+  .plane-layer{position:absolute;z-index:3;width:min(78vw,760px);aspect-ratio:1.55/1;will-change:transform,opacity}
+  .grid-dots{position:absolute;inset:-2%;background-image:radial-gradient(var(--line) 1.4px,transparent 1.5px);background-size:34px 34px;-webkit-mask:radial-gradient(circle at center,#000 0,#000 var(--r,0%),transparent calc(var(--r,0%) + 16%));mask:radial-gradient(circle at center,#000 0,#000 var(--r,0%),transparent calc(var(--r,0%) + 16%))}
+  .axis-h,.axis-v{position:absolute;background:var(--light);box-shadow:0 0 18px -4px var(--light);will-change:transform;opacity:.9}
+  .axis-h{left:0;right:0;top:50%;height:1px;transform:translateY(-50%) scaleX(var(--sx,.12));transform-origin:center}
+  .axis-v{top:0;bottom:0;left:50%;width:1px;transform:translateX(-50%) scaleY(var(--sy,0));transform-origin:center}
+  .axlab{position:absolute;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-dim);opacity:0;white-space:nowrap;cursor:pointer;transition:color .25s;z-index:8}
+  .axlab:hover,.axlab.open{color:var(--light)}
+  .axlab .tick{font-size:9px;color:var(--ink-faint)}
+  .axlab:hover .tick,.axlab.open .tick{color:var(--light)}
+  .l-top{top:-30px;left:50%;transform:translateX(-50%)}
+  .l-bot{bottom:-30px;left:50%;transform:translateX(-50%)}
+  .l-left{left:-14px;top:50%;transform:translateY(-50%) rotate(-90deg)}
+  .l-right{right:-14px;top:50%;transform:translateY(-50%) rotate(90deg)}
+
+  .node{position:absolute;transform:translate(-50%,-50%);opacity:0;text-align:center;will-change:opacity,transform;pointer-events:none}
+  .node .nt{font-family:var(--serif);font-size:clamp(1rem,1.7vw,1.35rem);color:var(--ink);line-height:1.05;text-shadow:0 0 20px var(--base)}
+  .node .nc{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;text-shadow:0 0 16px var(--base)}
+  .node.chip .nc{color:var(--light)}
+  .node .halo{position:absolute;left:50%;top:50%;width:2px;height:2px;border-radius:50%;background:var(--light);box-shadow:0 0 0 3px var(--light-soft),0 0 22px 3px var(--light);transform:translate(-50%,-50%);opacity:.65}
+
+  .cursor-light{position:absolute;width:460px;height:460px;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,var(--light-soft) 0%,transparent 60%);pointer-events:none;opacity:0;transition:opacity .4s;mix-blend-mode:screen;z-index:2}
+  html[data-theme="day"] .cursor-light{mix-blend-mode:multiply}
+  .plane-layer.live{pointer-events:auto}
+  .plane-layer.lit .cursor-light{opacity:1}
+
+  .settled-hint{position:absolute;bottom:-58px;left:50%;transform:translateX(-50%);opacity:0;transition:opacity .5s;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+  .plane-layer.live .settled-hint{opacity:1}
+  .settled-hint b{color:var(--ink-dim);font-weight:400}
+
+  /* axis drawers (below stage, in flow) */
+  .drawers{position:relative;z-index:10;margin-top:-1px}
+  .drawer{max-width:var(--maxw);margin:0 auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden;max-height:0;opacity:0;transition:max-height .45s,opacity .35s,margin .3s}
+  .drawer.open{max-height:220px;opacity:1;margin-bottom:12px}
+  .drawer-inner{padding:22px 26px;display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap}
+  .drawer-inner .poles{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--light);padding-top:3px;white-space:nowrap}
+  .drawer-inner p{color:var(--ink-dim);max-width:60ch;font-size:15px;line-height:1.65}
+
+  /* ---------- sections below ---------- */
+  section.blk{position:relative;z-index:10;background:var(--base)}
+  .sec-head{display:flex;align-items:baseline;gap:16px}
+  .sec-head .idx{font-family:var(--mono);font-size:12px;color:var(--light);letter-spacing:.1em}
+  .sec-head .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
+  .sec-title{font-family:var(--serif);font-weight:400;font-size:clamp(2rem,4vw,3.1rem);line-height:1.05;margin:14px 0 0}
+
+  .process{padding:100px 0}
+  .steps{margin-top:44px;border-top:1px solid var(--line)}
+  .step{display:grid;grid-template-columns:70px 1fr;gap:28px;padding:30px 4px;border-bottom:1px solid var(--line);align-items:baseline;transition:padding-left .35s,background .35s}
+  .step:hover{padding-left:20px;background:linear-gradient(90deg,var(--light-soft),transparent 40%)}
+  .step .snum{font-family:var(--mono);font-size:12px;color:var(--light)}
+  .step h3{font-family:var(--serif);font-weight:400;font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.1;margin-bottom:8px}
+  .step p{color:var(--ink-dim);max-width:58ch;font-size:15px}
+  .step .stag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-top:12px}
+
+  .work{padding:100px 0}
+  .rows{margin-top:44px;border-top:1px solid var(--line)}
+  .row{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;padding:26px 4px;border-bottom:1px solid var(--line);cursor:pointer;transition:padding-left .35s,background .35s}
+  .row:hover{padding-left:18px;background:linear-gradient(90deg,var(--light-soft),transparent 45%)}
+  .row .rtitle{font-family:var(--serif);font-size:clamp(1.35rem,2.4vw,1.9rem);line-height:1.1}
+  .row .rmeta{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:7px}
+  .row .rcoord{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--light);text-align:right;white-space:nowrap}
+  .row .arr{color:var(--ink-faint);transition:transform .3s,color .3s}
+  .row:hover .arr{transform:translateX(5px);color:var(--light)}
+  .rowright{display:flex;align-items:center;gap:22px}
+
+  .cta{padding:120px 0 60px}
+  .cta-box{border:1px solid var(--line);border-radius:var(--radius);padding:64px 56px;text-align:center;background:var(--surface)}
+  .avail{display:inline-flex;align-items:center;gap:9px;margin-bottom:22px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--light);box-shadow:0 0 12px 1px var(--light);animation:pulse 2.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .cta-box h2{font-family:var(--serif);font-weight:400;font-size:clamp(2.2rem,4.4vw,3.4rem);line-height:1.05;margin:0 0 18px}
+  .cta-box p{color:var(--ink-dim);max-width:48ch;margin:0 auto 34px;font-size:16px}
+  .btn{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:14px 22px;border:1px solid var(--line);border-radius:100px;color:var(--ink);cursor:pointer;background:transparent;transition:all .3s;display:inline-flex;align-items:center;gap:10px}
+  .btn:hover{border-color:var(--light);box-shadow:0 0 0 1px var(--light-soft),0 0 34px -14px var(--light)}
+  footer{padding:40px 0 60px;border-top:1px solid var(--line)}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .foot .mono{text-transform:none;letter-spacing:.04em}
+
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s,transform .8s}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:680px){
+    .wrap{padding:0 22px}header{padding:16px 22px}
+    .plane-layer{width:86vw}
+    .node .nt{font-size:1rem}.node.chip{display:none}
+    .row{grid-template-columns:1fr}.rowright{justify-content:space-between}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><b>Greg Toler</b><span>GT Strategies</span></div>
+  <nav>
+    <a class="navlink" href="#process"><span class="n">02</span>Approach</a>
+    <a class="navlink" href="#work"><span class="n">03</span>Work</a>
+    <button class="toggle" id="themeBtn">Day</button>
+  </nav>
+</header>
+
+<!-- SCROLL STAGE: hero morphs into the framework -->
+<section class="stage" id="stage">
+  <div class="pin">
+    <canvas id="contour"></canvas>
+
+    <div class="hero-layer" id="hero">
+      <div class="hero-eyebrow mono">
+        <span><span class="ax">&#8597;</span> Strategy &mdash; Execution</span>
+        <span><span class="ax">&#8596;</span> Go-to-market &mdash; Operations</span>
+      </div>
+      <h1 class="thesis">I diagnose it at the strategy level, then <em>build the fix</em> myself.</h1>
+      <p class="lede">Most operators do one or the other. They think, or they build. I move across go-to-market and operations, from framing the problem to shipping the system that solves it.</p>
+      <div class="scrollcue"><span class="cueline"></span><span class="mono">Scroll to see where I sit</span></div>
+    </div>
+
+    <div class="plane-layer" id="plane">
+      <div class="grid-dots" id="grid"></div>
+      <div class="axis-h" id="axh"></div>
+      <div class="axis-v" id="axv"></div>
+      <div class="cursor-light" id="clight"></div>
+
+      <span class="axlab l-top"    data-axis="y">Strategy <span class="tick">&#9650;</span></span>
+      <span class="axlab l-bot"    data-axis="y"><span class="tick">&#9660;</span> Execution</span>
+      <span class="axlab l-left"   data-axis="x">Go-to-market <span class="tick">&#9668;</span></span>
+      <span class="axlab l-right"  data-axis="x"><span class="tick">&#9658;</span> Operations</span>
+
+      <!-- quadrant titles -->
+      <div class="node" data-x="26" data-y="30" data-t="0.64"><div class="nt">GTM strategy</div></div>
+      <div class="node" data-x="74" data-y="30" data-t="0.66"><div class="nt">RevOps &amp; BizOps design</div></div>
+      <div class="node" data-x="26" data-y="70" data-t="0.68"><div class="nt">GTM execution</div></div>
+      <div class="node" data-x="74" data-y="70" data-t="0.70"><div class="nt">Systems &amp; automation</div></div>
+      <!-- chips -->
+      <div class="node chip" data-x="28" data-y="43" data-t="0.80"><div class="nc">Positioning &middot; ICP &middot; pipeline</div><span class="halo"></span></div>
+      <div class="node chip" data-x="72" data-y="43" data-t="0.82"><div class="nc">Architecture &middot; dashboards</div><span class="halo"></span></div>
+      <div class="node chip" data-x="28" data-y="83" data-t="0.84"><div class="nc">Campaigns &middot; sales process</div><span class="halo"></span></div>
+      <div class="node chip" data-x="72" data-y="83" data-t="0.86"><div class="nc">Integrations &middot; agents</div><span class="halo"></span></div>
+
+      <div class="settled-hint"><b>Click an axis</b> to break it down &middot; move across the plane</div>
+    </div>
+  </div>
+</section>
+
+<div class="drawers wrap" style="padding-top:0">
+  <div class="drawer" id="drawerY"><div class="drawer-inner">
+    <div class="poles">Strategy &#10231; Execution</div>
+    <p>Strategy is naming the real problem and the shape of the answer. Execution is building it so it holds up without me. Most people are anchored to one end. I work the full height, which is why I can spot the problem and still be the one who fixes it.</p>
+  </div></div>
+  <div class="drawer" id="drawerX"><div class="drawer-inner">
+    <div class="poles">GTM &#10231; Operations</div>
+    <p>I came up in go-to-market, then moved horizontally into the operational layer underneath it. Same operator, wider surface. That range is why I can connect a pipeline problem to the process and tooling actually causing it.</p>
+  </div></div>
+</div>
+
+<section class="blk process" id="process">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="idx">02</span><span class="eyebrow">How we'd work</span></div>
+    <h2 class="sec-title">You come to me one of three ways</h2>
+    <div class="steps">
+      <div class="step"><div class="snum">01</div><div><h3>Fix it</h3><p>Something is broken and it is costing you time, money, or both. I dig into the data, find where it is actually breaking, and fix it.</p><div class="stag">Leaking pipeline &middot; bloated stack &middot; manual work</div></div></div>
+      <div class="step"><div class="snum">02</div><div><h3>Build it</h3><p>There is a gap and nothing off the shelf fills it. I build the system, tool, or workflow that does, and connect it into what you already run.</p><div class="stag">Internal tools &middot; automation &middot; pipelines &middot; AI</div></div></div>
+      <div class="step"><div class="snum">03</div><div><h3>Scale it</h3><p>It works today but will not survive growth. I make it repeatable and documented so it keeps running without living in one person's head.</p><div class="stag">SOPs &middot; onboarding systems &middot; frameworks</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="blk work" id="work">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="idx">03</span><span class="eyebrow">Selected work</span></div>
+    <h2 class="sec-title">Plotted on the same map</h2>
+    <div class="rows">
+      <div class="row"><div><div class="rtitle">Revenue operations rebuild</div><div class="rmeta">FinTech &middot; Series B &middot; active</div></div><div class="rowright"><span class="rcoord">Ops &middot; Strategy + Execution</span><span class="arr">&#8594;</span></div></div>
+      <div class="row"><div><div class="rtitle">Account scoring platform</div><div class="rmeta">B2B SaaS &middot; product build</div></div><div class="rowright"><span class="rcoord">Ops &middot; Execution</span><span class="arr">&#8594;</span></div></div>
+      <div class="row"><div><div class="rtitle">Pipeline &amp; forecasting system</div><div class="rmeta">GTM &middot; strategy to dashboard</div></div><div class="rowright"><span class="rcoord">GTM &middot; Strategy</span><span class="arr">&#8594;</span></div></div>
+      <div class="row"><div><div class="rtitle">Automated intake &amp; routing</div><div class="rmeta">Email to Asana &middot; agents</div></div><div class="rowright"><span class="rcoord">Ops &middot; Execution</span><span class="arr">&#8594;</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="blk cta" id="contact">
+  <div class="wrap reveal">
+    <div class="cta-box">
+      <div class="avail mono" style="justify-content:center"><span class="dot"></span> Available for projects</div>
+      <h2>Tell me what's going on.</h2>
+      <p>Send me the situation in a few sentences. I will figure out the right approach and do the work.</p>
+      <a class="btn" href="#" style="margin:0 auto">Start a project <span>&#8594;</span></a>
+    </div>
+  </div>
+  <div class="wrap"><footer><div class="foot"><div class="brand"><b>Greg Toler</b><span>GT Strategies</span></div><div class="mono">Operator + builder &middot; Greenville, SC</div></div></footer></div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var root=document.documentElement,btn=document.getElementById("themeBtn");
+  btn.addEventListener("click",function(){var n=root.getAttribute("data-theme")==="night";root.setAttribute("data-theme",n?"day":"night");btn.textContent=n?"Night":"Day";});
+
+  var clamp=function(v,a,b){return v<a?a:v>b?b:v;};
+  var seg=function(p,a,b){return clamp((p-a)/(b-a),0,1);};
+  var ease=function(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;};
+
+  var stage=document.getElementById("stage"),
+      hero=document.getElementById("hero"),
+      plane=document.getElementById("plane"),
+      grid=document.getElementById("grid"),
+      axh=document.getElementById("axh"),
+      axv=document.getElementById("axv"),
+      labs=[].slice.call(plane.querySelectorAll(".axlab")),
+      nodes=[].slice.call(plane.querySelectorAll(".node"));
+
+  // place nodes by data-x/data-y
+  nodes.forEach(function(n){ n.style.left=n.getAttribute("data-x")+"%"; n.style.top=n.getAttribute("data-y")+"%"; });
+
+  function render(){
+    var rect=stage.getBoundingClientRect();
+    var denom=stage.offsetHeight-window.innerHeight;
+    var p=clamp(-rect.top/denom,0,1);
+
+    // hero fades out first
+    var h=seg(p,0,0.14);
+    hero.style.opacity=(1-h);
+    hero.style.transform="translateY("+(-h*44)+"px)";
+    hero.style.pointerEvents=h>0.6?"none":"auto";
+
+    // plane fades in as hero leaves, then holds
+    var pin=seg(p,0.08,0.2);
+    plane.style.opacity = reduce?1:pin;
+
+    // axes grow: horizontal first (the hero line stretching), then vertical
+    var sx=0.12+ease(seg(p,0.12,0.44))*0.88;
+    var sy=ease(seg(p,0.2,0.5));
+    axh.style.setProperty("--sx",sx.toFixed(3));
+    axv.style.setProperty("--sy",sy.toFixed(3));
+
+    // dotted grid grows radially from center
+    var r=ease(seg(p,0.42,0.74))*82;
+    grid.style.setProperty("--r",r.toFixed(1)+"%");
+
+    // axis labels fade in
+    var la=seg(p,0.34,0.52);
+    labs.forEach(function(l){ if(!l.classList.contains("held")) l.style.opacity=la; });
+
+    // nodes bloom at their thresholds
+    nodes.forEach(function(n){
+      var t=parseFloat(n.getAttribute("data-t"));
+      var o=seg(p,t,t+0.07);
+      n.style.opacity=o;
+      var yo=(1-o)*10;
+      n.style.transform="translate(-50%,calc(-50% + "+yo+"px)) scale("+(0.92+o*0.08).toFixed(3)+")";
+    });
+
+    // settle: enable interaction near the end
+    if(p>=0.9){ plane.classList.add("live"); } else { plane.classList.remove("live","lit"); }
+  }
+
+  if(reduce){
+    // static final state
+    plane.style.opacity=1;hero.style.opacity=0;
+    axh.style.setProperty("--sx","1");axv.style.setProperty("--sy","1");
+    grid.style.setProperty("--r","82%");
+    labs.forEach(function(l){l.style.opacity=1;});
+    nodes.forEach(function(n){n.style.opacity=1;n.style.transform="translate(-50%,-50%)";});
+    plane.classList.add("live");
+  } else {
+    var ticking=false;
+    function onScroll(){ if(!ticking){ticking=true;requestAnimationFrame(function(){render();ticking=false;});} }
+    window.addEventListener("scroll",onScroll,{passive:true});
+    window.addEventListener("resize",onScroll);
+    render();
+  }
+
+  // interactive cursor light + node proximity (once live)
+  var clight=document.getElementById("clight");
+  plane.addEventListener("mousemove",function(e){
+    if(!plane.classList.contains("live"))return;
+    var r=plane.getBoundingClientRect();
+    var x=e.clientX-r.left,y=e.clientY-r.top;
+    clight.style.left=x+"px";clight.style.top=y+"px";
+    plane.classList.add("lit");
+    var mx=x/r.width,my=y/r.height;
+    nodes.forEach(function(n){
+      var nx=parseFloat(n.getAttribute("data-x"))/100, ny=parseFloat(n.getAttribute("data-y"))/100;
+      var d=Math.hypot(mx-nx,my-ny);
+      var boost=d<0.22?1:0.55;
+      n.style.filter="none";
+      n.style.opacity=Math.max(parseFloat(n.style.opacity||1),boost);
+    });
+  });
+  plane.addEventListener("mouseleave",function(){plane.classList.remove("lit");});
+
+  // axis drawers
+  var dY=document.getElementById("drawerY"),dX=document.getElementById("drawerX");
+  labs.forEach(function(l){
+    l.addEventListener("click",function(){
+      var axis=l.getAttribute("data-axis");
+      var target=axis==="y"?dY:dX, other=axis==="y"?dX:dY;
+      var open=!target.classList.contains("open");
+      target.classList.toggle("open",open); other.classList.remove("open");
+      labs.forEach(function(x){ x.classList.toggle("open", open && x.getAttribute("data-axis")===axis); });
+      if(open) target.scrollIntoView({behavior:"smooth",block:"center"});
+    });
+  });
+
+  // reveals
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}});},{threshold:.14});
+  document.querySelectorAll(".reveal").forEach(function(el){io.observe(el);});
+
+  // contour bg
+  var cv=document.getElementById("contour"),ctx=cv.getContext("2d"),W,H,t=0;
+  function size(){W=cv.width=cv.offsetWidth*devicePixelRatio;H=cv.height=cv.offsetHeight*devicePixelRatio;}
+  size();window.addEventListener("resize",size);
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var col=getComputedStyle(document.documentElement).getPropertyValue("--light").trim();
+    for(var l=0;l<7;l++){
+      ctx.beginPath();
+      var amp=(22+l*10)*devicePixelRatio,yB=H*(0.16+l*0.11),ph=t*0.0006*(1+l*0.16)+l*0.9;
+      for(var x=0;x<=W;x+=12*devicePixelRatio){
+        var y=yB+Math.sin(x*0.0016+ph)*amp+Math.sin(x*0.004+ph*1.7)*amp*0.35;
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=col;ctx.globalAlpha=0.05+l*0.006;ctx.lineWidth=devicePixelRatio;ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+  if(reduce){draw();}else{(function loop(){t+=16;draw();requestAnimationFrame(loop);})();}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+---
+/**
+ * V2 — Hero → Framework scroll morph, plus the in-place axis interaction.
+ *
+ * THE SEAM: the rule under the headline is the SAME element that becomes the X axis.
+ * It never fades and is never re-created — it slides down and widens. That one continuous
+ * object is what makes hero and framework read as a single section.
+ *
+ * THE AXIS MODES: clicking an axis does NOT drop you to a drawer further down the page.
+ * The framework rearranges in place —
+ *   mode "y": the vertical axis slides LEFT; a panel stretches open to its right.
+ *             The X axis and all the nodes recede.
+ *   mode "x": the horizontal axis (the seam) slides UP, carrying its Go-to-market /
+ *             Operations labels with it; a panel stretches open beneath it.
+ *             The Y axis and the nodes recede.
+ * Clicking elsewhere, or Escape, returns to the full grid.
+ *
+ * The arrow glyphs beside the axis words are gone: the axis lines carry their own
+ * arrowheads, so the duplicates were just noise.
+ *
+ * The dotted grid and drifting silk are NOT here — they're the global Backdrop.
+ */
+
+const GRID_COLS = 12;
+const GRID_ROWS = 8;
+const cx = (i: number) => (i / GRID_COLS) * 100;
+const cy = (j: number) => (j / GRID_ROWS) * 100;
+
+const capabilities = [
+  { label: "GTM strategy",         i: 3, j: 2, t: 0.70 },
+  { label: "RevOps & BizOps",      i: 9, j: 2, t: 0.59 },
+  { label: "GTM execution",        i: 3, j: 6, t: 0.76 },
+  { label: "Systems & automation", i: 9, j: 6, t: 0.65 },
+];
+
+---
+
+<a class="v2-skip" href="#approach">Skip to content</a>
+
+<section class="v2-stage" id="v2-stage">
+  <div class="v2-pin" id="v2-pin">
+
+    <div class="v2-hero" id="v2-hero">
+      <div class="v2-hero-eyebrow v2-mono">
+        <span>Strategy &mdash; Execution</span>
+        <span>Go-to-market &mdash; Operations</span>
+      </div>
+      <h1 class="v2-thesis" id="v2-thesis">
+        I diagnose it at the strategy level, then <em>build the fix</em> myself.
+      </h1>
+      <p class="v2-lede">
+        Most operators do one or the other. They think, or they build. I move across
+        go-to-market and operations, from framing the problem to shipping the system
+        that solves it.
+      </p>
+    </div>
+
+    <div class="v2-seam" id="v2-seam" aria-hidden="true"></div>
+
+    <div class="v2-plane" id="v2-plane" data-mode="grid">
+      <div class="v2-axis-v" id="v2-axv" aria-hidden="true"></div>
+
+      <button class="v2-axlab v2-l-top" data-axis="y" aria-expanded="false" aria-controls="v2-panel-y">Strategy</button>
+      <button class="v2-axlab v2-l-bot" data-axis="y" aria-expanded="false" aria-controls="v2-panel-y">Execution</button>
+      <button class="v2-axlab v2-l-left" data-axis="x" aria-expanded="false" aria-controls="v2-panel-x">Go-to-market</button>
+      <button class="v2-axlab v2-l-right" data-axis="x" aria-expanded="false" aria-controls="v2-panel-x">Operations</button>
+
+      {capabilities.map((n) => (
+        <div class="v2-node" data-t={n.t} style={`left:${cx(n.i)}%;top:${cy(n.j)}%`}>
+          <span class="nt">{n.label}</span>
+        </div>
+      ))}
+
+      <div class="v2-panel v2-panel-y" id="v2-panel-y" role="region" aria-label="Strategy to Execution">
+        <button class="v2-panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        <div class="inner">
+          <span class="poles v2-mono">Strategy &#10231; Execution</span>
+          <p>Strategy is naming the real problem and the shape of the answer. Execution is
+          building it so it holds up without me. Most people are anchored to one end. I work
+          the full height, which is why I can spot the problem and still be the one who
+          fixes it.</p>
+        </div>
+      </div>
+
+      <div class="v2-panel v2-panel-x" id="v2-panel-x" role="region" aria-label="Go-to-market to Operations">
+        <button class="v2-panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        <div class="inner">
+          <span class="poles v2-mono">GTM &#10231; Operations</span>
+          <p>I came up in go-to-market, then moved horizontally into the operational layer
+          underneath it. Same operator, wider surface. That range is why I can connect a
+          pipeline problem to the process and tooling actually causing it.</p>
+        </div>
+      </div>
+
+      <p class="v2-hint v2-mono" id="v2-hint"><b>Click an axis</b> to break it down</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-stage { position: relative; height: 240vh; z-index: 1; }
+  .v2-pin {
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .v2-hero {
+    position: absolute; z-index: 5;
+    width: 100%; max-width: var(--v2-maxw); padding: 0 48px;
+    text-align: center;
+    will-change: opacity, transform;
+  }
+  .v2-hero-eyebrow {
+    display: flex; gap: 30px; flex-wrap: wrap;
+    justify-content: center; margin-bottom: 28px;
+  }
+  .v2-thesis {
+    font-family: var(--v2-display); font-weight: 600;
+    font-size: clamp(2.2rem, 5.4vw, 4.8rem);
+    line-height: 1.04; letter-spacing: -0.015em;
+    max-width: 24ch; margin: 0 auto;
+  }
+  .v2-thesis em { font-style: normal; color: var(--v2-light); }
+  .v2-lede {
+    font-size: clamp(.98rem, 1.5vw, 1.12rem);
+    color: var(--v2-ink-dim); max-width: 62ch; line-height: 1.62;
+    margin: 74px auto 0;
+  }
+
+  /* ---------- the seam / X axis ---------- */
+  .v2-seam {
+    position: absolute; left: 50%; top: 0;
+    height: 1px; width: 140px;
+    background: var(--v2-light);
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft),
+                0 0 46px 6px var(--v2-light-soft);
+    transform: translate(-50%, 0);
+    z-index: 6; will-change: transform, width;
+    transition: opacity .5s var(--v2-ease-out);
+  }
+  .v2-seam::before, .v2-seam::after {
+    content: ""; position: absolute; top: 50%; width: 0; height: 0;
+    border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent;
+    opacity: var(--arrow, 0); transition: opacity .25s linear;
+  }
+  .v2-seam::before { left: -1px;  transform: translate(-100%, -50%); border-right: 7px solid var(--v2-light); }
+  .v2-seam::after  { right: -1px; transform: translate(100%, -50%);  border-left:  7px solid var(--v2-light); }
+
+  /* ---------- the plane ---------- */
+  .v2-plane {
+    position: absolute; z-index: 3;
+    height: min(56vh, 540px); aspect-ratio: 1.5 / 1; width: auto; max-width: 64vw;
+    opacity: 0; will-change: opacity;
+    --yx: 50%;   /* vertical axis: position across the plane */
+    --xy: 50%;   /* horizontal axis: position down the plane */
+  }
+
+  .v2-axis-v {
+    position: absolute; top: 0; bottom: 0; left: var(--yx); width: 1px;
+    background: var(--v2-light);
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft),
+                0 0 46px 6px var(--v2-light-soft);
+    transform: translateX(-50%) scaleY(var(--sy, 0)); transform-origin: center;
+    opacity: .85;
+    transition: left .75s var(--v2-ease-out), opacity .5s var(--v2-ease-out);
+  }
+  .v2-axis-v::before, .v2-axis-v::after {
+    content: ""; position: absolute; left: 50%; width: 0; height: 0;
+    border-left: 3.5px solid transparent; border-right: 3.5px solid transparent;
+    opacity: var(--arrow, 0); transition: opacity .25s linear;
+  }
+  .v2-axis-v::before { top: -1px;    transform: translate(-50%, -100%); border-bottom: 7px solid var(--v2-light); }
+  .v2-axis-v::after  { bottom: -1px; transform: translate(-50%, 100%);  border-top:    7px solid var(--v2-light); }
+
+  .v2-axlab {
+    position: absolute; z-index: 9;
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--v2-ink-dim);
+    background: none; border: 0; padding: 5px 8px;
+    opacity: 0; white-space: nowrap;
+    transition: color .3s var(--v2-ease-out), left .75s var(--v2-ease-out),
+                top .75s var(--v2-ease-out);
+  }
+  .v2-axlab:hover, .v2-axlab[aria-expanded="true"] { color: var(--v2-light); }
+  .v2-l-top   { top: -34px;    left: var(--yx); transform: translateX(-50%); }
+  .v2-l-bot   { bottom: -34px; left: var(--yx); transform: translateX(-50%); }
+  .v2-l-left  { right: 100%; top: var(--xy); transform: translateY(-50%); margin-right: 16px; }
+  .v2-l-right { left: 100%;  top: var(--xy); transform: translateY(-50%); margin-left: 16px; }
+
+  .v2-node {
+    position: absolute; transform: translate(-50%, -50%);
+    opacity: 0; text-align: center; pointer-events: none; z-index: 7;
+    will-change: opacity, transform;
+  }
+  .v2-node .nt {
+    font-family: var(--v2-display); font-weight: 500;
+    font-size: clamp(.8rem, 1.25vw, 1.05rem);
+    line-height: 1.05; color: var(--v2-ink);
+    text-shadow: 0 0 20px var(--v2-base), 0 0 7px var(--v2-base);
+  }
+
+  /* whatever isn't the subject recedes */
+  .v2-node { transition: opacity .5s var(--v2-ease-out); }
+  .v2-plane[data-mode="y"] .v2-node, .v2-plane[data-mode="x"] .v2-node { opacity: 0 !important; }
+  .v2-plane[data-mode="x"] .v2-axis-v { opacity: 0; }
+
+  /* ---------- in-place panels ---------- */
+  .v2-panel {
+    position: absolute; z-index: 8;
+    justify-content: center;   /* copy block sits centred in the box, not left-hugged */
+    opacity: 0; pointer-events: none;
+    background: color-mix(in srgb, var(--v2-surface) 92%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--v2-line);
+    border-radius: var(--v2-radius);
+    display: flex; align-items: center;
+    transition: transform .8s var(--v2-ease-out), opacity .4s var(--v2-ease-out);
+  }
+  .v2-panel-close {
+    position: absolute; top: 14px; right: 14px; z-index: 2;
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    color: var(--v2-ink-faint);
+    background: none; border: 1px solid var(--v2-line); border-radius: 50%;
+    transition: color .25s var(--v2-ease-out), border-color .25s var(--v2-ease-out),
+                transform .25s var(--v2-ease-out);
+  }
+  .v2-panel-close:hover { color: var(--v2-ink); border-color: var(--v2-light); transform: rotate(90deg); }
+  .v2-panel-close svg { display: block; }
+
+  .v2-panel .inner { padding: 48px 64px; opacity: 0; transition: opacity .35s var(--v2-ease-out); }
+  .v2-panel .poles { display: block; color: var(--v2-light); margin-bottom: 16px; font-size: 11px; }
+  .v2-panel p {
+    color: var(--v2-ink-dim);
+    font-size: clamp(15px, 1.35vw, 19px);
+    line-height: 1.7; margin: 0; max-width: 64ch;
+  }
+
+  /* The open window spans the GRID — i.e. the viewport — not the plane's own box.
+     calc(50% - 50vw/vh) escapes the plane outward to the viewport edge, padded to
+     clear the header (top) and breathe elsewhere. */
+  .v2-panel-y {
+    left: var(--yx);
+    right: calc(50% - 50vw + 240px);        /* == EDGE_X — same span as the x-panel */
+    top: 5%; bottom: 5%;
+    margin-left: 64px;                      /* clears the STRATEGY/EXECUTION labels, which are
+                                               centred on the axis and were clipping the box */
+    transform-origin: left center; transform: scaleX(.015);
+  }
+  .v2-panel-x {
+    top: var(--xy);
+    /* the Y panel is the size Greg wants both to be: width vw-544, height 90% of the
+       plane. Same box here, centred under the raised line. */
+    left: calc(50% - 50vw + 272px);
+    right: calc(50% - 50vw + 272px);
+    height: 90%;
+    bottom: auto;
+    margin-top: 26px;
+    transform-origin: top center; transform: scaleY(.015);
+  }
+  .v2-plane[data-mode="y"] .v2-panel-y { opacity: 1; pointer-events: auto; transform: scaleX(1); }
+  .v2-plane[data-mode="x"] .v2-panel-x { opacity: 1; pointer-events: auto; transform: scaleY(1); }
+  .v2-plane[data-mode="y"] .v2-panel-y .inner,
+  .v2-plane[data-mode="x"] .v2-panel-x .inner { opacity: 1; transition-delay: .3s; }
+
+  .v2-plane.is-live { pointer-events: auto; }
+  .v2-hint {
+    position: absolute; bottom: -62px; left: 50%; transform: translateX(-50%);
+    opacity: 0; transition: opacity .5s var(--v2-ease-out);
+    white-space: nowrap; margin: 0; letter-spacing: .14em;
+  }
+  .v2-plane.is-live .v2-hint { opacity: 1; }
+  .v2-plane[data-mode="y"] .v2-hint, .v2-plane[data-mode="x"] .v2-hint { opacity: 0; }
+  .v2-hint b { color: var(--v2-ink-dim); font-weight: 400; }
+
+  @media (max-width: 860px) {
+    /* the LEFT rail eats 76px; centre the pinned composition in the remaining space
+       and cap the plane so nothing reaches under the rail or off the right edge */
+    .v2-pin { padding-left: 94px; }
+    .v2-plane { max-width: calc(92vw - 94px); }
+
+    /* Greg's screenshot: "GO-TO-MARKET" clipped off the viewport's left edge. The side
+       labels hang OUTSIDE the plane on desktop; on small screens there is no outside.
+       Tuck them inside, sitting just above their end of the axis line. */
+    .v2-l-left  { right: auto; left: 2px;  top: calc(var(--xy) - 22px); transform: none; margin: 0; }
+    .v2-l-right { left: auto;  right: 2px; top: calc(var(--xy) - 22px); transform: none; margin: 0; }
+  }
+
+  @media (max-width: 720px) {
+    .v2-stage { height: 260vh; }
+    .v2-hero { padding: 0 22px; }
+    .v2-lede { margin-top: 58px; }
+    .v2-plane { height: min(52vh, 420px); aspect-ratio: 1 / 1.15; max-width: 86vw; }
+    .v2-node .nt { font-size: .78rem; }
+    .v2-l-left { margin-right: 8px; } .v2-l-right { margin-left: 8px; }
+    .v2-panel .inner { padding: 18px 20px; }
+    .v2-panel p { font-size: 13px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .v2-stage { height: auto; }
+    .v2-pin { position: relative; height: auto; flex-direction: column; gap: 90px; padding: 90px 0; }
+    .v2-hero { position: relative; }
+    .v2-plane { position: relative; opacity: 1 !important; }
+    .v2-seam { display: none; }
+  }
+</style>
+
+<script>
+  (() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const $ = (id: string) => document.getElementById(id);
+
+    const stage = $("v2-stage"), pin = $("v2-pin"), hero = $("v2-hero"),
+          thesis = $("v2-thesis"), seam = $("v2-seam"),
+          plane = $("v2-plane"), axv = $("v2-axv");
+    if (!stage || !pin || !hero || !thesis || !seam || !plane || !axv) return;
+
+    const labs = Array.from(plane.querySelectorAll<HTMLElement>(".v2-axlab"));
+    const marks = Array.from(plane.querySelectorAll<HTMLElement>(".v2-node"));
+
+    const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
+    const seg = (p: number, a: number, b: number) => clamp((p - a) / (b - a), 0, 1);
+    const ease = (t: number) => (t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    type Mode = "grid" | "y" | "x";
+    let mode: Mode = "grid";
+
+    // px offsets from the viewport edges when an axis is opened out
+    const EDGE_X = 240;   // y-mode: axis inset — matches the x-panel's 240px footprint,
+                          // so both open windows span the same row and stay centred
+    // x-mode: the line's Y is computed so the whole unit (line + gap + panel)
+    // sits vertically centred in the viewport — a fixed inset stopped being centred
+    // once the panel took the y-panel's fixed height.
+
+    let xyPin = 0;        // seam's target Y within the pin, kept for render()
+
+    function applyMode(next: Mode) {
+      mode = next;
+      if (next !== "grid") (window as any).v2Backdrop?.setFocus(0);
+      plane!.dataset.mode = next;
+
+      const pr = pin!.getBoundingClientRect();
+      const plr = plane!.getBoundingClientRect();
+
+      // --yx / --xy are plane-relative; convert the viewport-edge targets into
+      // plane coordinates so labels and panels ride with the axis
+      if (next === "y") {
+        plane!.style.setProperty("--yx", (EDGE_X - (plr.left - pr.left)).toFixed(1) + "px");
+      } else {
+        plane!.style.setProperty("--yx", "50%");
+      }
+      if (next === "x") {
+        const unitH = 26 + plr.height * 0.9;        // gap below line + panel height
+        const edgeY = Math.max(96, (pr.height - unitH) / 2);
+        plane!.style.setProperty("--xy", (edgeY - (plr.top - pr.top)).toFixed(1) + "px");
+        xyPin = edgeY;
+      } else {
+        plane!.style.setProperty("--xy", "50%");
+        xyPin = (plr.top - pr.top) + plr.height * 0.5;
+      }
+
+      // the inactive axis's labels get out of the way — they were ghosting through
+      // the open panel's copy
+      labs.forEach((l) => {
+        const active = next === "grid" || l.dataset.axis === next;
+        l.style.opacity = active ? "1" : "0";
+        l.setAttribute("aria-expanded", String(next !== "grid" && l.dataset.axis === next));
+      });
+      render();
+    }
+
+    function render() {
+      const denom = stage!.offsetHeight - window.innerHeight;
+      if (denom <= 0) return;
+      const p = clamp(-stage!.getBoundingClientRect().top / denom, 0, 1);
+
+      const h = seg(p, 0.03, 0.15);
+      hero!.style.opacity = String(1 - h);
+      hero!.style.transform = `translateY(${-h * 44}px)`;
+      hero!.style.pointerEvents = h > 0.6 ? "none" : "auto";
+
+      const m = ease(seg(p, 0.06, 0.44));   // the signature stretch — given the widest window
+      seam!.style.setProperty("--arrow", seg(p, 0.38, 0.48).toFixed(3));
+      axv!.style.setProperty("--arrow", seg(p, 0.48, 0.58).toFixed(3));
+
+      const pr = pin!.getBoundingClientRect();
+      const tr = thesis!.getBoundingClientRect();
+      const plr = plane!.getBoundingClientRect();
+
+      const seamY0 = tr.bottom - pr.top + 26;
+      // the seam always terminates at its labels — plane width, never wider
+      const seamY1 = mode === "x" ? xyPin : (plr.top - pr.top) + plr.height * 0.5;
+      const seamW0 = Math.min(160, tr.width * 0.28);
+
+      seam!.style.width = lerp(seamW0, plr.width, m).toFixed(1) + "px";
+      seam!.style.transform = `translate(-50%, ${lerp(seamY0, seamY1, m).toFixed(1)}px)`;
+      seam!.style.opacity = mode === "y" ? "0" : "1";
+
+      plane!.style.opacity = String(seg(p, 0.24, 0.38));
+      axv!.style.setProperty("--sy", ease(seg(p, 0.34, 0.56)).toFixed(3));
+
+      (window as any).v2Backdrop?.setFocus(seg(p, 0.28, 0.48) * (1 - seg(p, 0.84, 0.98)));
+
+      if (mode === "grid") {
+        const la = seg(p, 0.40, 0.54);
+        labs.forEach((l) => { l.style.opacity = String(la); });
+      }
+
+      // while a panel is open the nodes are driven by CSS, not by scroll
+      if (mode === "grid") {
+        marks.forEach((mk) => {
+          const t = parseFloat(mk.dataset.t || "0.8");
+          const o = seg(p, t, t + 0.06);
+          mk.style.opacity = o.toFixed(3);
+          mk.style.transform = `translate(-50%, calc(-50% + ${((1 - o) * 9).toFixed(1)}px)) scale(${(0.94 + o * 0.06).toFixed(3)})`;
+        });
+      }
+
+      plane!.classList.toggle("is-live", p >= 0.80);
+    }
+
+    if (reduce) {
+      plane.style.opacity = "1";
+      axv.style.setProperty("--sy", "1");
+      labs.forEach((l) => { l.style.opacity = "1"; });
+      marks.forEach((mk) => { mk.style.opacity = "1"; mk.style.transform = "translate(-50%,-50%)"; });
+      plane.classList.add("is-live");
+      (window as any).v2Backdrop?.setFocus(1);
+    } else {
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { render(); ticking = false; });
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", render);
+      document.fonts?.ready.then(render);
+      render();
+    }
+
+    // seam transitions only while switching modes — never during scroll, or the
+    // scroll morph would lag behind the wheel
+    const seamEase = () => {
+      seam!.style.transition = "transform .8s var(--v2-ease-out), width .8s var(--v2-ease-out), opacity .5s var(--v2-ease-out)";
+      window.setTimeout(() => { seam!.style.transition = "opacity .5s var(--v2-ease-out)"; }, 850);
+    };
+
+    labs.forEach((l) => {
+      l.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const axis = (l.dataset.axis || "y") as "y" | "x";
+        seamEase();
+        applyMode(mode === axis ? "grid" : axis);
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (mode === "grid") return;
+      const t = e.target as Element | null;
+      if (t?.closest?.(".v2-axlab") || t?.closest?.(".v2-panel")) return;
+      seamEase();
+      applyMode("grid");
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mode !== "grid") { seamEase(); applyMode("grid"); }
+    });
+    plane.querySelectorAll<HTMLElement>(".v2-panel-close").forEach((b) =>
+      b.addEventListener("click", (e) => { e.stopPropagation(); seamEase(); applyMode("grid"); })
+    );
+  })();
+</script>
