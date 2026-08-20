@@ -22,7 +22,8 @@
 | Motion study | **Parked** | `decisions/003-motion-study-parked.md` — carry-forward: dots, glow, grain, restrained motion |
 | **Section 01 hero→framework** | **Built, live at /v2** | `build/05-section-01-status.md` — 5 passes, in-place axis modes, real logo, custom cursor |
 | Placeholder sections 02–05 | Stubbed | On `/v2` so nav motion is visible |
-| Cutover plan | Not started | |
+| **Deploy/staging** | **Ready, push held** | Local `staging` branch committed. Runbook: `build/07-deploy-runbook.md` (incl. the gh account-switch gotcha). Push when copy + mobile are ready |
+| Cutover plan | Not started | Prereqs listed at the end of the runbook |
 | V1 fabricated content | **Live on prod** | Audit found fake case studies/apps still shipping |
 
 ## Pick up here (new session — token-cheap path)
