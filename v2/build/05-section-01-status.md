@@ -540,3 +540,15 @@ lists) in V2's clothes. Re-cut in the hero/framework's own vocabulary:
 - Work rows: plot-dot glow + olive coordLabels (the framework's readout style).
 - Class names preserved so pass 15's mobile rules still bind.
 Committed together with pass 15 (mobile port) — same files, both Greg-approved.
+
+---
+
+# Pass 17 — About: drawn, not told (2026-08-20)
+
+Greg: still text-heavy in places. Biggest offender was About's 3-paragraph bio.
+Replaced with the bio AS A DIAGRAM: a glowing X-axis traverse (the plane's own axis
+stroke, arrowhead and node dots) with three waypoints — Go-to-market ops → Embedded
+operator → Builder — each carrying a mono label + 3-word descriptor. One line of
+prose survives, set large in the display face: "Most operational problems aren't
+technology problems. They're design problems." (olive on the payoff). ~120 words of
+biography became a one-viewport composition in the site's grammar.

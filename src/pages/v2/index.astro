@@ -130,18 +130,31 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
         <h2>I build the systems that make businesses run.</h2>
       </header>
       <div class="v2-about">
-        <div class="v2-about-bio">
-          <p>I started in go-to-market operations &mdash; territory planning, pipeline,
-          tech stacks, the systems and politics of getting marketing and sales working
-          together. The work taught me that most operational problems aren't technology
-          problems. They're design problems.</p>
-          <p>That took me sideways into the operational layer: embedded COO for an agency,
-          productizing service delivery, building AI systems and custom tools that replace
-          expensive software. Same operator, wider surface &mdash; it's the horizontal
-          axis of the map above.</p>
-          <p>Today I work with businesses that need someone who can think strategically
-          and get their hands dirty. Not one or the other.</p>
+        <!-- the bio, DRAWN instead of told: the career is a traverse of the plane's
+             X axis, so it renders as one — three waypoints on the same glowing line.
+             One line of prose survives (the worldview line). -->
+        <div class="v2-journey" aria-label="Career: from go-to-market into operations">
+          <div class="v2-jline" aria-hidden="true"></div>
+          <div class="v2-jstops">
+            <div class="v2-jstop">
+              <span class="jdot" aria-hidden="true"></span>
+              <span class="v2-mono jlab">Go-to-market ops</span>
+              <span class="jdesc">Territory &middot; pipeline &middot; tech stacks</span>
+            </div>
+            <div class="v2-jstop">
+              <span class="jdot" aria-hidden="true"></span>
+              <span class="v2-mono jlab">Embedded operator</span>
+              <span class="jdesc">COO work &middot; productized delivery</span>
+            </div>
+            <div class="v2-jstop">
+              <span class="jdot" aria-hidden="true"></span>
+              <span class="v2-mono jlab">Builder</span>
+              <span class="jdesc">AI systems &middot; custom tools</span>
+            </div>
+          </div>
         </div>
+        <p class="v2-about-line">Most operational problems aren't technology problems.
+        <em>They're design problems.</em></p>
         <!-- stats as coordinate readouts, focus areas as one mono line — plane grammar -->
         <dl class="v2-stats">
           <div><dd>10+</dd><dt class="v2-mono">Years</dt></div>
@@ -366,10 +379,36 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   }
   .v2-quote figcaption { color: var(--v2-ink-faint); }
 
-  /* ---------- 06 about: one centred column; stats as coordinate readouts ---------- */
+  /* ---------- 06 about: the bio drawn as a traverse of the X axis ---------- */
   .v2-about { text-align: center; }
-  .v2-about-bio { max-width: 58ch; margin: 0 auto; text-align: left; }
-  .v2-about-bio p { color: var(--v2-ink-dim); font-size: 15.5px; line-height: 1.75; margin: 0 0 18px; }
+  .v2-journey { position: relative; max-width: 720px; margin: 12px auto 0; padding: 26px 0 0; }
+  .v2-jline {
+    position: absolute; left: 2%; right: 2%; top: 26px; height: 1px;
+    background: var(--v2-light); opacity: .55;
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft);
+  }
+  .v2-jline::after {
+    content: ""; position: absolute; right: -1px; top: 50%;
+    transform: translate(100%, -50%);
+    border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent;
+    border-left: 7px solid var(--v2-light); opacity: .7;
+  }
+  .v2-jstops { display: flex; justify-content: space-between; }
+  .v2-jstop { position: relative; flex: 1; padding-top: 22px; }
+  .v2-jstop .jdot {
+    position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%);
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--v2-light);
+    box-shadow: 0 0 0 3px var(--v2-light-soft), 0 0 14px 2px var(--v2-light);
+  }
+  .v2-jstop .jlab { display: block; color: var(--v2-ink); margin-bottom: 6px; }
+  .v2-jstop .jdesc { display: block; color: var(--v2-ink-faint); font-size: 12.5px; }
+  .v2-about-line {
+    max-width: 44ch; margin: 56px auto 0;
+    font-family: var(--v2-display); font-weight: 500;
+    font-size: clamp(1.1rem, 2vw, 1.45rem); line-height: 1.45; color: var(--v2-ink-dim);
+  }
+  .v2-about-line em { font-style: normal; color: var(--v2-light); }
   .v2-stats { display: flex; justify-content: center; gap: 72px; margin: 48px 0 22px; }
   .v2-stats dd { font-family: var(--v2-display); font-weight: 600; font-size: 2rem; color: var(--v2-ink); margin: 0 0 6px; }
   .v2-stats dt { color: var(--v2-ink-faint); }
