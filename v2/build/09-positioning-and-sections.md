@@ -48,18 +48,29 @@ out in prose.
 burying the offer), 5-paragraph bios, example-lists inside every card, unattributed
 result ranges, prose that explains what layout should show.
 
-## Section order
+## Section order (REVISED per Greg, 2026-08-20 night)
 
 | # | Section | Job | Status |
 |---|---------|-----|--------|
-| 01 | Hero | The identity claim, felt | **Built** |
-| 02 | Framework | "What I do" — the plane + axis panels | **Built** |
-| 03 | Approach | "How we work" — Fix / Build / Scale | Placeholder |
-| 04 | Work | Case studies plotted on the plane | Placeholder |
-| 05 | Proof band | Logos + quotes | Not stubbed yet |
+| 01 | Hero | The identity claim, felt | Built; headline being re-cut |
+| 02 | Framework | WHAT I do — the plane + axis panels | **Built** |
+| 03 | Approach | HOW I do it — Fix / Build / Scale | Placeholder |
+| 04 | Contact CTA | Slim mid-page band → links #contact | Not stubbed |
+| 05 | Proof band | Monochrome logos (locked) + quote placeholders | Not stubbed |
 | 06 | About | The person behind the plane | Placeholder |
-| 07 | Contact | The 4-step intake, ported | Placeholder |
+| 07 | Work | "More work examples" — linked case studies | Placeholder |
+| 08 | Contact | THE form (single instance; every link targets it) | Placeholder |
 | — | Content/CMS | Separate page, later; nav slot reserved | Deferred |
+
+**Approach ↔ Work relationship (open, by design):** Greg intends case studies to be
+EMBEDDED/LINKED inside the Approach pillars once written ("when I write and link those
+in the right section"). So: build Approach with a per-pillar slot for 1-2 case links;
+keep 07 as the fuller "more examples" index. If embedding fully wins later, 07 can
+shrink or fold away — don't over-invest in 07 until real case studies exist.
+
+**Contact appears exactly twice:** the slim CTA band at 04 (post-Approach, when the
+reader is warmest) and the full form at 08. Menu "Contact", the CTA band, pillar
+links, and anything else all target #08. Deep-link prefill (`?situation=`) — locked yes.
 
 ---
 
@@ -161,12 +172,31 @@ repo. Not part of the current build.
 
 ---
 
-## Open questions for Greg (approve/decide, then we build)
+## Decisions logged (Greg, 2026-08-20 night)
 
-1. Hero lede: adopt "Most consultants diagnose problems and hand you a deck. I do
-   the work." — yes/no/blend?
-2. About headline: keep V1's line, or an echo of the plane?
-3. Proof band placement after Work — agreed? Logos monochrome — agreed?
-4. Section 03 CTAs deep-linking the prefilled intake — agreed?
-5. Build order proposal: 03 Approach → 07 Contact (they're coupled via the deep-link)
-   → 05 Proof band → 06 About → 04 Work (needs real case studies from Greg).
+- Monochrome logos: **YES, locked.**
+- Prefilled intake deep-links from Approach: **YES.**
+- Section order revised (table above); Approach may absorb case links over time.
+- Headline: current line to be replaced — candidates below, Greg picks.
+
+## Hero headline — candidates (pick one / redline)
+
+Current (to beat): "I diagnose it at the strategy level, then build the fix myself."
+Criteria: distinct, clear, short, carries the dichotomy, zero consultant-speak.
+
+A. **"Most consultants hand you a deck. I hand you the fix."**
+   Contrast does the work; concrete noun vs noun; "the fix" takes the accent color.
+   Lede then carries the plane: "Strategy to execution, go-to-market to operations —
+   I frame the problem and ship the system that solves it."
+B. **"I find problems like a strategist and fix them like a builder."**
+   The dichotomy stated as a skill, not a category.
+C. **"Strategy that ships."**
+   Three words; the plane and lede do the explaining. Boldest cut, most poster-like.
+D. **"The thinking and the building. One person."**
+   Blunt version of V1's "not one or the other."
+E. **"I draw the map, then build the road."**
+   Metaphor pair; pairs eerily well with a site whose hero literally draws axes.
+
+Recommendation: **A** — clearest and most distinct, weaponizes V1's best sentence,
+and instantly disqualifies the deck-consultant category Greg keeps being boxed into.
+C as the daring alternate if A feels long.
