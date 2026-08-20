@@ -435,3 +435,53 @@ re-deriving them. Benchmark screenshot in the session log (V1 sidebar, image 11)
 - Work pushed to `staging` branch → github.com/gt-quantum/gregtoler. If the Cloudflare
   Pages project is connected to the repo, the branch gets an automatic preview URL
   (…staging….pages.dev) shareable for feedback. The /v2 route is `noindex`.
+
+---
+
+# Pass 14 — mobile audit, plan only (2026-08-20, late)
+
+No V2 code touched. Output: `08-mobile-plan.md` + `08-mobile-evidence/`.
+
+- V1's mobile shell is `SpineNavigation.jsx` (JS `innerWidth <= 768`) + `BaseLayout.astro`
+  media queries + `global.css` tokens. `FluidSpineMenu.jsx` is an unused older variant.
+- Measured the live site and `/v2` at 390×844 with headless Chrome over CDP (script saved in
+  the evidence folder — this is the workaround for Greg's 55% zoom blocking the extension).
+- V1 at ≤768: 60px icon rail flush left (top 77 → bottom 0, padding 16 8 24), 36px item
+  boxes on a 46px stride (10px ghost connector), divider 30/12/16, content margin-left 60 +
+  padding 24 16 32 16 → 298px text column. Header 72 tall, logo 37px at x=34.
+- V2 at 390, beyond the known rail-proportion debt: hero + formed plane centred at x=289
+  instead of 242 and running 61–67px off the right edge (pin `padding-left` shifts abs-pos
+  children by the full amount); both axis panels open at 0–2px wide (desktop-only calc
+  geometry); no `body{margin:0}`/`box-sizing` reset so `main` starts at (8,8) everywhere;
+  text column 216px; item stride 30px (flex-basis 0 kills the ghost spacing); `100vh` pin.
+- Plan: step 0 resets + dvh + safe-area → 1 hero/plane insets → 2 rail port (V1 numbers) →
+  3 hero scale → 4 plane geometry → 5 panels as bottom sheet → 6 breakpoints 860 + 768.
+- Decisions for Greg: D1 rail glyph (recommend the unused `01–05` numerals), D2 rail flush
+  left at 60px vs inset 76, D3 swap 720→768, D4 bottom-sheet panels.
+
+---
+
+# Pass 14 — full page built out (2026-08-20, late)
+
+All sections from `09-positioning-and-sections.md` now exist for real:
+- Hero: INTERIM headline "Most consultants hand you a deck. I hand you the fix."
+  (candidate A — Greg approved NONE; workshop stays open.) Lede carries the plane.
+- 03 Approach: three beats (V1 taglines, lines-not-paragraphs), per-pillar case-slot
+  comments, CTAs deep-linking the intake pre-filled (#contact?situation=…).
+- 04 Slim CTA band ("Sound familiar?" → #contact).
+- 05 Proof: monochrome logo MARQUEE (real V1 brand assets, ink-flattened, pauses on
+  hover + reduced-motion) + two OBVIOUSLY-fake quote placeholders.
+- 06 About: V1 bio compressed 5→3 paragraphs; "design problems" line kept; stats +
+  4 focus areas. Headshot deliberately not yet placed.
+- 07 Work: thin placeholder rows by design (may fold into Approach later).
+- 08 Contact: `ContactIntake.astro` — V1's 4-step conversational form ported React→
+  vanilla, reskinned; designed pending/error/success states, aria-live, double-submit
+  guard, deep-link prefill; POSTs to existing /api/contact (Slack).
+- Nav reordered to match page: Framework · Approach · About · Work · Contact.
+- Bug caught live: `.v2-sec { padding: 110px 0 }` zeroed .v2-wrap's horizontal
+  padding (shorthand on the same element) — sections lost their left edge. Now
+  padding-top/bottom only.
+
+Open: headline workshop; real quotes; real case studies; SLACK_WEBHOOK_URL env needed
+in CF for the form to deliver in production (works via /api/contact locally only if
+env is set — verify before staging share).

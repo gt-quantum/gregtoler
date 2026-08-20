@@ -7,6 +7,7 @@ import V2Layout from "../../layouts/V2Layout.astro";
 import HeroFramework from "../../components/v2/HeroFramework.astro";
 import GTMark from "../../components/v2/GTMark.astro";
 import SpineNav from "../../components/v2/SpineNav.astro";
+import ContactIntake from "../../components/v2/ContactIntake.astro";
 ---
 
 <V2Layout>
@@ -37,30 +38,148 @@ import SpineNav from "../../components/v2/SpineNav.astro";
       <HeroFramework />
     </div>
 
-    <!-- Placeholder sections: real content comes later. They exist so the spine nav's
-         section-follow + connector-stretch motion can be seen end to end. -->
-    <section class="v2-wrap v2-ph" id="approach" aria-label="Approach (placeholder)">
-      <p class="v2-mono">02 · Approach</p>
-      <h2>[Placeholder] Fix it. Build it. Scale it.</h2>
-      <p class="body">[Three-beat sequence lands here. Watch the nav connector while scrolling.]</p>
+    <!-- 03 · APPROACH — how I do it. Three beats, not boxes (brief rule).
+         Copy = V1's pillar taglines, one line each (lines-not-paragraphs rule).
+         Each beat carries a case-slot comment for embedded case links later, and a
+         quiet CTA that deep-links the intake pre-filled. -->
+    <section class="v2-wrap v2-sec" id="approach" aria-label="Approach">
+      <header class="v2-sec-head">
+        <span class="v2-mono idx">02</span>
+        <h2>Fix what's broken, build what's missing, scale what works.</h2>
+      </header>
+      <ol class="v2-beats">
+        <li class="v2-beat">
+          <span class="v2-mono bnum">01</span>
+          <div>
+            <h3>Fix it</h3>
+            <p>Something isn't working and it's costing you time, money, or both.</p>
+            <p class="v2-mono btags">Leaking pipeline &middot; bloated stack &middot; manual work</p>
+            <!-- case-slot: 1-2 real case links land here when written -->
+            <a class="v2-beat-cta" href="#contact?situation=broken">Start here &rarr;</a>
+          </div>
+        </li>
+        <li class="v2-beat">
+          <span class="v2-mono bnum">02</span>
+          <div>
+            <h3>Build it</h3>
+            <p>You have a gap and nothing off the shelf fills it.</p>
+            <p class="v2-mono btags">Internal tools &middot; automation &middot; pipelines &middot; AI</p>
+            <!-- case-slot -->
+            <a class="v2-beat-cta" href="#contact?situation=build">Start here &rarr;</a>
+          </div>
+        </li>
+        <li class="v2-beat">
+          <span class="v2-mono bnum">03</span>
+          <div>
+            <h3>Scale it</h3>
+            <p>It works today but it won't survive growth.</p>
+            <p class="v2-mono btags">SOPs &middot; onboarding systems &middot; frameworks</p>
+            <!-- case-slot -->
+            <a class="v2-beat-cta" href="#contact?situation=scale">Start here &rarr;</a>
+          </div>
+        </li>
+      </ol>
     </section>
 
-    <section class="v2-wrap v2-ph" id="work" aria-label="Work (placeholder)">
-      <p class="v2-mono">03 · Work</p>
-      <h2>[Placeholder] Plotted on the same map.</h2>
-      <p class="body">[Case studies, plotted by coordinate on the framework. Placeholders in v2/content/case-studies/.]</p>
+    <!-- 04 · slim contact CTA band (links the single form; not a form itself) -->
+    <section class="v2-wrap v2-ctaband" aria-label="Get in touch">
+      <p>Sound familiar?</p>
+      <a class="v2-band-link" href="#contact">Tell me what's going on &rarr;</a>
     </section>
 
-    <section class="v2-wrap v2-ph" id="about" aria-label="About (placeholder)">
-      <p class="v2-mono">04 · About</p>
-      <h2>[Placeholder] The operator behind the map.</h2>
-      <p class="body">[About copy lands here.]</p>
+    <!-- 05 · PROOF — monochrome logo scroll (real brands, from V1) + quote placeholders -->
+    <section class="v2-wrap v2-sec v2-proof" aria-label="Proof">
+      <p class="v2-mono lbl">Brands I've worked with</p>
+      <div class="v2-logoscroll" aria-hidden="false">
+        <div class="v2-logotrack">
+          {[0,1].map((dup) => (
+            <div class="v2-logoset" aria-hidden={dup === 1 ? "true" : undefined}>
+              <img src="/images/brands/state-farm.svg" alt={dup ? "" : "State Farm"} />
+              <img src="/images/brands/siemens.svg" alt={dup ? "" : "Siemens"} class="sm" />
+              <img src="/images/brands/BambooHR_logo.svg.png" alt={dup ? "" : "BambooHR"} />
+              <img src="/images/brands/certifid.svg" alt={dup ? "" : "CertifID"} />
+              <img src="/images/brands/nrev.svg" alt={dup ? "" : "nrev.ai"} />
+              <img src="/images/brands/medix.svg" alt={dup ? "" : "Medix"} />
+              <img src="/images/brands/sayers.svg" alt={dup ? "" : "Sayers"} />
+              <span class="v2-logotext">CRC Group</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- quotes: PLACEHOLDERS, deliberately obvious — real quotes come from Greg.
+           Never invent plausible praise (CLAUDE.md: don't invent proof). -->
+      <div class="v2-quotes">
+        <figure class="v2-quote">
+          <blockquote>[Quote placeholder &mdash; Greg supplies a real client quote]</blockquote>
+          <figcaption class="v2-mono">[Name &middot; Role, Company]</figcaption>
+        </figure>
+        <figure class="v2-quote">
+          <blockquote>[Quote placeholder &mdash; Greg supplies a real client quote]</blockquote>
+          <figcaption class="v2-mono">[Name &middot; Role, Company]</figcaption>
+        </figure>
+      </div>
     </section>
 
-    <section class="v2-wrap v2-ph" id="contact" aria-label="Contact (placeholder)">
-      <p class="v2-mono">05 · Contact</p>
-      <h2>[Placeholder] Tell me what's going on.</h2>
-      <p class="body">[Contact flow lands here.]</p>
+    <!-- 06 · ABOUT — V1's bio compressed to three short paragraphs; the human texture
+         cut from the plane lives here instead -->
+    <section class="v2-wrap v2-sec" id="about" aria-label="About">
+      <header class="v2-sec-head">
+        <span class="v2-mono idx">03</span>
+        <h2>I build the systems that make businesses run.</h2>
+      </header>
+      <div class="v2-about">
+        <div class="v2-about-bio">
+          <p>I started in go-to-market operations &mdash; territory planning, pipeline,
+          tech stacks, the systems and politics of getting marketing and sales working
+          together. The work taught me that most operational problems aren't technology
+          problems. They're design problems.</p>
+          <p>That took me sideways into the operational layer: embedded COO for an agency,
+          productizing service delivery, building AI systems and custom tools that replace
+          expensive software. Same operator, wider surface &mdash; it's the horizontal
+          axis of the map above.</p>
+          <p>Today I work with businesses that need someone who can think strategically
+          and get their hands dirty. Not one or the other.</p>
+        </div>
+        <div class="v2-about-side">
+          <dl class="v2-stats">
+            <div><dt class="v2-mono">Years</dt><dd>10+</dd></div>
+            <div><dt class="v2-mono">Projects</dt><dd>40+</dd></div>
+            <div><dt class="v2-mono">Tools built</dt><dd>12</dd></div>
+          </dl>
+          <ul class="v2-focus">
+            <li>Operations &amp; process design</li>
+            <li>AI &amp; automation</li>
+            <li>GTM strategy</li>
+            <li>Custom tools &amp; systems</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 · WORK — "more examples" index. Thin BY DESIGN until real case studies
+         exist (they may end up embedded in Approach instead — decisions pending). -->
+    <section class="v2-wrap v2-sec" id="work" aria-label="Selected work">
+      <header class="v2-sec-head">
+        <span class="v2-mono idx">04</span>
+        <h2>Selected work</h2>
+      </header>
+      <ul class="v2-workrows">
+        <li class="v2-workrow"><span>[Placeholder &mdash; real case study]</span><span class="v2-mono">GTM &middot; Strategy</span></li>
+        <li class="v2-workrow"><span>[Placeholder &mdash; real case study]</span><span class="v2-mono">Ops &middot; Execution</span></li>
+        <li class="v2-workrow"><span>[Placeholder &mdash; real case study]</span><span class="v2-mono">Ops &middot; Strategy + Execution</span></li>
+      </ul>
+      <p class="v2-worknote">Case studies are being written &mdash; each will plot back onto the map above.</p>
+    </section>
+
+    <!-- 08 · CONTACT — the single form; every contact link on the page targets this -->
+    <section class="v2-wrap v2-sec" id="contact" aria-label="Contact">
+      <header class="v2-sec-head center">
+        <span class="v2-mono idx">05</span>
+        <h2>Tell me what's going on.</h2>
+        <p class="v2-sec-sub">Four quick steps' worth of context, then it's in my inbox.</p>
+      </header>
+      <ContactIntake />
     </section>
   </main>
 </V2Layout>
@@ -141,13 +260,101 @@ import SpineNav from "../../components/v2/SpineNav.astro";
     }
   }
 
-  .v2-ph { min-height: 72vh; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
-  .v2-ph h2 { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.6rem, 3.2vw, 2.6rem); margin: 0; color: var(--v2-ink); }
-  .v2-ph .body { color: var(--v2-ink-dim); max-width: 56ch; margin: 0; }
-
-  @media (max-width: 720px) {
-    .v2-head { padding: 16px 22px; }
+  /* ---------- shared section chrome ---------- */
+  /* vertical rhythm only — horizontal padding belongs to .v2-wrap (setting
+     the shorthand here zeroed it and broke every section's left edge) */
+  .v2-sec { padding-top: 110px; padding-bottom: 110px; }
+  .v2-sec-head { margin-bottom: 44px; }
+  .v2-sec-head .idx { color: var(--v2-light); display: block; margin-bottom: 10px; }
+  .v2-sec-head h2 {
+    font-family: var(--v2-display); font-weight: 600;
+    font-size: clamp(1.7rem, 3.4vw, 2.7rem); line-height: 1.1;
+    margin: 0; color: var(--v2-ink); max-width: 24ch;
   }
+  .v2-sec-head.center { text-align: center; }
+  .v2-sec-head.center h2 { margin: 0 auto; }
+  .v2-sec-sub { color: var(--v2-ink-dim); margin: 14px 0 0; font-size: 15px; }
+
+  /* ---------- 03 approach: three beats, hairline rows, hover slide ---------- */
+  .v2-beats { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--v2-line); }
+  .v2-beat {
+    display: grid; grid-template-columns: 64px 1fr; gap: 26px;
+    padding: 30px 6px; border-bottom: 1px solid var(--v2-line);
+    transition: padding-left .35s var(--v2-ease-out), background .35s;
+  }
+  .v2-beat:hover { padding-left: 22px; background: linear-gradient(90deg, var(--v2-light-soft), transparent 45%); }
+  .v2-beat .bnum { color: var(--v2-light); padding-top: 8px; }
+  .v2-beat h3 { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.3rem, 2.4vw, 1.9rem); margin: 0 0 8px; color: var(--v2-ink); }
+  .v2-beat p { color: var(--v2-ink-dim); max-width: 58ch; margin: 0; font-size: 15px; }
+  .v2-beat .btags { color: var(--v2-ink-faint); margin-top: 12px; letter-spacing: .12em; }
+  .v2-beat-cta {
+    display: inline-block; margin-top: 14px;
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--v2-ink-dim);
+    transition: color .25s var(--v2-ease-out);
+  }
+  .v2-beat-cta:hover { color: var(--v2-light); }
+
+  /* ---------- 04 slim CTA band ---------- */
+  .v2-ctaband {
+    display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap;
+    padding-top: 8px; padding-bottom: 8px;
+  }
+  .v2-ctaband p { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.2rem, 2.2vw, 1.7rem); color: var(--v2-ink-dim); margin: 0; }
+  .v2-band-link {
+    font-family: var(--v2-mono); font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--v2-light);
+    border-bottom: 1px solid var(--v2-light-soft); padding-bottom: 3px;
+    transition: border-color .25s var(--v2-ease-out);
+  }
+  .v2-band-link:hover { border-color: var(--v2-light); }
+
+  /* ---------- 05 proof: monochrome logo marquee + quote placeholders ---------- */
+  .v2-proof .lbl { margin-bottom: 26px; }
+  .v2-logoscroll { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  .v2-logotrack { display: flex; width: max-content; animation: v2marquee 42s linear infinite; }
+  .v2-logoscroll:hover .v2-logotrack { animation-play-state: paused; }
+  @keyframes v2marquee { to { transform: translateX(-50%); } }
+  .v2-logoset { display: flex; align-items: center; gap: 64px; padding-right: 64px; }
+  .v2-logoset img {
+    height: 22px; width: auto;
+    /* monochrome (locked): flatten to ink, sit quiet like the header logo */
+    filter: brightness(0) invert(0.85);
+    opacity: .5;
+    transition: opacity .3s var(--v2-ease-out);
+  }
+  .v2-logoset img.sm { height: 15px; }
+  .v2-logoset img:hover { opacity: .85; }
+  .v2-logotext { font-size: 14px; font-weight: 500; color: var(--v2-ink-dim); opacity: .6; white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { .v2-logotrack { animation: none; } }
+
+  .v2-quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-top: 64px; }
+  .v2-quote { margin: 0; border-left: 1px solid var(--v2-light); padding-left: 22px; }
+  .v2-quote blockquote { margin: 0 0 12px; font-size: clamp(1rem, 1.6vw, 1.15rem); line-height: 1.6; color: var(--v2-ink-dim); font-style: normal; }
+  .v2-quote figcaption { color: var(--v2-ink-faint); }
+
+  /* ---------- 06 about ---------- */
+  .v2-about { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr); gap: 64px; }
+  .v2-about-bio p { color: var(--v2-ink-dim); font-size: 15.5px; line-height: 1.7; margin: 0 0 18px; max-width: 58ch; }
+  .v2-stats { display: flex; gap: 34px; margin: 0 0 30px; }
+  .v2-stats dt { color: var(--v2-ink-faint); margin-bottom: 4px; }
+  .v2-stats dd { font-family: var(--v2-display); font-weight: 600; font-size: 1.7rem; color: var(--v2-ink); margin: 0; }
+  .v2-focus { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--v2-line); }
+  .v2-focus li { padding: 11px 2px; border-bottom: 1px solid var(--v2-line); color: var(--v2-ink-dim); font-size: 14px; }
+  @media (max-width: 860px) { .v2-about { grid-template-columns: 1fr; gap: 40px; } }
+
+  /* ---------- 07 work rows (thin, placeholder-labelled) ---------- */
+  .v2-workrows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--v2-line); }
+  .v2-workrow {
+    display: flex; justify-content: space-between; gap: 20px; align-items: baseline;
+    padding: 20px 4px; border-bottom: 1px solid var(--v2-line);
+    color: var(--v2-ink-dim); font-size: 15px;
+  }
+  .v2-worknote { color: var(--v2-ink-faint); font-size: 13px; margin: 16px 0 0; }
+
+  /* ---------- 08 contact ---------- */
+  #contact .v2-sec-head { margin-bottom: 34px; }
+
 </style>
 
 <script>

@@ -1,0 +1,302 @@
+---
+/**
+ * V2 — conversational intake. PORT of V1's ContactSection.jsx (the 4-step
+ * "typeform-style" form Greg asked for — it already existed), reskinned to V2
+ * tokens and rewritten from React to ~vanilla JS.
+ *
+ * Steps: 1 situation → 2 involvement areas → 3 the story → 4 name/email + send.
+ * Deep-link prefill: #contact?situation=broken|build|scale|ongoing|unsure
+ * (also reads plain ?situation= for the Approach pillar links).
+ *
+ * Submits JSON to /api/contact (existing endpoint → Slack webhook), payload shape
+ * matched to src/pages/api/contact.js.
+ *
+ * Off-happy-path states are DESIGNED, not defaulted (see build/03-anti-ai-tells.md):
+ * pending, failure with retry, success — with aria-live announcements and a
+ * double-submit guard.
+ */
+const situations = [
+  { label: "Something's broken or inefficient", value: "broken" },
+  { label: "I need something built", value: "build" },
+  { label: "Something works but won't scale", value: "scale" },
+  { label: "I need ongoing operational support", value: "ongoing" },
+  { label: "Not sure yet — something needs to change", value: "unsure" },
+];
+const areas = [
+  "Process / workflow", "Technology / tools", "AI / automation",
+  "Strategy / architecture", "People / training", "Data / reporting",
+];
+---
+
+<div class="v2-intake" id="v2-intake" data-step="1">
+  <ol class="v2-intake-steps v2-mono" aria-hidden="true">
+    <li data-s="1" class="on">01</li><li data-s="2">02</li><li data-s="3">03</li><li data-s="4">04</li>
+  </ol>
+
+  <form id="v2-intake-form" novalidate>
+    <!-- 1 · situation -->
+    <fieldset class="v2-step" data-step="1">
+      <legend><span class="v2-mono">01</span>What's going on?</legend>
+      <div class="v2-sit-grid" role="radiogroup" aria-label="Your situation">
+        {situations.map((s) => (
+          <label class="v2-sit">
+            <input type="radio" name="situation" value={s.value} />
+            <span>{s.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <!-- 2 · involvement -->
+    <fieldset class="v2-step" data-step="2" hidden>
+      <legend><span class="v2-mono">02</span>What does it touch?</legend>
+      <p class="v2-step-hint">Pick any that apply.</p>
+      <div class="v2-chip-grid">
+        {areas.map((a) => (
+          <label class="v2-chip">
+            <input type="checkbox" name="involvement" value={a} />
+            <span>{a}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <!-- 3 · the story -->
+    <fieldset class="v2-step" data-step="3" hidden>
+      <legend><span class="v2-mono">03</span>Tell me what's going on.</legend>
+      <p class="v2-step-hint">A few sentences is plenty. I'll figure out the right approach.</p>
+      <textarea name="message" rows="5" placeholder="What's happening, what you've tried, what good looks like…" aria-label="Your situation in a few sentences"></textarea>
+    </fieldset>
+
+    <!-- 4 · reach you -->
+    <fieldset class="v2-step" data-step="4" hidden>
+      <legend><span class="v2-mono">04</span>Where do I reach you?</legend>
+      <div class="v2-who">
+        <label>Name <input type="text" name="name" autocomplete="name" required /></label>
+        <label>Email <input type="email" name="email" autocomplete="email" required inputmode="email" /></label>
+      </div>
+      <p class="v2-field-err" id="v2-intake-fielderr" role="alert" hidden></p>
+    </fieldset>
+
+    <div class="v2-intake-nav">
+      <button type="button" class="v2-int-back" id="v2-int-back" hidden>Back</button>
+      <button type="button" class="v2-int-next" id="v2-int-next" disabled>Continue</button>
+      <button type="submit" class="v2-int-send" id="v2-int-send" hidden>
+        <span class="idle">Send it over</span>
+        <span class="busy" hidden>Sending&hellip;</span>
+      </button>
+    </div>
+
+    <p class="v2-intake-status" id="v2-intake-status" aria-live="polite"></p>
+  </form>
+
+  <!-- success replaces the form entirely -->
+  <div class="v2-intake-done" id="v2-intake-done" hidden>
+    <p class="v2-mono">Received</p>
+    <h3>Got it. I'll read it today and reply within one business day.</h3>
+    <p>If it's time-sensitive, <a href="https://linkedin.com/in/gregtoler" target="_blank" rel="noopener noreferrer">LinkedIn</a> is the fast lane.</p>
+  </div>
+</div>
+
+<style>
+  .v2-intake {
+    max-width: 640px; margin: 0 auto;
+    border: 1px solid var(--v2-line); border-radius: var(--v2-radius);
+    background: color-mix(in srgb, var(--v2-surface) 92%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    padding: 34px 38px 30px;
+  }
+  .v2-intake-steps {
+    display: flex; gap: 14px; list-style: none; margin: 0 0 26px; padding: 0;
+  }
+  .v2-intake-steps li { opacity: .35; transition: opacity .3s, color .3s; }
+  .v2-intake-steps li.on { opacity: 1; color: var(--v2-light); }
+  .v2-intake-steps li.done { opacity: .7; }
+
+  fieldset { border: 0; margin: 0; padding: 0; min-height: 190px; }
+  legend {
+    font-family: var(--v2-display); font-weight: 600;
+    font-size: clamp(1.2rem, 2.2vw, 1.55rem); color: var(--v2-ink);
+    margin-bottom: 18px; display: flex; align-items: baseline; gap: 12px;
+  }
+  legend .v2-mono { color: var(--v2-light); }
+  .v2-step-hint { color: var(--v2-ink-faint); font-size: 13px; margin: -10px 0 16px; }
+
+  .v2-sit-grid { display: grid; gap: 8px; }
+  .v2-sit input { position: absolute; opacity: 0; pointer-events: none; }
+  .v2-sit span {
+    display: block; padding: 12px 16px;
+    border: 1px solid var(--v2-line); border-radius: var(--v2-radius);
+    color: var(--v2-ink-dim); font-size: 14.5px;
+    transition: border-color .25s var(--v2-ease-out), color .25s, background .25s;
+  }
+  .v2-sit:hover span { color: var(--v2-ink); }
+  .v2-sit input:checked + span {
+    border-color: var(--v2-light); color: var(--v2-ink);
+    background: var(--v2-light-soft);
+  }
+  .v2-sit input:focus-visible + span { outline: 2px solid var(--v2-light); outline-offset: 2px; }
+
+  .v2-chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .v2-chip input { position: absolute; opacity: 0; pointer-events: none; }
+  .v2-chip span {
+    display: block; padding: 8px 14px; border-radius: 100px;
+    border: 1px solid var(--v2-line); color: var(--v2-ink-dim);
+    font-size: 13px;
+    transition: border-color .25s var(--v2-ease-out), color .25s, background .25s;
+  }
+  .v2-chip:hover span { color: var(--v2-ink); }
+  .v2-chip input:checked + span {
+    border-color: var(--v2-light); color: var(--v2-ink); background: var(--v2-light-soft);
+  }
+  .v2-chip input:focus-visible + span { outline: 2px solid var(--v2-light); outline-offset: 2px; }
+
+  textarea, .v2-who input {
+    width: 100%; background: var(--v2-base);
+    border: 1px solid var(--v2-line); border-radius: var(--v2-radius);
+    color: var(--v2-ink); font-family: var(--v2-sans); font-size: 14.5px;
+    padding: 12px 14px;
+    transition: border-color .25s var(--v2-ease-out);
+  }
+  textarea:focus, .v2-who input:focus { outline: none; border-color: var(--v2-light); }
+  .v2-who { display: grid; gap: 14px; }
+  .v2-who label { display: grid; gap: 6px; font-family: var(--v2-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--v2-ink-faint); }
+  .v2-field-err { color: #C96B6B; font-size: 13px; margin: 12px 0 0; }
+
+  .v2-intake-nav { display: flex; gap: 12px; margin-top: 22px; }
+  .v2-int-back, .v2-int-next, .v2-int-send {
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; padding: 11px 20px; border-radius: 100px;
+    cursor: pointer; transition: border-color .25s, color .25s, opacity .25s;
+  }
+  .v2-int-back { background: none; border: 0; color: var(--v2-ink-faint); }
+  .v2-int-back:hover { color: var(--v2-ink); }
+  .v2-int-next, .v2-int-send {
+    margin-left: auto; background: transparent;
+    border: 1px solid var(--v2-line); color: var(--v2-ink);
+  }
+  .v2-int-next:hover:not(:disabled), .v2-int-send:hover:not(:disabled) { border-color: var(--v2-light); }
+  .v2-int-next:disabled { opacity: .35; cursor: default; }
+  .v2-int-send:disabled { opacity: .6; cursor: progress; }
+
+  .v2-intake-status { min-height: 1.2em; margin: 14px 0 0; font-size: 13px; color: var(--v2-ink-dim); }
+  .v2-intake-status.err { color: #C96B6B; }
+
+  .v2-intake-done { text-align: center; padding: 26px 0 14px; }
+  .v2-intake-done .v2-mono { color: var(--v2-light); margin-bottom: 12px; }
+  .v2-intake-done h3 { font-family: var(--v2-display); font-weight: 600; font-size: 1.35rem; margin: 0 0 12px; color: var(--v2-ink); }
+  .v2-intake-done p { color: var(--v2-ink-dim); font-size: 14px; margin: 0; }
+  .v2-intake-done a { color: var(--v2-light); }
+
+  @media (max-width: 720px) { .v2-intake { padding: 24px 20px; } }
+</style>
+
+<script>
+  (() => {
+    const root = document.getElementById("v2-intake");
+    const form = document.getElementById("v2-intake-form") as HTMLFormElement | null;
+    if (!root || !form) return;
+
+    const steps = Array.from(form.querySelectorAll<HTMLFieldSetElement>(".v2-step"));
+    const dots = Array.from(root.querySelectorAll<HTMLElement>(".v2-intake-steps li"));
+    const back = document.getElementById("v2-int-back") as HTMLButtonElement;
+    const next = document.getElementById("v2-int-next") as HTMLButtonElement;
+    const send = document.getElementById("v2-int-send") as HTMLButtonElement;
+    const status = document.getElementById("v2-intake-status")!;
+    const fieldErr = document.getElementById("v2-intake-fielderr")!;
+    const done = document.getElementById("v2-intake-done")!;
+
+    let step = 1;
+    const LAST = 4;
+
+    function stepValid(): boolean {
+      if (step === 1) return !!form!.querySelector('input[name="situation"]:checked');
+      return true; // 2 and 3 are optional by design — momentum over interrogation
+    }
+
+    function show() {
+      steps.forEach((f) => { f.hidden = parseInt(f.dataset.step!) !== step; });
+      dots.forEach((d) => {
+        const n = parseInt(d.dataset.s!);
+        d.classList.toggle("on", n === step);
+        d.classList.toggle("done", n < step);
+      });
+      back.hidden = step === 1;
+      next.hidden = step === LAST;
+      send.hidden = step !== LAST;
+      next.disabled = !stepValid();
+      root!.dataset.step = String(step);
+      const first = steps[step - 1].querySelector<HTMLElement>("input, textarea");
+      first?.focus({ preventScroll: true });
+    }
+
+    form.addEventListener("change", () => { next.disabled = !stepValid(); });
+    next.addEventListener("click", () => { if (stepValid() && step < LAST) { step++; show(); } });
+    back.addEventListener("click", () => { if (step > 1) { step--; show(); } });
+
+    // deep-link prefill: ?situation=… in query or after the #contact hash
+    const q = new URLSearchParams(window.location.search);
+    const hashQ = window.location.hash.includes("?")
+      ? new URLSearchParams(window.location.hash.split("?")[1]) : null;
+    const pre = q.get("situation") || hashQ?.get("situation");
+    if (pre) {
+      const input = form.querySelector<HTMLInputElement>(`input[name="situation"][value="${pre}"]`);
+      if (input) { input.checked = true; step = 2; }
+    }
+    show();
+
+    // submit — designed states, no default browser behaviour
+    let sending = false;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (sending) return;                       // double-submit guard
+
+      const name = (form.elements.namedItem("name") as HTMLInputElement).value.trim();
+      const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
+      fieldErr.hidden = true;
+      if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        fieldErr.textContent = !name
+          ? "I need a name to reply to."
+          : "That email doesn't look right — mind checking it?";
+        fieldErr.hidden = false;
+        return;
+      }
+
+      sending = true;
+      send.disabled = true;
+      send.querySelector(".idle")!.toggleAttribute("hidden", true);
+      send.querySelector(".busy")!.toggleAttribute("hidden", false);
+      status.classList.remove("err");
+      status.textContent = "";
+
+      const sit = form.querySelector<HTMLInputElement>('input[name="situation"]:checked');
+      const payload = {
+        situation: sit ? sit.nextElementSibling!.textContent : "(not set)",
+        involvement: Array.from(form.querySelectorAll<HTMLInputElement>('input[name="involvement"]:checked')).map((c) => c.value),
+        message: (form.elements.namedItem("message") as HTMLTextAreaElement).value.trim(),
+        name, email,
+        contactMethod: "email",
+      };
+
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.hidden = true;
+        root!.querySelector(".v2-intake-steps")!.setAttribute("hidden", "");
+        done.hidden = false;
+        status.textContent = "Sent.";
+      } catch {
+        sending = false;
+        send.disabled = false;
+        send.querySelector(".idle")!.toggleAttribute("hidden", false);
+        send.querySelector(".busy")!.toggleAttribute("hidden", true);
+        status.classList.add("err");
+        status.textContent = "That didn't go through — nothing lost, try Send again. If it keeps failing, email greg@gregtoler.com directly.";
+      }
+    });
+  })();
+</script>
