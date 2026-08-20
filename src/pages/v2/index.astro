@@ -44,40 +44,46 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
          quiet CTA that deep-links the intake pre-filled. -->
     <section class="v2-wrap v2-sec" id="approach" aria-label="Approach">
       <header class="v2-sec-head">
-        <span class="v2-mono idx">02</span>
+        <span class="v2-mono idx">Approach</span>
         <h2>Fix what's broken, build what's missing, scale what works.</h2>
       </header>
-      <!-- three stations on a glowing vertical line — the framework's own grammar
-           (axis + nodes in space), not editorial rows -->
-      <ol class="v2-beats">
-        <li class="v2-beat">
-          <span class="bnode" aria-hidden="true"></span>
-          <span class="v2-mono bnum">01</span>
-          <h3>Fix it</h3>
-          <p>Something isn't working and it's costing you time, money, or both.</p>
-          <p class="v2-mono btags">Leaking pipeline &middot; bloated stack &middot; manual work</p>
-          <!-- case-slot: 1-2 real case links land here when written -->
-          <a class="v2-beat-cta" href="#contact?situation=broken">Start here &rarr;</a>
-        </li>
-        <li class="v2-beat">
-          <span class="bnode" aria-hidden="true"></span>
-          <span class="v2-mono bnum">02</span>
-          <h3>Build it</h3>
-          <p>You have a gap and nothing off the shelf fills it.</p>
-          <p class="v2-mono btags">Internal tools &middot; automation &middot; pipelines &middot; AI</p>
-          <!-- case-slot -->
-          <a class="v2-beat-cta" href="#contact?situation=build">Start here &rarr;</a>
-        </li>
-        <li class="v2-beat">
-          <span class="bnode" aria-hidden="true"></span>
-          <span class="v2-mono bnum">03</span>
-          <h3>Scale it</h3>
-          <p>It works today but it won't survive growth.</p>
-          <p class="v2-mono btags">SOPs &middot; onboarding systems &middot; frameworks</p>
-          <!-- case-slot -->
-          <a class="v2-beat-cta" href="#contact?situation=scale">Start here &rarr;</a>
-        </li>
-      </ol>
+      <!-- Approach as a FLOWCHART — Greg thinks in Lucid: boxes, connectors,
+           arrows, decision points. This section IS a decision tree, so it's drawn
+           as one: entry diamond → three branches → converge toward contact. -->
+      <div class="v2-flow">
+        <div class="v2-fentry">
+          <span class="fdiamond" aria-hidden="true"></span>
+          <span class="v2-mono fentry-lab">Something's off</span>
+        </div>
+        <div class="v2-fbranch" aria-hidden="true"><i class="riser"></i><i class="rail"></i></div>
+        <ol class="v2-beats">
+          <li class="v2-beat">
+            <i class="fdrop" aria-hidden="true"></i>
+            <h3>Fix it</h3>
+            <p>Something isn't working and it's costing you time, money, or both.</p>
+            <p class="v2-mono btags">Leaking pipeline &middot; bloated stack &middot; manual work</p>
+            <!-- case-slot: 1-2 real case links land here when written -->
+            <a class="v2-beat-cta" href="#contact?situation=broken">Start here &rarr;</a>
+          </li>
+          <li class="v2-beat">
+            <i class="fdrop" aria-hidden="true"></i>
+            <h3>Build it</h3>
+            <p>You have a gap and nothing off the shelf fills it.</p>
+            <p class="v2-mono btags">Internal tools &middot; automation &middot; pipelines &middot; AI</p>
+            <!-- case-slot -->
+            <a class="v2-beat-cta" href="#contact?situation=build">Start here &rarr;</a>
+          </li>
+          <li class="v2-beat">
+            <i class="fdrop" aria-hidden="true"></i>
+            <h3>Scale it</h3>
+            <p>It works today but it won't survive growth.</p>
+            <p class="v2-mono btags">SOPs &middot; onboarding systems &middot; frameworks</p>
+            <!-- case-slot -->
+            <a class="v2-beat-cta" href="#contact?situation=scale">Start here &rarr;</a>
+          </li>
+        </ol>
+        <div class="v2-fmerge" aria-hidden="true"><i class="rail"></i><i class="drop"></i></div>
+      </div>
     </section>
 
     <!-- 04 · slim contact CTA band (links the single form; not a form itself) -->
@@ -126,7 +132,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
          cut from the plane lives here instead -->
     <section class="v2-wrap v2-sec" id="about" aria-label="About">
       <header class="v2-sec-head">
-        <span class="v2-mono idx">03</span>
+        <span class="v2-mono idx">About</span>
         <h2>I build the systems that make businesses run.</h2>
       </header>
       <div class="v2-about">
@@ -169,7 +175,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
          exist (they may end up embedded in Approach instead — decisions pending). -->
     <section class="v2-wrap v2-sec" id="work" aria-label="Selected work">
       <header class="v2-sec-head">
-        <span class="v2-mono idx">04</span>
+        <span class="v2-mono idx">Work</span>
         <h2>Selected work</h2>
       </header>
       <ul class="v2-workrows">
@@ -183,7 +189,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
     <!-- 08 · CONTACT — the single form; every contact link on the page targets this -->
     <section class="v2-wrap v2-sec" id="contact" aria-label="Contact">
       <header class="v2-sec-head center">
-        <span class="v2-mono idx">05</span>
+        <span class="v2-mono idx">Contact</span>
         <h2>Tell me what's going on.</h2>
         <p class="v2-sec-sub">Four quick steps' worth of context, then it's in my inbox.</p>
       </header>
@@ -290,65 +296,113 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   }
   .v2-sec-sub { color: var(--v2-ink-dim); margin: 16px 0 0; font-size: 15px; }
 
-  /* ---------- 03 approach: three stations on a glowing vertical axis ---------- */
-  .v2-beats {
-    list-style: none; margin: 0 auto; padding: 10px 0 0; position: relative;
-    max-width: 560px;
+  /* ---------- 03 approach: a drawn decision tree (Lucid grammar) ----------
+     Diagram primitives — reuse these for future process visuals:
+     .fdiamond (decision), .v2-beat (process box), .riser/.rail/.fdrop/.drop
+     (connectors), arrowheads via border triangles. Same stroke + glow as the axes. */
+  .v2-flow { position: relative; }
+
+  .v2-fentry { text-align: center; position: relative; padding-bottom: 6px; }
+  .v2-fentry .fdiamond {
+    display: block; width: 12px; height: 12px; margin: 0 auto 12px;
+    background: var(--v2-base);
+    border: 1px solid var(--v2-light); transform: rotate(45deg);
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 18px 2px var(--v2-light-soft);
   }
-  /* the axis itself — same stroke + glow as the plane's Y axis */
-  .v2-beats::before {
-    content: ""; position: absolute; left: 50%; top: 0; bottom: 0;
-    width: 1px; transform: translateX(-50%);
+  .v2-fentry .fentry-lab { color: var(--v2-ink-dim); }
+
+  /* branch: riser from the diamond, distribution rail, drops into each box */
+  .v2-fbranch { position: relative; height: 56px; max-width: 66.6%; margin: 0 auto; }
+  .v2-fbranch .riser {
+    position: absolute; left: 50%; top: -6px; height: 30px; width: 1px;
+    transform: translateX(-50%);
     background: var(--v2-light); opacity: .55;
-    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft);
+    box-shadow: 0 0 6px 0 var(--v2-light-soft);
   }
-  /* arrowhead at the axis foot, like the plane's axes */
-  .v2-beats::after {
+  .v2-fbranch .rail {
+    position: absolute; left: 0; right: 0; top: 24px; height: 1px;
+    background: var(--v2-light); opacity: .55;
+    box-shadow: 0 0 6px 0 var(--v2-light-soft);
+  }
+  /* the three drops + arrowheads live on the boxes themselves */
+  .v2-beat .fdrop {
+    position: absolute; left: 50%; top: -32px; height: 26px; width: 1px;
+    transform: translateX(-50%);
+    background: var(--v2-light); opacity: .55;
+    box-shadow: 0 0 6px 0 var(--v2-light-soft);
+  }
+  .v2-beat .fdrop::after {
     content: ""; position: absolute; left: 50%; bottom: -1px;
     transform: translate(-50%, 100%);
     border-left: 3.5px solid transparent; border-right: 3.5px solid transparent;
-    border-top: 7px solid var(--v2-light); opacity: .7;
+    border-top: 6px solid var(--v2-light); opacity: .8;
+  }
+
+  /* process boxes: hairline, 2px radius (the token), glass — Lucid shapes in
+     the site's material */
+  .v2-beats {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
   }
   .v2-beat {
     position: relative; text-align: center;
-    padding: 44px 24px 52px;
+    border: 1px solid var(--v2-line); border-radius: var(--v2-radius);
+    background: color-mix(in srgb, var(--v2-surface) 72%, transparent);
+    padding: 30px 22px 26px;
+    transition: border-color .35s var(--v2-ease-out), transform .35s var(--v2-ease-out);
   }
-  /* station node: the plane's plot-dot, reused */
-  .v2-beat .bnode {
-    position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%);
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--v2-light);
-    box-shadow: 0 0 0 3px var(--v2-light-soft), 0 0 14px 2px var(--v2-light);
-  }
-  .v2-beat .bnum { display: block; color: var(--v2-light); margin-bottom: 10px; }
+  .v2-beat:hover { border-color: color-mix(in srgb, var(--v2-light) 55%, var(--v2-line)); transform: translateY(-3px); }
   .v2-beat h3 {
     font-family: var(--v2-display); font-weight: 600;
-    font-size: clamp(1.4rem, 2.6vw, 2rem); margin: 0 0 10px; color: var(--v2-ink);
-    text-shadow: 0 0 20px var(--v2-base), 0 0 7px var(--v2-base);
+    font-size: clamp(1.25rem, 2.2vw, 1.6rem); margin: 0 0 10px; color: var(--v2-ink);
   }
-  .v2-beat p { color: var(--v2-ink-dim); max-width: 44ch; margin: 0 auto; font-size: 15px; }
-  .v2-beat .btags { color: var(--v2-ink-faint); margin-top: 12px; letter-spacing: .12em; }
+  .v2-beat p { color: var(--v2-ink-dim); margin: 0; font-size: 14px; line-height: 1.55; }
+  .v2-beat .btags { color: var(--v2-ink-faint); margin-top: 12px; letter-spacing: .1em; font-size: 9px; }
   .v2-beat-cta {
     display: inline-block; margin-top: 16px;
-    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .12em;
+    font-family: var(--v2-mono); font-size: 10.5px; letter-spacing: .12em;
     text-transform: uppercase; color: var(--v2-ink-dim);
     transition: color .25s var(--v2-ease-out);
   }
   .v2-beat-cta:hover { color: var(--v2-light); }
 
+  /* merge: rail under the boxes, single drop + arrowhead pointing at the CTA band */
+  .v2-fmerge { position: relative; height: 58px; max-width: 66.6%; margin: 0 auto; }
+  .v2-fmerge .rail {
+    position: absolute; left: 0; right: 0; top: 26px; height: 1px;
+    background: var(--v2-light); opacity: .4;
+    box-shadow: 0 0 6px 0 var(--v2-light-soft);
+  }
+  .v2-fmerge .drop {
+    position: absolute; left: 50%; top: 26px; height: 26px; width: 1px;
+    transform: translateX(-50%);
+    background: var(--v2-light); opacity: .55;
+  }
+  .v2-fmerge .drop::after {
+    content: ""; position: absolute; left: 50%; bottom: -1px;
+    transform: translate(-50%, 100%);
+    border-left: 3.5px solid transparent; border-right: 3.5px solid transparent;
+    border-top: 6px solid var(--v2-light); opacity: .8;
+  }
+
   /* ---------- 04 slim CTA band: centred, like the hero's scroll cue ---------- */
   .v2-ctaband {
     display: flex; flex-direction: column; align-items: center; gap: 16px;
-    text-align: center; padding-top: 10px; padding-bottom: 10px;
+    text-align: center; padding-top: 0; padding-bottom: 10px;
   }
   .v2-ctaband p { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.2rem, 2.2vw, 1.7rem); color: var(--v2-ink-dim); margin: 0; }
+  /* the merge arrow must land ON the band — kill the inter-section gap */
+  #approach.v2-sec { padding-bottom: 0; }
+
+  /* terminator node: the flow's arrows land on this pill */
   .v2-band-link {
     font-family: var(--v2-mono); font-size: 12px; letter-spacing: .12em;
     text-transform: uppercase; color: var(--v2-light);
-    border-bottom: 1px solid var(--v2-light-soft); padding-bottom: 3px;
-    transition: border-color .25s var(--v2-ease-out);
+    border: 1px solid var(--v2-line); border-radius: 100px;
+    padding: 12px 22px;
+    transition: border-color .25s var(--v2-ease-out), box-shadow .25s var(--v2-ease-out);
   }
-  .v2-band-link:hover { border-color: var(--v2-light); }
+  .v2-band-link:hover { border-color: var(--v2-light); box-shadow: 0 0 0 1px var(--v2-light-soft), 0 0 26px -10px var(--v2-light); }
 
   /* ---------- 05 proof ---------- */
   .v2-proof { text-align: center; }

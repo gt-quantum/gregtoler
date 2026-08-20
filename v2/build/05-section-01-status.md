@@ -552,3 +552,26 @@ operator → Builder — each carrying a mono label + 3-word descriptor. One lin
 prose survives, set large in the display face: "Most operational problems aren't
 technology problems. They're design problems." (olive on the payoff). ~120 words of
 biography became a one-viewport composition in the site's grammar.
+
+---
+
+# Pass 18 — Lucid grammar + named sections (2026-08-20)
+
+Greg: "I build with boxes, lines, arrows in Lucidchart… charts and frameworks to
+represent process and strategy — that's how my brain works." New DESIGN PRINCIPLE
+alongside the plane grammar: **flowchart grammar** — diagram primitives in the
+site's material (hairline boxes, 2px radius, glass fill; connectors with the axes'
+stroke+glow; border-triangle arrowheads; diamond decision nodes).
+
+First application — Approach IS a decision tree, so it's drawn as one:
+  ◇ "Something's off" → riser → distribution rail → three arrowed drops →
+  [Fix it] [Build it] [Scale it] process boxes → merge rail → single arrow →
+  lands on the "Tell me what's going on" terminator pill (CTA band, now bordered
+  like a Lucid terminator; #approach bottom padding zeroed so the arrow connects).
+
+Also per Greg: numbered section eyebrows ("02/03/04/05") replaced with NAMES
+(Approach/About/Work/Contact); beat numerals dropped (box titles carry the names).
+
+Primitives documented in the CSS comment block for reuse: .fdiamond, .v2-beat box,
+.riser/.rail/.fdrop/.drop connectors. Future candidates: case-study rows as
+[Problem]→[Built]→[Result] micro-flows; the framework panels' pillar links.
