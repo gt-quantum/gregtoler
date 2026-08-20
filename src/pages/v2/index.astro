@@ -47,36 +47,35 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
         <span class="v2-mono idx">02</span>
         <h2>Fix what's broken, build what's missing, scale what works.</h2>
       </header>
+      <!-- three stations on a glowing vertical line — the framework's own grammar
+           (axis + nodes in space), not editorial rows -->
       <ol class="v2-beats">
         <li class="v2-beat">
+          <span class="bnode" aria-hidden="true"></span>
           <span class="v2-mono bnum">01</span>
-          <div>
-            <h3>Fix it</h3>
-            <p>Something isn't working and it's costing you time, money, or both.</p>
-            <p class="v2-mono btags">Leaking pipeline &middot; bloated stack &middot; manual work</p>
-            <!-- case-slot: 1-2 real case links land here when written -->
-            <a class="v2-beat-cta" href="#contact?situation=broken">Start here &rarr;</a>
-          </div>
+          <h3>Fix it</h3>
+          <p>Something isn't working and it's costing you time, money, or both.</p>
+          <p class="v2-mono btags">Leaking pipeline &middot; bloated stack &middot; manual work</p>
+          <!-- case-slot: 1-2 real case links land here when written -->
+          <a class="v2-beat-cta" href="#contact?situation=broken">Start here &rarr;</a>
         </li>
         <li class="v2-beat">
+          <span class="bnode" aria-hidden="true"></span>
           <span class="v2-mono bnum">02</span>
-          <div>
-            <h3>Build it</h3>
-            <p>You have a gap and nothing off the shelf fills it.</p>
-            <p class="v2-mono btags">Internal tools &middot; automation &middot; pipelines &middot; AI</p>
-            <!-- case-slot -->
-            <a class="v2-beat-cta" href="#contact?situation=build">Start here &rarr;</a>
-          </div>
+          <h3>Build it</h3>
+          <p>You have a gap and nothing off the shelf fills it.</p>
+          <p class="v2-mono btags">Internal tools &middot; automation &middot; pipelines &middot; AI</p>
+          <!-- case-slot -->
+          <a class="v2-beat-cta" href="#contact?situation=build">Start here &rarr;</a>
         </li>
         <li class="v2-beat">
+          <span class="bnode" aria-hidden="true"></span>
           <span class="v2-mono bnum">03</span>
-          <div>
-            <h3>Scale it</h3>
-            <p>It works today but it won't survive growth.</p>
-            <p class="v2-mono btags">SOPs &middot; onboarding systems &middot; frameworks</p>
-            <!-- case-slot -->
-            <a class="v2-beat-cta" href="#contact?situation=scale">Start here &rarr;</a>
-          </div>
+          <h3>Scale it</h3>
+          <p>It works today but it won't survive growth.</p>
+          <p class="v2-mono btags">SOPs &middot; onboarding systems &middot; frameworks</p>
+          <!-- case-slot -->
+          <a class="v2-beat-cta" href="#contact?situation=scale">Start here &rarr;</a>
         </li>
       </ol>
     </section>
@@ -111,10 +110,12 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
            Never invent plausible praise (CLAUDE.md: don't invent proof). -->
       <div class="v2-quotes">
         <figure class="v2-quote">
+          <span class="qhalo" aria-hidden="true"></span>
           <blockquote>[Quote placeholder &mdash; Greg supplies a real client quote]</blockquote>
           <figcaption class="v2-mono">[Name &middot; Role, Company]</figcaption>
         </figure>
         <figure class="v2-quote">
+          <span class="qhalo" aria-hidden="true"></span>
           <blockquote>[Quote placeholder &mdash; Greg supplies a real client quote]</blockquote>
           <figcaption class="v2-mono">[Name &middot; Role, Company]</figcaption>
         </figure>
@@ -141,19 +142,13 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
           <p>Today I work with businesses that need someone who can think strategically
           and get their hands dirty. Not one or the other.</p>
         </div>
-        <div class="v2-about-side">
-          <dl class="v2-stats">
-            <div><dt class="v2-mono">Years</dt><dd>10+</dd></div>
-            <div><dt class="v2-mono">Projects</dt><dd>40+</dd></div>
-            <div><dt class="v2-mono">Tools built</dt><dd>12</dd></div>
-          </dl>
-          <ul class="v2-focus">
-            <li>Operations &amp; process design</li>
-            <li>AI &amp; automation</li>
-            <li>GTM strategy</li>
-            <li>Custom tools &amp; systems</li>
-          </ul>
-        </div>
+        <!-- stats as coordinate readouts, focus areas as one mono line — plane grammar -->
+        <dl class="v2-stats">
+          <div><dd>10+</dd><dt class="v2-mono">Years</dt></div>
+          <div><dd>40+</dd><dt class="v2-mono">Projects</dt></div>
+          <div><dd>12</dd><dt class="v2-mono">Tools built</dt></div>
+        </dl>
+        <p class="v2-focusline v2-mono">Operations &amp; process design &middot; AI &amp; automation &middot; GTM strategy &middot; Custom tools &amp; systems</p>
       </div>
     </section>
 
@@ -165,9 +160,9 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
         <h2>Selected work</h2>
       </header>
       <ul class="v2-workrows">
-        <li class="v2-workrow"><span>[Placeholder &mdash; real case study]</span><span class="v2-mono">GTM &middot; Strategy</span></li>
-        <li class="v2-workrow"><span>[Placeholder &mdash; real case study]</span><span class="v2-mono">Ops &middot; Execution</span></li>
-        <li class="v2-workrow"><span>[Placeholder &mdash; real case study]</span><span class="v2-mono">Ops &middot; Strategy + Execution</span></li>
+        <li class="v2-workrow"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">GTM &middot; Strategy</span></li>
+        <li class="v2-workrow"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">Ops &middot; Execution</span></li>
+        <li class="v2-workrow"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">Ops &middot; Strategy + Execution</span></li>
       </ul>
       <p class="v2-worknote">Case studies are being written &mdash; each will plot back onto the map above.</p>
     </section>
@@ -244,61 +239,94 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
      the logo — V1's sidebar layout. Content pads off it; LinkedIn sits at the rail's
      foot under a divider, exactly like the original. */
   @media (max-width: 860px) {
-    main { padding-left: 94px; }   /* rail inset 18 + rail 76 */
-    .v2-head { padding-right: 20px; }
+    main { padding-left: var(--v2-rail); }        /* V1: content margin-left 60 */
+    .v2-head { padding: 16px 20px 16px 30px; }    /* V1: logo at x=34 (30 + the brand's 4px) */
+    /* the rail's foot, V1's numbers: 20px glyph, 16px under a 30px divider, 24px off
+       the bottom; box centred on the rail column (x=30) */
     .v2-linkedin {
       position: fixed;
-      left: 39px; bottom: 16px;    /* centred on the rail's column */
+      left: calc(var(--v2-rail) / 2 - 17px);
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
       z-index: 70;
-      padding: 8px;
+      padding: 7px;
     }
-    /* the small divider V1's sidebar draws above its socials */
+    .v2-linkedin svg { width: 20px; height: 20px; }
     .v2-linkedin::before {
       content: ""; position: absolute;
-      top: -12px; left: 50%; transform: translateX(-50%);
-      width: 26px; height: 1px; background: var(--v2-line);
+      top: -10px; left: 50%; transform: translateX(-50%);
+      width: 30px; height: 1px; background: var(--v2-line);
     }
   }
 
-  /* ---------- shared section chrome ---------- */
-  /* vertical rhythm only — horizontal padding belongs to .v2-wrap (setting
-     the shorthand here zeroed it and broke every section's left edge) */
-  .v2-sec { padding-top: 110px; padding-bottom: 110px; }
-  .v2-sec-head { margin-bottom: 44px; }
-  .v2-sec-head .idx { color: var(--v2-light); display: block; margin-bottom: 10px; }
+  /* ---------- shared section chrome — the hero/framework's own grammar:
+       centred compositions, a glowing seam-rule, mono coordinates ---------- */
+  .v2-sec { padding-top: 120px; padding-bottom: 120px; }
+  .v2-sec-head { margin-bottom: 56px; text-align: center; }
+  .v2-sec-head .idx { color: var(--v2-light); display: block; margin-bottom: 12px; }
   .v2-sec-head h2 {
     font-family: var(--v2-display); font-weight: 600;
     font-size: clamp(1.7rem, 3.4vw, 2.7rem); line-height: 1.1;
-    margin: 0; color: var(--v2-ink); max-width: 24ch;
+    margin: 0 auto; color: var(--v2-ink); max-width: 24ch;
   }
-  .v2-sec-head.center { text-align: center; }
-  .v2-sec-head.center h2 { margin: 0 auto; }
-  .v2-sec-sub { color: var(--v2-ink-dim); margin: 14px 0 0; font-size: 15px; }
+  /* the seam, quoted: a centred glowing rule under every section title */
+  .v2-sec-head::after {
+    content: ""; display: block;
+    width: 140px; height: 1px; margin: 26px auto 0;
+    background: var(--v2-light);
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft);
+  }
+  .v2-sec-sub { color: var(--v2-ink-dim); margin: 16px 0 0; font-size: 15px; }
 
-  /* ---------- 03 approach: three beats, hairline rows, hover slide ---------- */
-  .v2-beats { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--v2-line); }
-  .v2-beat {
-    display: grid; grid-template-columns: 64px 1fr; gap: 26px;
-    padding: 30px 6px; border-bottom: 1px solid var(--v2-line);
-    transition: padding-left .35s var(--v2-ease-out), background .35s;
+  /* ---------- 03 approach: three stations on a glowing vertical axis ---------- */
+  .v2-beats {
+    list-style: none; margin: 0 auto; padding: 10px 0 0; position: relative;
+    max-width: 560px;
   }
-  .v2-beat:hover { padding-left: 22px; background: linear-gradient(90deg, var(--v2-light-soft), transparent 45%); }
-  .v2-beat .bnum { color: var(--v2-light); padding-top: 8px; }
-  .v2-beat h3 { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.3rem, 2.4vw, 1.9rem); margin: 0 0 8px; color: var(--v2-ink); }
-  .v2-beat p { color: var(--v2-ink-dim); max-width: 58ch; margin: 0; font-size: 15px; }
+  /* the axis itself — same stroke + glow as the plane's Y axis */
+  .v2-beats::before {
+    content: ""; position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 1px; transform: translateX(-50%);
+    background: var(--v2-light); opacity: .55;
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft);
+  }
+  /* arrowhead at the axis foot, like the plane's axes */
+  .v2-beats::after {
+    content: ""; position: absolute; left: 50%; bottom: -1px;
+    transform: translate(-50%, 100%);
+    border-left: 3.5px solid transparent; border-right: 3.5px solid transparent;
+    border-top: 7px solid var(--v2-light); opacity: .7;
+  }
+  .v2-beat {
+    position: relative; text-align: center;
+    padding: 44px 24px 52px;
+  }
+  /* station node: the plane's plot-dot, reused */
+  .v2-beat .bnode {
+    position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%);
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--v2-light);
+    box-shadow: 0 0 0 3px var(--v2-light-soft), 0 0 14px 2px var(--v2-light);
+  }
+  .v2-beat .bnum { display: block; color: var(--v2-light); margin-bottom: 10px; }
+  .v2-beat h3 {
+    font-family: var(--v2-display); font-weight: 600;
+    font-size: clamp(1.4rem, 2.6vw, 2rem); margin: 0 0 10px; color: var(--v2-ink);
+    text-shadow: 0 0 20px var(--v2-base), 0 0 7px var(--v2-base);
+  }
+  .v2-beat p { color: var(--v2-ink-dim); max-width: 44ch; margin: 0 auto; font-size: 15px; }
   .v2-beat .btags { color: var(--v2-ink-faint); margin-top: 12px; letter-spacing: .12em; }
   .v2-beat-cta {
-    display: inline-block; margin-top: 14px;
+    display: inline-block; margin-top: 16px;
     font-family: var(--v2-mono); font-size: 11px; letter-spacing: .12em;
     text-transform: uppercase; color: var(--v2-ink-dim);
     transition: color .25s var(--v2-ease-out);
   }
   .v2-beat-cta:hover { color: var(--v2-light); }
 
-  /* ---------- 04 slim CTA band ---------- */
+  /* ---------- 04 slim CTA band: centred, like the hero's scroll cue ---------- */
   .v2-ctaband {
-    display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap;
-    padding-top: 8px; padding-bottom: 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    text-align: center; padding-top: 10px; padding-bottom: 10px;
   }
   .v2-ctaband p { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.2rem, 2.2vw, 1.7rem); color: var(--v2-ink-dim); margin: 0; }
   .v2-band-link {
@@ -309,51 +337,76 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   }
   .v2-band-link:hover { border-color: var(--v2-light); }
 
-  /* ---------- 05 proof: monochrome logo marquee + quote placeholders ---------- */
-  .v2-proof .lbl { margin-bottom: 26px; }
+  /* ---------- 05 proof ---------- */
+  .v2-proof { text-align: center; }
+  .v2-proof .lbl { margin-bottom: 28px; }
   .v2-logoscroll { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
   .v2-logotrack { display: flex; width: max-content; animation: v2marquee 42s linear infinite; }
   .v2-logoscroll:hover .v2-logotrack { animation-play-state: paused; }
   @keyframes v2marquee { to { transform: translateX(-50%); } }
   .v2-logoset { display: flex; align-items: center; gap: 64px; padding-right: 64px; }
-  .v2-logoset img {
-    height: 22px; width: auto;
-    /* monochrome (locked): flatten to ink, sit quiet like the header logo */
-    filter: brightness(0) invert(0.85);
-    opacity: .5;
-    transition: opacity .3s var(--v2-ease-out);
-  }
+  .v2-logoset img { height: 22px; width: auto; filter: brightness(0) invert(0.85); opacity: .5; transition: opacity .3s var(--v2-ease-out); }
   .v2-logoset img.sm { height: 15px; }
   .v2-logoset img:hover { opacity: .85; }
   .v2-logotext { font-size: 14px; font-weight: 500; color: var(--v2-ink-dim); opacity: .6; white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) { .v2-logotrack { animation: none; } }
 
-  .v2-quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-top: 64px; }
-  .v2-quote { margin: 0; border-left: 1px solid var(--v2-light); padding-left: 22px; }
-  .v2-quote blockquote { margin: 0 0 12px; font-size: clamp(1rem, 1.6vw, 1.15rem); line-height: 1.6; color: var(--v2-ink-dim); font-style: normal; }
+  /* quotes float as nodes: halo dot above, no card, no border */
+  .v2-quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 72px; margin-top: 84px; }
+  .v2-quote { margin: 0; text-align: center; position: relative; padding-top: 26px; }
+  .v2-quote .qhalo {
+    position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--v2-light);
+    box-shadow: 0 0 0 3px var(--v2-light-soft), 0 0 14px 2px var(--v2-light);
+  }
+  .v2-quote blockquote {
+    margin: 0 0 14px; font-family: var(--v2-display); font-weight: 500;
+    font-size: clamp(1.05rem, 1.8vw, 1.3rem); line-height: 1.5; color: var(--v2-ink-dim);
+  }
   .v2-quote figcaption { color: var(--v2-ink-faint); }
 
-  /* ---------- 06 about ---------- */
-  .v2-about { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr); gap: 64px; }
-  .v2-about-bio p { color: var(--v2-ink-dim); font-size: 15.5px; line-height: 1.7; margin: 0 0 18px; max-width: 58ch; }
-  .v2-stats { display: flex; gap: 34px; margin: 0 0 30px; }
-  .v2-stats dt { color: var(--v2-ink-faint); margin-bottom: 4px; }
-  .v2-stats dd { font-family: var(--v2-display); font-weight: 600; font-size: 1.7rem; color: var(--v2-ink); margin: 0; }
-  .v2-focus { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--v2-line); }
-  .v2-focus li { padding: 11px 2px; border-bottom: 1px solid var(--v2-line); color: var(--v2-ink-dim); font-size: 14px; }
-  @media (max-width: 860px) { .v2-about { grid-template-columns: 1fr; gap: 40px; } }
+  /* ---------- 06 about: one centred column; stats as coordinate readouts ---------- */
+  .v2-about { text-align: center; }
+  .v2-about-bio { max-width: 58ch; margin: 0 auto; text-align: left; }
+  .v2-about-bio p { color: var(--v2-ink-dim); font-size: 15.5px; line-height: 1.75; margin: 0 0 18px; }
+  .v2-stats { display: flex; justify-content: center; gap: 72px; margin: 48px 0 22px; }
+  .v2-stats dd { font-family: var(--v2-display); font-weight: 600; font-size: 2rem; color: var(--v2-ink); margin: 0 0 6px; }
+  .v2-stats dt { color: var(--v2-ink-faint); }
+  .v2-focusline { color: var(--v2-ink-faint); letter-spacing: .14em; margin: 0; }
 
-  /* ---------- 07 work rows (thin, placeholder-labelled) ---------- */
-  .v2-workrows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--v2-line); }
+  /* ---------- 07 work: rows carry the plane's plot-dot ---------- */
+  .v2-workrows { list-style: none; margin: 0 auto; padding: 0; max-width: 720px; border-top: 1px solid var(--v2-line); }
   .v2-workrow {
-    display: flex; justify-content: space-between; gap: 20px; align-items: baseline;
-    padding: 20px 4px; border-bottom: 1px solid var(--v2-line);
+    display: flex; align-items: baseline; gap: 18px;
+    padding: 22px 6px; border-bottom: 1px solid var(--v2-line);
     color: var(--v2-ink-dim); font-size: 15px;
+    transition: padding-left .35s var(--v2-ease-out), background .35s;
   }
-  .v2-worknote { color: var(--v2-ink-faint); font-size: 13px; margin: 16px 0 0; }
+  .v2-workrow:hover { padding-left: 20px; background: linear-gradient(90deg, var(--v2-light-soft), transparent 45%); }
+  .v2-workrow .wdot {
+    align-self: center; flex: none; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--v2-light);
+    box-shadow: 0 0 0 2px var(--v2-light-soft), 0 0 10px 2px var(--v2-light);
+  }
+  .v2-workrow .wtitle { flex: 1; }
+  .v2-workrow .wcoord { color: var(--v2-light); opacity: .8; }
+  .v2-worknote { color: var(--v2-ink-faint); font-size: 13px; margin: 18px auto 0; max-width: 720px; text-align: center; }
 
   /* ---------- 08 contact ---------- */
   #contact .v2-sec-head { margin-bottom: 34px; }
+
+  /* ---------- sections 02–08 on phones — V1's density: single column, tighter rows ---------- */
+  @media (max-width: 768px) {
+    .v2-sec { padding-top: 64px; padding-bottom: 64px; }   /* top/bottom only — .v2-wrap owns the sides */
+    .v2-sec-head { margin-bottom: 30px; }
+    .v2-beat { grid-template-columns: 32px 1fr; gap: 14px; padding: 24px 0; }
+    .v2-beat:hover { padding-left: 0; }
+    .v2-logoset { gap: 40px; padding-right: 40px; }
+    .v2-quotes { margin-top: 44px; gap: 28px; }
+    .v2-stats { gap: 24px; }
+    .v2-workrow { flex-direction: column; gap: 6px; align-items: flex-start; }
+  }
 
 </style>
 

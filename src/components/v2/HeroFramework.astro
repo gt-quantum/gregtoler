@@ -117,7 +117,7 @@ const capabilities = [
   }
   .v2-thesis {
     font-family: var(--v2-display); font-weight: 600;
-    font-size: clamp(2.2rem, 5.4vw, 4.8rem);
+    font-size: clamp(2rem, 5.4vw, 4.8rem);   /* floor = V1's 32px hero; 5.4vw wins above ~600px */
     line-height: 1.04; letter-spacing: -0.015em;
     max-width: 24ch; margin: 0 auto;
   }
@@ -275,27 +275,51 @@ const capabilities = [
   .v2-hint b { color: var(--v2-ink-dim); font-weight: 400; }
 
   @media (max-width: 860px) {
-    /* the LEFT rail eats 76px; centre the pinned composition in the remaining space
-       and cap the plane so nothing reaches under the rail or off the right edge */
-    .v2-pin { padding-left: 94px; }
-    .v2-plane { max-width: calc(92vw - 94px); }
+    /* Rail-aware geometry (v2/build/08-mobile-plan.md). The pin stays full-width; the
+       absolutely-positioned hero and plane get INSETS. Padding on the pin shifted their
+       static position by the whole rail width, not half, and pushed both off the right
+       edge of a phone. */
+    .v2-pin { height: 100dvh; }   /* iOS: no jump when the URL bar collapses */
+    /* the pin already sits inside main's rail padding, so insets are 0 — the pin IS the column */
+    .v2-hero { left: 0; right: 0; width: auto; max-width: none; padding: 0 16px; }
+    .v2-plane {
+      left: 0; right: 0; margin: 0 auto;   /* over-constrained + auto margins = centred in the column */
+      width: min(calc(100% - 32px), calc(min(52dvh, 420px) / 1.15));
+      height: auto; aspect-ratio: 1 / 1.15; max-width: none;
+    }
 
     /* Greg's screenshot: "GO-TO-MARKET" clipped off the viewport's left edge. The side
        labels hang OUTSIDE the plane on desktop; on small screens there is no outside.
        Tuck them inside, sitting just above their end of the axis line. */
     .v2-l-left  { right: auto; left: 2px;  top: calc(var(--xy) - 22px); transform: none; margin: 0; }
     .v2-l-right { left: auto;  right: 2px; top: calc(var(--xy) - 22px); transform: none; margin: 0; }
+    /* 44px tap targets without moving the visible text */
+    .v2-axlab::after { content: ""; position: absolute; inset: -11px; }
+    .v2-node .nt { font-size: .78rem; }
+
+    /* Panels. The desktop boxes span axis → viewport edge; a phone has no edge to span
+       to (both collapsed to 2px). Bottom sheet over the content column instead — the
+       axis still slides in the plane, only the copy box detaches from it. */
+    .v2-panel, .v2-panel-y, .v2-panel-x {
+      position: fixed; top: auto; height: auto; margin: 0;
+      left: calc(var(--v2-rail) + 16px); right: 16px;
+      bottom: max(16px, env(safe-area-inset-bottom, 0px));
+      max-height: 58dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      transform-origin: bottom center; transform: scaleY(.015);
+    }
+    .v2-plane[data-mode="y"] .v2-panel-y,
+    .v2-plane[data-mode="x"] .v2-panel-x { transform: scaleY(1); }
+    .v2-panel .inner { padding: 22px 20px 20px; }
+    .v2-panel p { font-size: 15px; line-height: 1.6; }
+    .v2-panel-close { width: 40px; height: 40px; top: 10px; right: 10px; }
   }
 
-  @media (max-width: 720px) {
+  /* phone density — V1's 768 line */
+  @media (max-width: 768px) {
     .v2-stage { height: 260vh; }
-    .v2-hero { padding: 0 22px; }
-    .v2-lede { margin-top: 58px; }
-    .v2-plane { height: min(52vh, 420px); aspect-ratio: 1 / 1.15; max-width: 86vw; }
-    .v2-node .nt { font-size: .78rem; }
-    .v2-l-left { margin-right: 8px; } .v2-l-right { margin-left: 8px; }
-    .v2-panel .inner { padding: 18px 20px; }
-    .v2-panel p { font-size: 13px; }
+    .v2-hero-eyebrow { flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .v2-thesis { max-width: 20ch; }
+    .v2-lede { margin-top: 36px; font-size: 15px; max-width: 34ch; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -337,6 +361,10 @@ const capabilities = [
 
     let xyPin = 0;        // seam's target Y within the pin, kept for render()
 
+    // ≤860 the panel is a bottom sheet, not attached to the axis: the axis just slides
+    // to the plane's own edge (plane-relative %), no viewport-edge maths
+    const mobile = () => window.matchMedia("(max-width: 860px)").matches;
+
     function applyMode(next: Mode) {
       mode = next;
       if (next !== "grid") (window as any).v2Backdrop?.setFocus(0);
@@ -348,11 +376,14 @@ const capabilities = [
       // --yx / --xy are plane-relative; convert the viewport-edge targets into
       // plane coordinates so labels and panels ride with the axis
       if (next === "y") {
-        plane!.style.setProperty("--yx", (EDGE_X - (plr.left - pr.left)).toFixed(1) + "px");
+        plane!.style.setProperty("--yx", mobile() ? "16%" : (EDGE_X - (plr.left - pr.left)).toFixed(1) + "px");
       } else {
         plane!.style.setProperty("--yx", "50%");
       }
-      if (next === "x") {
+      if (next === "x" && mobile()) {
+        plane!.style.setProperty("--xy", "12%");
+        xyPin = (plr.top - pr.top) + plr.height * 0.12;
+      } else if (next === "x") {
         const unitH = 26 + plr.height * 0.9;        // gap below line + panel height
         const edgeY = Math.max(96, (pr.height - unitH) / 2);
         plane!.style.setProperty("--xy", (edgeY - (plr.top - pr.top)).toFixed(1) + "px");
@@ -420,6 +451,11 @@ const capabilities = [
       }
 
       plane!.classList.toggle("is-live", p >= 0.80);
+    }
+
+    if (window.matchMedia("(hover: none)").matches) {
+      const b = $("v2-hint")?.querySelector("b");
+      if (b) b.textContent = "Tap an axis";
     }
 
     if (reduce) {

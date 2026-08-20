@@ -78,6 +78,10 @@
   /* geometry — deliberately NOT a uniform 16px radius everywhere */
   --v2-radius: 2px;
   --v2-maxw: 1440px;
+  /* the reading column for sections 02+. The hero/plane are a centred composition
+     (plane ≤ 810px, lede 62ch); sections share that measure instead of running the
+     full 1440 — otherwise they read as a different page from section 01 */
+  --v2-measure: 880px;
 
   /* the plane's grid: 12 x 8 cells, so node coordinates snap to real
      intersections at any viewport width. Percentage-based, not fixed px. */
@@ -128,6 +132,16 @@
 }
 
 .v2-wrap { max-width: var(--v2-maxw); margin: 0 auto; padding: 0 32px; }
+
+/* ---------- mobile shell (≤860): V1's rail numbers — see v2/build/08-mobile-plan.md ---------- */
+@media (max-width: 860px) {
+  .v2 {
+    --v2-rail: 60px;    /* V1: aside width 60, content margin-left 60 */
+    margin: 0;          /* the browser's 8px body margin was never reset; scoped here so
+                           desktop stays pixel-identical to what was tuned */
+  }
+  .v2-wrap { padding: 0 16px; }   /* V1: content padding 24 16 32 16 */
+}
 
 .v2-mono {
   font-family: var(--v2-mono);

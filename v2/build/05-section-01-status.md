@@ -485,3 +485,58 @@ All sections from `09-positioning-and-sections.md` now exist for real:
 Open: headline workshop; real quotes; real case studies; SLACK_WEBHOOK_URL env needed
 in CF for the form to deliver in production (works via /api/contact locally only if
 env is set — verify before staging share).
+
+---
+
+# Pass 15 — mobile port shipped + desktop section measure (2026-08-20, late)
+
+Greg approved 08-mobile-plan.md with all four recommendations (numerals, flush-left 60px
+rail, 720→768, bottom-sheet panels) on the condition that desktop is untouched.
+
+**Desktop guarantee:** every mobile rule is inside `@media (max-width: 860px)` / `768px`.
+Measured at 1440×900 before and after (hero, formed plane, both panels): pixel-identical.
+The body-margin reset is scoped to ≤860 for the same reason.
+
+**Shipped (files: v2-tokens.css, SpineNav.astro, HeroFramework.astro, index.astro):**
+- Tokens: `--v2-rail: 60px`, `body.v2 { margin: 0 }` at ≤860; `.v2-wrap` padding 16.
+- Rail: left 0, top 84, bottom 73 (+safe-area), 36px item boxes, 10px ghost connectors →
+  46px stride (V1's exact numbers). Labels hidden, `01–05` numerals shown; active = accent.
+  Tracker now walks sections in page order (About sits above Work).
+- Hero/plane: pin padding removed; hero and plane use insets 0 inside main's rail padding →
+  centred at x=225 on a 390 screen (was 289, off-screen). Plane = column width, 1/1.15.
+  Thesis floor 2rem; eyebrow stacks at ≤768; "Tap an axis" on hover:none.
+- Panels at ≤860: fixed bottom sheet (rail+16 → 16, max 58dvh, scrollable). Axis still
+  slides (y → 16%, x → 12% of the plane). Axis labels get a 44px hit area.
+- Foot: LinkedIn 20px glyph, box centred on x=30, 24px off the bottom, 30px divider.
+- Sections 02–08 at ≤768: 64px vertical padding, tighter beat grid, stacked work rows.
+- **Desktop (Greg's request mid-session):** sections ran full 1440 while hero/plane are a
+  ~800px centred composition. New token `--v2-measure: 880px`; `.v2-sec, .v2-ctaband`
+  take it as max-width. Measured at 1440: sections 280→1160, plane 342→1098, same centre.
+
+**Verified headless (390×844 touch, 820×1100, 1440×900, 1920×1080)** — screenshots in
+the scratch session only; re-run `08-mobile-evidence/measure.mjs` to regenerate.
+
+**Greg's phone checklist (the part headless can't do):**
+1. Scroll the morph: no jump when Safari's bar collapses (100dvh).
+2. Rail numerals sit left of the logo like V1's icons; nothing scrolls sideways.
+3. Tap Strategy / Go-to-market: sheet rises, closes via ×, tap-out, re-tap.
+4. LinkedIn clears the home indicator; landscape on a notched phone — rail not under it.
+5. Intake form: the 4 steps are usable with the keyboard up.
+
+---
+
+# Pass 16 — sections re-cut in the plane's grammar (2026-08-20, late)
+
+Greg: the new sections "feel disconnected from all the good work" — correct diagnosis:
+passes 14's sections were V1's editorial grammar (left rows, bordered cards, boxed
+lists) in V2's clothes. Re-cut in the hero/framework's own vocabulary:
+- Every section head: centred, mono index above, THE SEAM quoted as a centred glowing
+  rule beneath the title.
+- Approach: three stations ON a glowing vertical axis (stroke+glow identical to the
+  plane's Y axis, arrowhead at the foot, plot-dot nodes) — centred, not rows.
+- Quotes: floating, halo-dot above, display-face text — no cards, no borders.
+- About: single centred column; stats as coordinate readouts; focus areas as one
+  mono line. Side-column grid gone.
+- Work rows: plot-dot glow + olive coordLabels (the framework's readout style).
+- Class names preserved so pass 15's mobile rules still bind.
+Committed together with pass 15 (mobile port) — same files, both Greg-approved.

@@ -17,7 +17,7 @@
 | Type direction | Shortlist ready | `build/02-type-candidates.md` — free/self-hosted only |
 | Anti-AI-tells checklist | Done | `build/03-anti-ai-tells.md` — research-backed, use as build gate |
 | Design direction | **Locked** | Neutral charcoal ground, dark-olive accent `#8A9166`, Barlow/Hanken/Martian (researched) |
-| **Mobile** | **⚠ NOT DONE** | Rail ported V1-style but layout/alignment unfinished — analyse live site's mobile and port it |
+| **Mobile** | **Ported — needs Greg's phone check** | `build/08-mobile-plan.md` steps 0–6 shipped (pass 15): V1's 60px rail with `01–05` numerals, 298px text column, hero/plane centred, panels as bottom sheet, 860 + 768 breakpoints. Verified headless at 390/820; desktop 1440 measured pixel-identical. Still owed: Greg's device pass (iOS URL bar, safe areas) — checklist in pass 15 |
 | Nav | Done | Desktop: horizontal spine (V1 mechanic rotated). Mobile: V1's left rail. LinkedIn in chrome |
 | Motion study | **Parked** | `decisions/003-motion-study-parked.md` — carry-forward: dots, glow, grain, restrained motion |
 | **Section 01 hero→framework** | **Built, live at /v2** | `build/05-section-01-status.md` — 5 passes, in-place axis modes, real logo, custom cursor |
@@ -54,14 +54,18 @@ depends on them; everything decided from them is already distilled below and in
 - `public/fonts/v2/*.woff2` — Barlow 500/600, Hanken 400, Martian Mono 400
 
 **Next work, in order:** ① perf pass (never measured; 3 rAF loops + blurs at risk),
-② mobile port from V1 (in progress in a parallel session — plan lands in build/08),
+② mobile port from V1 — SHIPPED (pass 15, uncommitted at close); Greg's phone check is the
+only open item. Sections 02+ now share `--v2-measure` (880px) so they sit in the framework's column,
 ③ sections per `build/09-positioning-and-sections.md` (PROPOSAL awaiting Greg's answers
 to its 5 open questions): Approach → Contact → Proof band → About → Work.
 
 **Session gotchas:** replace whole code blocks, not drifted substrings (two silent
 no-op edits burned time); page-scoped Astro CSS can't style child components — style
 wrappers; Greg's ~55% browser zoom means extension-side responsive testing never
-trips the 860px breakpoint — verify mobile on his device.
+trips the 860px breakpoint — for geometry use
+`node v2/build/08-mobile-evidence/measure.mjs <url> <out> 390 844` (headless Chrome over
+CDP, no deps); for iOS behaviour use Greg's phone. V1's mobile shell is
+`SpineNavigation.jsx` + `BaseLayout.astro`, NOT `FluidSpineMenu.jsx` (unused).
 
 ## Intake references (rarely needed now)
 
