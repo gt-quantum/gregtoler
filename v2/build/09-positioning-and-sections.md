@@ -22,6 +22,32 @@ Every section below is one beat of that arc. Nothing else earns a slot.
 
 ---
 
+## Mining V1: lines, not paragraphs
+
+Greg's verdict (correct, and the brief agrees): **V1 is way too text-heavy and
+verbose.** So the rule for every port below: V1 contributes SENTENCES, never blocks.
+If a V2 section needs a paragraph where V1 had five, we compress; if it can be a
+line, it's a line. The plane, the panels and the tags carry meaning that V1 spelled
+out in prose.
+
+**The gold — V1 lines worth keeping verbatim (little else survives):**
+1. *"Most consultants diagnose problems and hand you a deck. I do the work."* — the
+   dichotomy in plain speech. Best sentence on the old site.
+2. *"Fix what's broken, build what's missing, scale what works."* — the offer in
+   nine words. Section 03's whole heading.
+3. *"Most operational problems aren't technology problems. They're design problems."*
+   — the worldview line; earns a spot in About or as a pull-quote.
+4. *"I build the systems that make businesses run."* — clean About headline.
+5. The pillar taglines (one line each): "Something isn't working and it's costing you
+   time, money, or both." / "You have a gap and nothing off the shelf fills it." /
+   "It works today but it won't survive growth."
+6. *"Think strategically and get their hands dirty. Not one or the other."* — the
+   plane's Y axis in words.
+
+**The V1 patterns we do NOT port:** 70-word subheadlines (audit flagged the hero
+burying the offer), 5-paragraph bios, example-lists inside every card, unattributed
+result ranges, prose that explains what layout should show.
+
 ## Section order
 
 | # | Section | Job | Status |
