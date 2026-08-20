@@ -54,8 +54,9 @@ depends on them; everything decided from them is already distilled below and in
 - `public/fonts/v2/*.woff2` — Barlow 500/600, Hanken 400, Martian Mono 400
 
 **Next work, in order:** ① perf pass (never measured; 3 rAF loops + blurs at risk),
-② mobile port from V1 (see status table ⚠ row — analyse the LIVE site first),
-③ section 02 Approach.
+② mobile port from V1 (in progress in a parallel session — plan lands in build/08),
+③ sections per `build/09-positioning-and-sections.md` (PROPOSAL awaiting Greg's answers
+to its 5 open questions): Approach → Contact → Proof band → About → Work.
 
 **Session gotchas:** replace whole code blocks, not drifted substrings (two silent
 no-op edits burned time); page-scoped Astro CSS can't style child components — style
