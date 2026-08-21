@@ -2,7 +2,7 @@
 
 **Owner:** Greg Toler
 **Goal:** Design and build the next iteration of gregtoler.com to eventually replace the current V1/MVP in production.
-**Status:** FULL PAGE built (18 passes, `build/05-section-01-status.md`). All sections live at /v2: hero (interim headline — workshop open), framework, Approach-as-flowchart, CTA band, proof marquee + quote placeholders, About-as-diagram, work stubs, 4-step intake. Two design grammars locked: the PLANE (axes/nodes/glow) + LUCID (boxes/connectors/arrows/diamonds — Greg thinks in flowcharts; primitives in index.astro CSS). Mobile ported per approved 08-mobile-plan (verify on device). Perf pass still owed. V1 untouched.
+**Status:** FULL PAGE built (18 passes, `build/05-section-01-status.md`). All sections live at /v2: hero (interim headline — workshop open), framework, Approach-as-flowchart, CTA band, proof marquee + quote placeholders, About (TEMP: two stacked review variants A/B replacing the journey diagram — awaiting Greg's reviewer; journey is in git b4d320b), work stubs, 4-step intake. Two design grammars locked: the PLANE (axes/nodes/glow) + LUCID (boxes/connectors/arrows/diamonds — Greg thinks in flowcharts; primitives in index.astro CSS). Mobile ported per approved 08-mobile-plan (verify on device). Perf pass still owed. V1 untouched.
 
 ## Status table
 

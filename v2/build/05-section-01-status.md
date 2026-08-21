@@ -575,3 +575,17 @@ Also per Greg: numbered section eyebrows ("02/03/04/05") replaced with NAMES
 Primitives documented in the CSS comment block for reuse: .fdiamond, .v2-beat box,
 .riser/.rail/.fdrop/.drop connectors. Future candidates: case-study rows as
 [Problem]→[Built]→[Result] micro-flows; the framework panels' pillar links.
+
+---
+
+# Addendum (post-close, 2026-08-20): peer-session corrections
+
+- **The 880px measure rule** (`.v2-sec, .v2-ctaband { max-width: var(--v2-measure) }`,
+  Greg-requested) was accidentally dropped by pass 16's wholesale style-block rewrite —
+  the flip side of the "replace whole blocks" lesson: whole-block replaces clobber a
+  peer's insertions. Peer restored it with a KEEP comment. **Preserve it.**
+- **About is temporarily TWO stacked review variants** (Option A portrait /
+  Option B atmosphere, `.v2-about-a`/`.v2-about-b`, assets in `public/images/v2/`),
+  replacing the pass-17 journey diagram while Greg sends it to a reviewer. Do NOT
+  restore the journey markup until Greg picks; the journey version lives in git
+  history (commit b4d320b) if it returns.
