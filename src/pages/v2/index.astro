@@ -184,19 +184,17 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
           </li>
         </ol>
         <div class="v2-fexit">
-          <a class="fnode" href="#contact" aria-label="Go to contact">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
+          <a class="fexit-btn" href="#contact">
+            <span class="fnode" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+            <span class="fexit-txt">Start the conversation</span>
           </a>
-          <span class="v2-mono fexit-lab">Then we talk</span>
+          <p class="fexit-sub">Pick the one that fits. I'll take it from there.</p>
         </div>
       </div>
     </section>
 
-    <!-- 04 · slim contact CTA band (links the single form; not a form itself) -->
-    <section class="v2-wrap v2-ctaband" aria-label="Get in touch">
-      <p>Pick the one that fits. I'll take it from there.</p>
-      <a class="v2-band-link" href="#contact">Start the conversation &rarr;</a>
-    </section>
 
 
 
@@ -208,14 +206,11 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
         <span class="v2-mono idx">Work</span>
         <h2>Selected work</h2>
       </header>
-      <div class="v2-workwrap" id="v2-workwrap">
-      <div class="v2-worktrace" aria-hidden="true"><i class="base"></i><i class="lit"></i><i class="head"></i></div>
       <ul class="v2-workrows">
         <li class="v2-workrow" style="--i:0"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">GTM &middot; Strategy</span></li>
         <li class="v2-workrow" style="--i:1"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">Ops &middot; Execution</span></li>
         <li class="v2-workrow" style="--i:2"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">Ops &middot; Strategy + Execution</span></li>
       </ul>
-      </div>
       <p class="v2-worknote">Case studies are being written &mdash; each will plot back onto the map above.</p>
     </section>
 
@@ -361,7 +356,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   /* Sections sit in the framework's centred column (--v2-measure, 880px), not the full
      1440 wrap — the hero/plane are ~800px centred and Greg wants the rest to match.
      .v2-wrap is content-box, so its 32px side padding sits outside this. KEEP. */
-  .v2-sec, .v2-ctaband { max-width: var(--v2-measure); }
+  .v2-sec { max-width: var(--v2-measure); }
   .v2-sec-head { margin-bottom: 56px; text-align: center; }
   .v2-sec-head .idx { color: var(--v2-light); display: block; margin-bottom: 12px; }
   .v2-sec-head h2 {
@@ -391,8 +386,8 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   .v2-flowsvg :global(.fbeams path) { fill: none; stroke: var(--v2-light); stroke-linecap: round; opacity: 0; }
   .v2-flowsvg :global(.fbeams .core) { stroke-width: 1.4; }
   .v2-flowsvg :global(.fbeams .halo) { stroke-width: 5; filter: url(#v2-glow); }
-  .v2-flow.is-live :global(.fbeams path) { animation: v2comet var(--dur, 3.4s) cubic-bezier(.45, 0, .55, 1) var(--delay, 0s) infinite; }
-  .v2-flow.is-live :global(.fbeams .halo) { --peak: .45; }
+  .v2-flowsvg :global(.fbeams path.run) { animation: v2comet var(--dur, 3.4s) cubic-bezier(.45, 0, .55, 1) var(--delay, 0s) infinite; }
+  .v2-flowsvg :global(.fbeams .halo) { --peak: .45; }
   @keyframes v2comet {
     0%   { stroke-dashoffset: var(--k); opacity: 0; }
     8%   { opacity: var(--peak, 1); }
@@ -440,64 +435,37 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   }
   .v2-beat-cta:hover { color: var(--v2-light); }
   .v2-fexit { text-align: center; padding-top: 84px; position: relative; z-index: 2; }
-  .v2-fexit .fexit-lab { display: block; margin-top: 12px; color: var(--v2-ink-dim); opacity: var(--p, 0); transition: opacity .4s var(--v2-ease-out); }
+  .fexit-btn {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 6px 22px 6px 6px; border: 1px solid var(--v2-line); border-radius: 100px;
+    background: color-mix(in srgb, var(--v2-surface) 85%, transparent);
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--v2-ink);
+    opacity: var(--p, 0); transform: translateY(calc((1 - var(--p, 0)) * 12px));
+    transition: border-color .35s var(--v2-ease-out), opacity .5s var(--v2-ease-out), transform .5s var(--v2-ease-out);
+  }
+  .fexit-btn .fnode { width: 38px; height: 38px; border-radius: 50%; box-shadow: none; }
+  .fexit-btn:hover { border-color: var(--v2-light); }
+  .fexit-btn:hover .fnode { border-color: var(--v2-light); box-shadow: 0 0 0 3px var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft); }
+  .fexit-sub { color: var(--v2-ink-dim); font-size: 14px; margin: 16px 0 0; opacity: var(--p, 0); transition: opacity .5s var(--v2-ease-out); }
 
   /* scroll-driven arrival: the script sets --p (0→1) per node */
-  .v2-flow.is-ready .v2-beat, .v2-flow.is-ready .v2-fexit .fnode {
+  .v2-flow.is-ready .v2-beat {
     opacity: var(--p, 0); transform: translateY(calc((1 - var(--p, 0)) * 16px));
   }
   .v2-flow.is-ready .v2-beat:hover { transform: translateY(-3px); }
 
-  /* ---------- 07 work: a tracing beam down the plot-dots, lit by scroll ---------- */
-  .v2-workwrap { position: relative; }
-  .v2-worktrace { position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; pointer-events: none; }
-  .v2-worktrace .base { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--v2-line); }
-  .v2-worktrace .lit {
-    position: absolute; left: 0; top: 0; width: 1px; height: calc(var(--p, 0) * 100%);
-    background: linear-gradient(180deg, transparent, var(--v2-light) 30%, var(--v2-light));
-    box-shadow: 0 0 8px 0 var(--v2-light-soft);
-  }
-  .v2-worktrace .head {
-    position: absolute; left: .5px; top: calc(var(--p, 0) * 100%); width: 6px; height: 6px; border-radius: 50%;
-    transform: translate(-50%, -50%); background: var(--v2-light);
-    box-shadow: 0 0 0 3px var(--v2-light-soft), 0 0 14px 3px var(--v2-light);
-    opacity: calc(var(--p, 0) * 4);
-  }
-  .v2-workrow { position: relative; transition: opacity .6s var(--v2-ease-out), transform .6s var(--v2-ease-out); }
-  .v2-workwrap.is-ready .v2-workrow:not(.lit) { opacity: .35; transform: translateX(-4px); }
-  .v2-workwrap.is-ready .v2-workrow:not(.lit) .wdot { opacity: .25; box-shadow: none; }
-  .v2-workrow .wdot { transition: opacity .4s var(--v2-ease-out), box-shadow .5s var(--v2-ease-out); }
+  /* ---------- 07 work: rows, hover only ---------- */
   .v2-workrow:hover .wdot { animation: v2pulse 1.6s var(--v2-ease-io) infinite; }
   @keyframes v2pulse {
     0%, 100% { box-shadow: 0 0 0 2px var(--v2-light-soft), 0 0 10px 2px var(--v2-light); }
     50% { box-shadow: 0 0 0 5px var(--v2-light-soft), 0 0 18px 5px var(--v2-light); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .v2-flow.is-ready .v2-beat, .v2-flow.is-ready .v2-fexit .fnode { opacity: 1; transform: none; }
+    .v2-flow.is-ready .v2-beat, .fexit-btn, .fexit-sub { opacity: 1; transform: none; }
     .v2-flowsvg :global(.fbase path) { stroke-dashoffset: 0 !important; }
-    .v2-flow.is-live :global(.fbeams path) { animation: none; }
-    .v2-workwrap.is-ready .v2-workrow:not(.lit) { opacity: 1; transform: none; }
-    .v2-worktrace .lit { height: 100%; } .v2-worktrace .head { display: none; }
+    .v2-flowsvg :global(.fbeams path.run) { animation: none; }
   }
-
-  /* ---------- 04 slim CTA band: centred, like the hero's scroll cue ---------- */
-  .v2-ctaband {
-    display: flex; flex-direction: column; align-items: center; gap: 16px;
-    text-align: center; padding-top: 0; padding-bottom: 10px;
-  }
-  .v2-ctaband p { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.2rem, 2.2vw, 1.7rem); color: var(--v2-ink-dim); margin: 0; }
-  /* the merge arrow must land ON the band — kill the inter-section gap */
-  #approach.v2-sec { padding-bottom: 0; }
-
-  /* terminator node: the flow's arrows land on this pill */
-  .v2-band-link {
-    font-family: var(--v2-mono); font-size: 12px; letter-spacing: .12em;
-    text-transform: uppercase; color: var(--v2-light);
-    border: 1px solid var(--v2-line); border-radius: 100px;
-    padding: 12px 22px;
-    transition: border-color .25s var(--v2-ease-out), box-shadow .25s var(--v2-ease-out);
-  }
-  .v2-band-link:hover { border-color: var(--v2-light); box-shadow: 0 0 0 1px var(--v2-light-soft), 0 0 26px -10px var(--v2-light); }
 
   /* ---------- 05 proof ---------- */
   .v2-proof { text-align: center; }
@@ -608,7 +576,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   }
 
   /* ---------- 07 work rows ---------- */
-  .v2-workrows { list-style: none; margin: 0 auto; padding: 0 0 0 30px; border-top: 1px solid var(--v2-line); }
+  .v2-workrows { list-style: none; margin: 0 auto; padding: 0; border-top: 1px solid var(--v2-line); }
   .v2-workrow {
     display: flex; align-items: baseline; gap: 18px;
     padding: 22px 6px; border-bottom: 1px solid var(--v2-line);
@@ -665,16 +633,19 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
     .v2-quotes { margin-top: 44px; gap: 28px; }
     .v2-stats { gap: 24px; }
 
-    /* --- Approach on phones: entry node top-left, cards full width, exit node below.
-       Curves come from the script (anchors switch to left-edge mid-points). --- */
-    .v2-fentry { text-align: left; display: flex; align-items: center; gap: 14px; padding: 0 0 40px; }
+    /* --- Approach on phones: a left spine, like a timeline. Entry node, each card's
+       icon node and the button's arrow all sit on one vertical line at the left; text
+       is ragged-left like desktop. Straight segments between them (script). --- */
+    .v2-fentry { display: flex; align-items: center; gap: 14px; text-align: left; padding: 0 0 36px; }
     .v2-fentry .fentry-lab { margin: 0; }
-    .v2-beats { grid-template-columns: 1fr; gap: 24px; padding: 0 12px 0 44px; }
-    .v2-beat { padding: 20px 18px 18px; }
+    .v2-beats { grid-template-columns: 1fr; gap: 28px; padding: 0; }
+    .v2-beat { text-align: left; padding: 18px 18px 16px; }
+    .v2-beat .fnode.sm { margin: 0 0 12px; }
     .v2-beat h3 { font-size: 1.2rem; }
-    .v2-fexit { text-align: left; padding-top: 44px; display: flex; align-items: center; gap: 14px; }
-    .v2-fexit .fexit-lab { margin: 0; }
-    .v2-worktrace { left: 8px; }
+    .v2-beat p { font-size: 13.5px; }
+    .v2-fexit { text-align: left; padding-top: 36px; }
+    .fexit-btn { gap: 12px; padding-right: 18px; }
+    .fexit-sub { margin-top: 12px; font-size: 13px; }
 
     /* --- Work rows: dot sits on the title's line, coord drops beneath --- */
     .v2-workrow {
@@ -701,6 +672,17 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
     .v2-about-a .v2-portrait img { width: 100%; max-width: 420px; margin: 0 auto; }
     .v2-about-a .v2-portrait { margin-bottom: 30px; }
   }
+
+  /* Mobile footer vs the fixed rail: belt AND suspenders. The SpineNav script pushes
+     the rail up as the footer arrives (visually stopping it at contact's end); this
+     rule guarantees the footer also PAINTS ABOVE the rail with a solid ground, so the
+     nav can never show through it even if a frame is dropped. */
+  @media (max-width: 860px) {
+    .v2-foot {
+      position: relative; z-index: 80;      /* rail + LinkedIn sit at 70 */
+      background: var(--v2-base);
+    }
+  }
 </style>
 
 <script>
@@ -720,8 +702,8 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       const entry = flow.querySelector<HTMLElement>(".v2-fentry .fnode")!;
       const beats = Array.from(flow.querySelectorAll<HTMLElement>(".v2-beat"));
       const nodes = beats.map((b) => b.querySelector<HTMLElement>(".fnode")!);
-      const exit = flow.querySelector<HTMLElement>(".v2-fexit .fnode")!;
-      type Link = { el: SVGPathElement; len: number; a: number; b: number };
+      const exit = flow.querySelector<HTMLElement>(".fexit-btn")!;
+      type Link = { el: SVGPathElement; len: number; a: number; b: number; beams: SVGPathElement[] };
       let links: Link[] = [];
 
       const curve = (x1: number, y1: number, x2: number, y2: number, phone: boolean) =>
@@ -736,25 +718,29 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
         const e = R(entry), x = R(exit);
         gBase.innerHTML = ""; gBeam.innerHTML = ""; links = [];
         const ds: { d: string; a: number; b: number }[] = [];
-        // entry → each card (stagger), each card → exit (later)
-        beats.forEach((bt, i) => {
-          const br = R(bt), nr = R(nodes[i]);
-          ds.push(phone
-            ? { d: curve(e.cx, e.b, br.l, nr.cy, true), a: 0.02 + i * 0.14, b: 0.42 + i * 0.14 }
-            : { d: curve(e.cx, e.b, nr.cx, nr.t, false), a: 0.02 + i * 0.1, b: 0.46 + i * 0.1 });
-        });
-        beats.forEach((bt, i) => {
-          const br = R(bt), nr = R(nodes[i]);
-          ds.push(phone
-            ? { d: `M${br.l} ${br.b - 26} C${x.cx} ${br.b - 26}, ${x.cx} ${br.b}, ${x.cx} ${Math.min(x.t, br.b + 60)} V${x.t}`, a: 0.5 + i * 0.1, b: 0.9 + i * 0.05 }
-            : { d: curve(nr.cx, br.b, x.cx, x.t, false), a: 0.5 + i * 0.1, b: 0.92 + i * 0.04 });
-        });
+        if (phone) {
+          // chain: entry → node1, card1 → node2, card2 → node3, card3 → button. Straight, on the spine.
+          const xb = R(exit.querySelector<HTMLElement>(".fnode")!);
+          let prevBottom = e.b, prevX = e.cx;
+          beats.forEach((bt, i) => {
+            const br = R(bt), nr = R(nodes[i]);
+            // down the spine, then a short jog if the node isn't exactly under the previous one
+            ds.push({ d: `M${prevX} ${prevBottom} V${nr.t - 10} L${nr.cx} ${nr.t}`, a: 0.02 + i * 0.22, b: 0.22 + i * 0.22 });
+            prevBottom = br.b; prevX = nr.cx;
+          });
+          ds.push({ d: `M${prevX} ${prevBottom} V${xb.t - 8} L${xb.cx} ${xb.t}`, a: 0.7, b: 0.95 });
+        } else {
+          // entry → each card (stagger), each card → the button (later)
+          beats.forEach((bt, i) => { const nr = R(nodes[i]); ds.push({ d: curve(e.cx, e.b, nr.cx, nr.t, false), a: 0.02 + i * 0.1, b: 0.46 + i * 0.1 }); });
+          beats.forEach((bt, i) => { const br = R(bt), nr = R(nodes[i]); ds.push({ d: curve(nr.cx, br.b, x.cx, x.t, false), a: 0.5 + i * 0.1, b: 0.92 + i * 0.04 }); });
+        }
         svg.setAttribute("viewBox", `0 0 ${fr.width} ${fr.height}`);
         ds.forEach(({ d, a, b }, i) => {
           const base = document.createElementNS(NS, "path"); base.setAttribute("d", d); gBase.appendChild(base);
           const len = base.getTotalLength();
           base.style.setProperty("--len", String(len));
-          links.push({ el: base, len, a, b });
+          const beams: SVGPathElement[] = [];
+          links.push({ el: base, len, a, b, beams });
           const k = Math.min(90, len * 0.45);
           for (const cls of ["halo", "core"]) {
             const p = document.createElementNS(NS, "path"); p.setAttribute("d", d); p.setAttribute("class", cls);
@@ -762,26 +748,33 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
             p.style.setProperty("--k", String(k)); p.style.setProperty("--len", String(len));
             p.style.setProperty("--dur", `${(2.6 + len / 400).toFixed(2)}s`);
             p.style.setProperty("--delay", `${(i < beats.length ? i * 0.55 : 1.8 + (i - beats.length) * 0.55).toFixed(2)}s`);
-            gBeam.appendChild(p);
+            gBeam.appendChild(p); beams.push(p);
           }
         });
         render(true);
       }
 
       // scroll-linked progress with inertia: target from the section's position, eased toward
-      let target = 0, cur = 0, raf = 0, live = false;
+      let target = 0, cur = 0, raf = 0;
       function progressTarget() {
         const r = flow!.getBoundingClientRect(), vh = window.innerHeight;
-        return clamp((vh * 0.88 - r.top) / (Math.min(r.height, vh * 0.9) * 0.9), 0, 1);
+        // fits in one screen: draw as it enters. Taller than the screen (phones): spread
+        // the draw across the scroll through it, so each link draws as it comes into view.
+        const span = r.height > vh * 0.9 ? r.height - vh * 0.35 : Math.min(r.height, vh * 0.9) * 0.9;
+        return clamp((vh * 0.88 - r.top) / span, 0, 1);
       }
       function render(force = false) {
         cur = force ? target : cur + (target - cur) * 0.11;
         if (Math.abs(target - cur) < 0.0015) cur = target;
-        links.forEach((l) => { l.el.style.strokeDashoffset = String(l.len * (1 - ease(seg(cur, l.a, l.b)))); });
-        beats.forEach((b, i) => b.style.setProperty("--p", ease(seg(cur, 0.28 + i * 0.1, 0.5 + i * 0.1)).toFixed(3)));
+        links.forEach((l) => {
+          const q = ease(seg(cur, l.a, l.b));
+          l.el.style.strokeDashoffset = String(l.len * (1 - q));
+          const run = q >= 0.985;
+          l.beams.forEach((bm) => bm.classList.toggle("run", run));   // each comet starts when ITS line is drawn
+        });
+        const ph = window.matchMedia("(max-width: 768px)").matches;
+        beats.forEach((b, i) => b.style.setProperty("--p", ease(ph ? seg(cur, 0.12 + i * 0.22, 0.3 + i * 0.22) : seg(cur, 0.28 + i * 0.1, 0.5 + i * 0.1)).toFixed(3)));
         exit.parentElement!.style.setProperty("--p", ease(seg(cur, 0.82, 1)).toFixed(3));   /* node + label share it */
-        const nowLive = cur >= 0.985;
-        if (nowLive !== live) { live = nowLive; flow!.classList.toggle("is-live", live); }
         if (cur !== target) raf = requestAnimationFrame(() => render()); else raf = 0;
       }
       const kick = () => { target = reduce ? 1 : progressTarget(); if (!raf) raf = requestAnimationFrame(() => render(reduce)); };
@@ -795,29 +788,6 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       kick();
     }
 
-    // Work: a beam traces down the plot-dots as you scroll; rows light as it passes
-    const wrap = document.getElementById("v2-workwrap");
-    if (wrap) {
-      const rows = Array.from(wrap.querySelectorAll<HTMLElement>(".v2-workrow"));
-      const trace = wrap.querySelector<HTMLElement>(".v2-worktrace")!;
-      let target = 0, cur = 0, raf = 0;
-      function tick() {
-        cur += (target - cur) * 0.12; if (Math.abs(target - cur) < 0.002) cur = target;
-        trace.style.setProperty("--p", cur.toFixed(4));
-        const wr = wrap!.getBoundingClientRect();
-        rows.forEach((r) => { const rr = r.getBoundingClientRect(); r.classList.toggle("lit", (rr.top + rr.height * 0.5 - wr.top) / wr.height <= cur + 0.02); });
-        if (cur !== target) raf = requestAnimationFrame(tick); else raf = 0;
-      }
-      const kick = () => {
-        const r = wrap!.getBoundingClientRect(), vh = window.innerHeight;
-        target = reduce ? 1 : clamp((vh * 0.8 - r.top) / (r.height + vh * 0.25), 0, 1);
-        if (!raf) raf = requestAnimationFrame(tick);
-      };
-      wrap.classList.add("is-ready");
-      window.addEventListener("scroll", kick, { passive: true });
-      window.addEventListener("resize", kick);
-      kick();
-    }
   })();
 
   // dark-only: clear any stored day preference so nobody is stuck in the parked theme

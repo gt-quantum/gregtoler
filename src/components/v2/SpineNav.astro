@@ -12,6 +12,15 @@
  * margin are all CSS-transitionable, so this is ~1KB of vanilla JS instead of a React island.
  */
 
+// Phone-width glyphs (≤768): line icons in the site's technical-drawing grammar,
+// 1.5px stroke, no fills except plotted points. Each echoes its section's own motif.
+const icons: Record<string, string> = {
+  framework: '<path d="M12 3v18M3 12h18"/><path d="M9.5 5.5 12 3l2.5 2.5M18.5 9.5 21 12l-2.5 2.5"/>',   // the two axes
+  about:     '<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',                          // the operator
+  approach:  '<path d="M12 3l4 4-4 4-4-4z"/><path d="M12 11v4M6 15h12M6 15v4M18 15v4M12 15v4"/>',        // decision → three branches
+  work:      '<rect x="4" y="4" width="16" height="16" rx="1"/><circle cx="9" cy="14.5" r="1.6" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.6" fill="currentColor" stroke="none"/>', // plotted on the map
+  contact:   '<rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 7l9 6 9-6"/>',                 // mail
+};
 const items = [
   // order mirrors the page: framework → about → approach → work → contact
   { id: "framework", label: "Framework", href: "#framework", n: "01" },
@@ -33,6 +42,7 @@ const items = [
       <a class="v2-spine-item" href={item.href} data-i={i} aria-label={item.label}>
         <span class="l">{item.label}</span>
         <span class="n" aria-hidden="true">{item.n}</span>
+        <svg class="i" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={icons[item.id]} />
       </a>
       {i < items.length - 1 && (
         <span class="v2-spine-link" data-link={i} aria-hidden="true">
@@ -62,7 +72,7 @@ const items = [
   }
   .v2-spine-item:hover { color: var(--v2-ink-dim); }
   .v2-spine-item[aria-current="true"] { color: var(--v2-ink); }
-  .v2-spine-item .n { display: none; }   /* numerals are the small-screen glyph only */
+  .v2-spine-item .n, .v2-spine-item .i { display: none; }   /* names on desktop; icons only at phone width */
 
   /* the connector: dot — line — dot. Collapsed to zero unless adjacent to active. */
   .v2-spine-link {
@@ -97,10 +107,10 @@ const items = [
        20 glyph + 16 + 1 + 12 = 73. */
     .v2-spine {
       position: fixed;
-      left: 0; top: 84px;
+      left: var(--v2-rail-x, 0px); top: 84px;
       bottom: calc(73px + env(safe-area-inset-bottom, 0px));
-      width: var(--v2-rail, 60px);
-      padding: 16px 8px 0;
+      width: var(--v2-rail-w, 60px);
+      padding: 16px 4px 0;
       box-sizing: border-box;
       transform: none;
       z-index: 70;
@@ -110,15 +120,15 @@ const items = [
       height: auto;
       margin: 0;
     }
-    /* words don't fit a 60px column — V1 switched to icons; V2 uses its section numerals */
-    .v2-spine-item .l { display: none; }
-    .v2-spine-item .n { display: block; }
+    /* section NAMES, centred on the connector line — the header nav's exact type
+       (11px Martian, .14em, faint → dim on hover → ink when current), just vertical */
+    .v2-spine-item .l { display: block; }
+    .v2-spine-item .n { display: none; }
     .v2-spine-item {
-      width: 36px; height: 36px; padding: 0;
+      width: 100%; height: 36px; padding: 0 2px;
       justify-content: center;
-      font-size: 11px; letter-spacing: .08em;
+      white-space: nowrap;      /* size, tracking, colours inherit from the desktop rule */
     }
-    .v2-spine-item[aria-current="true"] { color: var(--v2-light); }   /* V1: accent on the active glyph */
     .v2-spine-link {
       flex-direction: column;
       align-items: center;
@@ -136,6 +146,15 @@ const items = [
       min-height: 4px; min-width: 0;
       background: linear-gradient(180deg, var(--v2-line), var(--v2-ink-faint), var(--v2-line));
     }
+  }
+
+  /* true phone: names → icons (V1's own move), rail back to V1's 60px. Same colour
+     rule as the words: faint, ink when current. */
+  @media (max-width: 640px) {
+    .v2-spine { padding: 16px 8px 0; }
+    .v2-spine-item .l { display: none; }
+    .v2-spine-item .i { display: block; width: 22px; height: 22px; }
+    .v2-spine-item { width: 40px; height: 40px; padding: 0; }
   }
 </style>
 
@@ -189,7 +208,28 @@ const items = [
         if (p.t.offsetTop <= mid) active = p.i;
       }
       setActive(active);
+      pushOffFooter();
     }
+
+    // Mobile rail vs footer: the rail is fixed, so the footer used to slide up BEHIND
+    // it. When the footer enters the viewport, push the rail (and the fixed LinkedIn
+    // at its foot) up by the overlap — the rail visually stops at the contact
+    // section's end and the footer owns the full width.
+    const footerEl = document.querySelector<HTMLElement>(".v2-foot");
+    const linkedinEl = document.querySelector<HTMLElement>(".v2-linkedin");
+    const mobileMq = window.matchMedia("(max-width: 860px)");
+    function pushOffFooter() {
+      if (!footerEl) return;
+      if (!mobileMq.matches) {
+        nav!.style.transform = ""; if (linkedinEl) linkedinEl.style.transform = "";
+        return;
+      }
+      const overlap = Math.max(0, window.innerHeight - footerEl.getBoundingClientRect().top);
+      nav!.style.transform = overlap > 0 ? `translateY(${-overlap}px)` : "";
+      if (linkedinEl) linkedinEl.style.transform = overlap > 0 ? `translateY(${-overlap}px)` : "";
+    }
+    mobileMq.addEventListener?.("change", pushOffFooter);
+    pushOffFooter();
 
     let ticking = false;
     window.addEventListener("scroll", () => {
