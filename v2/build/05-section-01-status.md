@@ -633,3 +633,15 @@ Nav reordered to match. Contact section + ContactIntake.astro deliberately untou
 another editor is working the form live. (Also fixed self-inflicted: a regex edit
 flattened SpineNav's items array onto its comment line, which blanked the entire nav;
 rebuilt cleanly.)
+
+---
+
+# Pass 20 — vertical rhythm tightened (Greg)
+
+Section padding 120→72px across the board ("drive people through the page"), plus:
+proof hugs About (padding-top 20px) so the brands label enters the viewport while
+About is still on screen; the stacked A/B review variants share one section's worth
+of air (28/28+32) instead of two. Verified: About + "Brands I've worked with" co-visible
+in one viewport. Note: with both A/B variants stacked the About area is temporarily
+double-height — rhythm will tighten further automatically when the losing variant is
+deleted after review.

@@ -293,7 +293,14 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
 
   /* ---------- shared section chrome — the hero/framework's own grammar:
        centred compositions, a glowing seam-rule, mono coordinates ---------- */
-  .v2-sec { padding-top: 120px; padding-bottom: 120px; }
+  /* Tightened rhythm (Greg): less dead air between sections so the page pulls the
+     reader through — About should hand off to the brands within a viewport. */
+  .v2-sec { padding-top: 72px; padding-bottom: 72px; }
+  /* proof hugs About: curiosity about the person → who he's worked with, one glance */
+  .v2-proof.v2-sec { padding-top: 20px; }
+  /* the stacked A/B review variants share one section's worth of breathing room */
+  .v2-about-a.v2-sec { padding-bottom: 28px; }
+  .v2-about-b.v2-sec { padding-top: 28px; padding-bottom: 32px; }
   /* Sections sit in the framework's centred column (--v2-measure, 880px), not the full
      1440 wrap — the hero/plane are ~800px centred and Greg wants the rest to match.
      .v2-wrap is content-box, so its 32px side padding sits outside this. KEEP. */
