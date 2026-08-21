@@ -2,7 +2,7 @@
 
 **Owner:** Greg Toler
 **Goal:** Design and build the next iteration of gregtoler.com to eventually replace the current V1/MVP in production.
-**Status:** Section 01 complete (12 passes, see `build/05-section-01-status.md`). Accent locked (dark olive). ⚠ Mobile not done — port V1's mobile treatment in a dedicated session. Perf pass still owed. V1 untouched.
+**Status:** FULL PAGE built (18 passes, `build/05-section-01-status.md`). All sections live at /v2: hero (interim headline — workshop open), framework, Approach-as-flowchart, CTA band, proof marquee + quote placeholders, About-as-diagram, work stubs, 4-step intake. Two design grammars locked: the PLANE (axes/nodes/glow) + LUCID (boxes/connectors/arrows/diamonds — Greg thinks in flowcharts; primitives in index.astro CSS). Mobile ported per approved 08-mobile-plan (verify on device). Perf pass still owed. V1 untouched.
 
 ## Status table
 
@@ -20,8 +20,11 @@
 | **Mobile** | **Ported — needs Greg's phone check** | `build/08-mobile-plan.md` steps 0–6 shipped (pass 15): V1's 60px rail with `01–05` numerals, 298px text column, hero/plane centred, panels as bottom sheet, 860 + 768 breakpoints. Verified headless at 390/820; desktop 1440 measured pixel-identical. Still owed: Greg's device pass (iOS URL bar, safe areas) — checklist in pass 15 |
 | Nav | Done | Desktop: horizontal spine (V1 mechanic rotated). Mobile: V1's left rail. LinkedIn in chrome |
 | Motion study | **Parked** | `decisions/003-motion-study-parked.md` — carry-forward: dots, glow, grain, restrained motion |
-| **Section 01 hero→framework** | **Built, live at /v2** | `build/05-section-01-status.md` — 5 passes, in-place axis modes, real logo, custom cursor |
-| Placeholder sections 02–05 | Stubbed | On `/v2` so nav motion is visible |
+| **Section 01 hero→framework** | **Built** | In-place axis modes, real logo, custom cursor |
+| **Full page (all sections)** | **Built** | `build/09-positioning-and-sections.md` = the architecture; passes 14–18 = the build. Approach is a decision-tree FLOWCHART; About bio is drawn as an X-axis traverse; sections named, not numbered |
+| Hero headline | **INTERIM — workshop open** | "Most consultants hand you a deck. I hand you the fix." Greg approved NONE of the candidates; revisit |
+| Contact intake | Built | `ContactIntake.astro` (V1's 4-step ported). Needs SLACK_WEBHOOK_URL in CF env before a shared preview |
+| Proof | Half real | 8 real logos in monochrome marquee; quotes are OBVIOUS placeholders awaiting Greg |
 | **Deploy/staging** | **Ready, push held** | Local `staging` branch committed. Runbook: `build/07-deploy-runbook.md` (incl. the gh account-switch gotcha). Push when copy + mobile are ready |
 | Cutover plan | Not started | Prereqs listed at the end of the runbook |
 | V1 fabricated content | **Live on prod** | Audit found fake case studies/apps still shipping |
@@ -42,8 +45,10 @@ depends on them; everything decided from them is already distilled below and in
 (Greg usually has this tab open; it hot-reloads — don't keep re-opening it.)
 
 **What's built (all V2 code, nothing else touched):**
-- `src/pages/v2/index.astro` — preview route: header, spine nav mount, LinkedIn,
-  placeholder sections 02–05, `noindex`
+- `src/pages/v2/index.astro` — preview route: header/nav/LinkedIn + ALL page sections
+  (Approach flowchart, CTA band, proof, About diagram, work stubs, contact), `noindex`.
+  Lucid diagram primitives live in its CSS (.fdiamond/.riser/.rail/.fdrop)
+- `src/components/v2/ContactIntake.astro` — 4-step intake (V1 port), posts /api/contact
 - `src/layouts/V2Layout.astro` — meta/OG/schema, font preloads, backdrop + cursor mounts
 - `src/styles/v2-tokens.css` — ALL tokens (locked palette + accent `#8A9166`, type, fonts)
 - `src/components/v2/HeroFramework.astro` — section 01: scroll morph + axis panels
