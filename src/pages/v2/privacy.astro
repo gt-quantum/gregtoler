@@ -1,0 +1,78 @@
+---
+/**
+ * DRAFT for Greg's review — written to what the V2 site actually does (intake form →
+ * Slack, automated screening via OpenAI, Google Calendar booking embed, LinkedIn links,
+ * no ad tracking). Not legal advice. Items marked [CONFIRM] need Greg's answer.
+ */
+import LegalPage from "../../components/v2/LegalPage.astro";
+---
+
+<LegalPage title="Privacy Policy" updated="August 20, 2026">
+  <p>This site, gregtoler.com, is run by Greg Toler, operating as GT Strategies ("I", "me").
+  This page explains what information the site collects, why, and what happens to it.
+  The short version: I collect what you choose to send me through the contact form so I
+  can reply, and I don't sell or share it for marketing.</p>
+
+  <h2>What I collect</h2>
+  <ul>
+    <li><strong>What you type into the contact form</strong> — your situation, the areas it
+    touches, your message, your name, work email, and optionally a phone number, LinkedIn
+    URL, and preferred way to be contacted.</li>
+    <li><strong>Basic technical data</strong> that any web server receives — IP address,
+    browser type, pages requested — held briefly in hosting logs by Cloudflare, which
+    serves this site.</li>
+    <li><strong>A small browser preference</strong> (theme / accent) stored locally on your
+    device. It never leaves your browser and is not a tracking cookie.</li>
+  </ul>
+  <p>I do not run advertising trackers or sell data. <span class="note">[CONFIRM] If analytics
+  (e.g. Google Analytics) is added to this version of the site, list it here and in the
+  cookie section.</span></p>
+
+  <h2>How I use it</h2>
+  <ul>
+    <li>To read and reply to your inquiry. Form submissions are delivered to me as a
+    message in my private Slack workspace.</li>
+    <li>To sort genuine inquiries from spam. Submissions are run through an automated
+    screening step powered by OpenAI's API, which returns a yes/no on whether the message
+    looks like a real request for my services. OpenAI processes the text for that purpose
+    under its API terms and, per its policy, does not use API data to train its models. If
+    the screen passes, the site offers you a calendar to book a call.</li>
+    <li>To schedule a call if you choose to. The booking calendar is Google Calendar's
+    appointment scheduling, embedded on this site. Anything you enter there goes to Google
+    and is governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's privacy policy</a>.</li>
+  </ul>
+
+  <h2>Who else sees it</h2>
+  <p>Only the services needed to run the site and reply to you: Cloudflare (hosting),
+  Slack (where your inquiry lands), OpenAI (the spam screen), and Google (calendar
+  booking, if you use it). None of them are given your information for their own
+  marketing. I don't sell personal information.</p>
+
+  <h2>How long I keep it</h2>
+  <p>Inquiries stay in my Slack and email until I delete them, which I do periodically
+  for inquiries that didn't lead to a conversation. If we work together, your details
+  become part of that engagement's records. <span class="note">[CONFIRM] retention habit —
+  adjust if you keep or purge on a schedule.</span></p>
+
+  <h2>Your choices</h2>
+  <p>Email <a href="mailto:greg@gregtoler.com">greg@gregtoler.com</a> to ask what I hold
+  about you, to correct it, or to have it deleted. I'll do that unless I'm required to
+  keep it. You can also simply not use the form — LinkedIn works too.</p>
+
+  <h2>Cookies</h2>
+  <p>This site doesn't set tracking cookies. The embedded Google Calendar booking widget
+  may set Google cookies when it loads. Your browser's theme preference is stored in
+  local storage, not a cookie.</p>
+
+  <h2>Children</h2>
+  <p>This site is for businesses and working professionals and isn't directed at anyone
+  under 18.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, the date at the top will change with it.</p>
+
+  <h2>Contact</h2>
+  <p>Greg Toler, GT Strategies &middot; <a href="mailto:greg@gregtoler.com">greg@gregtoler.com</a>
+  <span class="note">[CONFIRM] add a mailing address / state if you want one listed — some
+  jurisdictions expect it.</span></p>
+</LegalPage>

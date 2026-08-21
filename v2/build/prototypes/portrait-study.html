@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Portrait study — About section</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  @font-face { font-family: "Barlow"; src: url("../../../public/fonts/v2/barlow-600.woff2") format("woff2"); font-weight: 600; }
+  @font-face { font-family: "Hanken Grotesk"; src: url("../../../public/fonts/v2/hanken-400.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Martian Mono"; src: url("../../../public/fonts/v2/martian-mono-400.woff2") format("woff2"); font-weight: 400; }
+  :root {
+    --base:#17181A; --surface:#1E1F22; --line:#2A2B2E; --dot:#45474B;
+    --ink:#D8DADC; --dim:#909297; --faint:#66686D;
+    --light:#8A9166; --light-soft:rgba(138,145,102,.11);
+    --display:"Barlow",system-ui,sans-serif; --sans:"Hanken Grotesk",system-ui,sans-serif; --mono:"Martian Mono",ui-monospace,monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--base); color:var(--ink); font-family:var(--sans); line-height:1.55; -webkit-font-smoothing:antialiased;
+         background-image: radial-gradient(circle, var(--dot) .8px, transparent .9px); background-size: 24px 24px; }
+  .mono { font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); }
+  .study { max-width: 880px; margin: 0 auto; padding: 80px 32px; }
+  .label { font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--light);
+           border-top:1px solid var(--line); padding-top:14px; margin: 90px 0 40px; display:flex; justify-content:space-between; }
+  .label span:last-child { color:var(--faint); }
+  .idx { color:var(--light); display:block; margin-bottom:10px; }
+  h2 { font-family:var(--display); font-weight:600; font-size:2.7rem; line-height:1.1; margin:0 0 44px; max-width:24ch; }
+  .about { display:grid; grid-template-columns: minmax(0,1.6fr) minmax(220px,1fr); gap:64px; align-items:start; }
+  .bio p { color:var(--dim); font-size:15.5px; line-height:1.7; margin:0 0 18px; max-width:58ch; }
+  .stats { display:flex; gap:34px; margin:0 0 30px; }
+  .stats dd { font-family:var(--display); font-weight:600; font-size:1.7rem; margin:0; }
+  .stats dt { color:var(--faint); margin-top:4px; }
+
+  /* ---- A · feathered atmosphere: photo sits BEHIND the section's right half ---- */
+  .sec-a { position:relative; padding-bottom:150px; }
+  .sec-a .photo { position:absolute; right:-120px; top:20px; width:520px; pointer-events:none; opacity:.92; }
+  .sec-a .about { position:relative; }
+
+  /* ---- B · halftone: the portrait is part of the lattice ---- */
+  .sec-b .side { position:relative; }
+  .sec-b .photo { width:100%; display:block; }
+
+  /* ---- C · contour: technical drawing with a ghost of the photo under it ---- */
+  .sec-c .fig { position:relative; width:100%; aspect-ratio: 4/5; }
+  .sec-c img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .sec-c .ghost { opacity:.38; }
+  .sec-c .tick { position:absolute; font-family:var(--mono); font-size:9px; letter-spacing:.14em; color:var(--faint); }
+  .sec-c .tick.t { left:0; top:-4px; } .sec-c .tick.b { right:0; bottom:-4px; }
+  .sec-c .fig::before, .sec-c .fig::after { content:""; position:absolute; background:var(--line); }
+  .sec-c .fig::before { left:0; right:0; top:50%; height:1px; }
+  .sec-c .fig::after { top:0; bottom:0; left:50%; width:1px; }
+
+  /* ---- D · node: plotted on the map, the way case studies will be ---- */
+  .sec-d .plot { position:relative; height:300px; }
+  .sec-d .ax-h, .sec-d .ax-v { position:absolute; background:var(--light); opacity:.6; }
+  .sec-d .ax-h { left:0; right:0; top:50%; height:1px; }
+  .sec-d .ax-v { top:0; bottom:0; left:50%; width:1px; }
+  .sec-d .node { position:absolute; left:62%; top:38%; transform:translate(-50%,-50%); width:128px; height:128px; border-radius:50%;
+                 overflow:hidden; box-shadow:0 0 0 1px var(--line), 0 0 24px 4px var(--light-soft), 0 0 60px 10px var(--light-soft); }
+  .sec-d .node img { width:100%; height:100%; object-fit:cover; display:block; }
+  .sec-d .tag { position:absolute; left:62%; top:calc(38% + 78px); transform:translateX(-50%); text-align:center; font-family:var(--mono); font-size:10px;
+                letter-spacing:.14em; text-transform:uppercase; color:var(--dim); white-space:nowrap; }
+  .sec-d .tag b { display:block; color:var(--ink); font-weight:400; margin-bottom:4px; }
+  .sec-d .lab { position:absolute; font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); }
+  .sec-d .lab.n { left:50%; top:-18px; transform:translateX(-50%); } .sec-d .lab.s { left:50%; bottom:-18px; transform:translateX(-50%); }
+  .sec-d .lab.w { left:0; top:calc(50% - 18px); } .sec-d .lab.e { right:0; top:calc(50% - 18px); }
+</style>
+</head>
+<body>
+<div class="study">
+  <p class="mono">Portrait study · About section · four treatments, same copy</p>
+
+  <!-- A -->
+  <div class="label"><span>A · Feathered atmosphere</span><span>photo behind the section, no edge</span></div>
+  <section class="sec-a">
+    <img class="photo" src="portrait/feather.png" alt="">
+    <span class="mono idx">03</span>
+    <h2>I build the systems that make businesses run.</h2>
+    <div class="about">
+      <div class="bio">
+        <p>I started in go-to-market operations — territory planning, pipeline, tech stacks, the systems and politics of getting marketing and sales working together. The work taught me that most operational problems aren't technology problems. They're design problems.</p>
+        <p>That took me sideways into the operational layer: embedded COO for an agency, productizing service delivery, building AI systems and custom tools that replace expensive software.</p>
+      </div>
+      <div></div>
+    </div>
+  </section>
+
+  <!-- B -->
+  <div class="label"><span>B · Halftone on the lattice</span><span>the portrait is made of the page's own dots</span></div>
+  <section class="sec-b">
+    <span class="mono idx">03</span>
+    <h2>I build the systems that make businesses run.</h2>
+    <div class="about">
+      <div class="bio">
+        <p>I started in go-to-market operations — territory planning, pipeline, tech stacks, the systems and politics of getting marketing and sales working together. The work taught me that most operational problems aren't technology problems. They're design problems.</p>
+        <p>That took me sideways into the operational layer: embedded COO for an agency, productizing service delivery, building AI systems and custom tools that replace expensive software.</p>
+      </div>
+      <div class="side"><img class="photo" src="portrait/halftone.png" alt="Greg Toler"></div>
+    </div>
+  </section>
+
+  <!-- C -->
+  <div class="label"><span>C · Contour drawing</span><span>technical-drawing line work over a ghost of the photo</span></div>
+  <section class="sec-c">
+    <span class="mono idx">03</span>
+    <h2>I build the systems that make businesses run.</h2>
+    <div class="about">
+      <div class="bio">
+        <p>I started in go-to-market operations — territory planning, pipeline, tech stacks, the systems and politics of getting marketing and sales working together. The work taught me that most operational problems aren't technology problems. They're design problems.</p>
+        <p>That took me sideways into the operational layer: embedded COO for an agency, productizing service delivery, building AI systems and custom tools that replace expensive software.</p>
+      </div>
+      <div class="fig">
+        <img class="ghost" src="portrait/ghost.png" alt="">
+        <img src="portrait/contour.png" alt="Greg Toler">
+        <span class="tick t">fig. 01</span><span class="tick b">G. Toler</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- D -->
+  <div class="label"><span>D · Plotted node</span><span>the operator on his own map — same grammar section 03 will use</span></div>
+  <section class="sec-d">
+    <span class="mono idx">03</span>
+    <h2>I build the systems that make businesses run.</h2>
+    <div class="about">
+      <div class="bio">
+        <p>I started in go-to-market operations — territory planning, pipeline, tech stacks, the systems and politics of getting marketing and sales working together. The work taught me that most operational problems aren't technology problems. They're design problems.</p>
+        <p>That took me sideways into the operational layer: embedded COO for an agency, productizing service delivery, building AI systems and custom tools that replace expensive software.</p>
+      </div>
+      <div class="plot">
+        <span class="lab n">Strategy</span><span class="lab s">Execution</span><span class="lab w">GTM</span><span class="lab e">Ops</span>
+        <span class="ax-h"></span><span class="ax-v"></span>
+        <span class="node"><img src="portrait/node.jpg" alt="Greg Toler"></span>
+        <span class="tag"><b>Greg Toler</b>both axes, full height</span>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

@@ -696,3 +696,16 @@ for the un-clipped culprit. Three found, three fixed:
    rails/per-box drops hide, diamond → riser → stack → merge arrow survives vertically.
 Verified 0px overflow at every probed width. (If the reviewer keeps a portrait variant,
 consider responsive image sizing instead of clipping as the finish-work.)
+
+# Pass 22 — Approach + Work rebuilt as animated flow (2026-08-20, late)
+
+Research in `11-flow-motion-research.md` (seunghyuk = scroll-linked + lerp; SaaS "animated
+beam" family = bezier connectors + comet + glass icon nodes; gionatannese is a 3D portfolio,
+not the reference Greg remembered). Built natively, no React/Tailwind.
+- Approach: entry node → 3 icon-node cards → exit node (→ contact). Bezier connectors
+  computed from real boxes in an SVG overlay; draw follows scroll with inertia; cards rise
+  as their connector arrives; comets loop once drawn. Phone: trunk-and-sweep variant.
+- Work: tracing beam down the dot column follows scroll; rows/dots light as it passes.
+- Gotcha logged: JS-created SVG nodes carry no Astro scope → style them via `:global()`.
+- Also this session: footer (+ /v2/privacy, /v2/terms drafts, LegalPage.astro), mobile
+  rail tiers (names ≤860 in the header's exact type; icons ≤640), About stats + accent.

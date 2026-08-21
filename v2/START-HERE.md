@@ -2,7 +2,7 @@
 
 **Owner:** Greg Toler
 **Goal:** Design and build the next iteration of gregtoler.com to eventually replace the current V1/MVP in production.
-**Status:** FULL PAGE built (18 passes, `build/05-section-01-status.md`). All sections live at /v2: hero (interim headline — workshop open), framework, Approach-as-flowchart, CTA band, proof marquee + quote placeholders, About (TEMP: two stacked review variants A/B replacing the journey diagram — awaiting Greg's reviewer; journey is in git b4d320b), work stubs, 4-step intake. Two design grammars locked: the PLANE (axes/nodes/glow) + LUCID (boxes/connectors/arrows/diamonds — Greg thinks in flowcharts; primitives in index.astro CSS). Mobile ported per approved 08-mobile-plan (verify on device). Perf pass still owed. V1 untouched.
+**Status:** FULL PAGE built (18 passes, `build/05-section-01-status.md`). All sections live at /v2: hero (interim headline — workshop open), framework, Approach-as-flowchart, CTA band, proof marquee + quote placeholders, About (TEMP: two stacked review variants A/B replacing the journey diagram — awaiting Greg's reviewer; journey is in git b4d320b), work stubs, 4-step intake with work-email gate + OpenAI qualification → booking calendar. Two design grammars locked: the PLANE (axes/nodes/glow) + LUCID (boxes/connectors/arrows/diamonds — Greg thinks in flowcharts; primitives in index.astro CSS). Mobile ported per approved 08-mobile-plan (verify on device). Perf pass still owed. V1 untouched.
 
 ## Status table
 
@@ -19,11 +19,11 @@
 | Design direction | **Locked** | Neutral charcoal ground, dark-olive accent `#8A9166`, Barlow/Hanken/Martian (researched) |
 | **Mobile** | **Ported — needs Greg's phone check** | `build/08-mobile-plan.md` steps 0–6 shipped (pass 15): V1's 60px rail with `01–05` numerals, 298px text column, hero/plane centred, panels as bottom sheet, 860 + 768 breakpoints. Verified headless at 390/820; desktop 1440 measured pixel-identical. Still owed: Greg's device pass (iOS URL bar, safe areas) — checklist in pass 15 |
 | Nav | Done | Desktop: horizontal spine (V1 mechanic rotated). Mobile: V1's left rail. LinkedIn in chrome |
-| Motion study | **Parked** | `decisions/003-motion-study-parked.md` — carry-forward: dots, glow, grain, restrained motion |
+| Motion study | **Study 02 built — Greg to pick A/B** | `build/10-logo-animation.md`. Real lockup, layered vector now exists (`prototypes/assets/gt-lockup-layered.svg`). Study 01 remains parked per `decisions/003` |
 | **Section 01 hero→framework** | **Built** | In-place axis modes, real logo, custom cursor |
 | **Full page (all sections)** | **Built** | `build/09-positioning-and-sections.md` = the architecture; passes 14–18 = the build. Approach is a decision-tree FLOWCHART; About bio is drawn as an X-axis traverse; sections named, not numbered |
 | Hero headline | **INTERIM — workshop open** | "Most consultants hand you a deck. I hand you the fix." Greg approved NONE of the candidates; revisit |
-| Contact intake | Built | `ContactIntake.astro` (V1's 4-step ported). Needs SLACK_WEBHOOK_URL in CF env before a shared preview |
+| Contact intake | **Built + gated (Greg: "perfect")** | `ContactIntake.astro`: step 1 auto-advances, ≥1 area, ≥40-char story, name*/work-email*/phone/LinkedIn, reach-method chips. Free mailboxes blocked (`lib/free-email-domains.js`, re-checked in `/api/contact`). `/api/qualify` (OpenAI gpt-5-nano, HMAC-token-gated, fails closed) decides whether the Google booking calendar shows after send — 6/6 on `scripts/qualify-test.mjs`. Both API routes now `prerender=false` (they were static → every POST 500'd, V1 too). **CF env needed before preview:** OPENAI_API_KEY, QUALIFY_SECRET, SLACK_WEBHOOK_URL (local `.env` has them, gitignored). Passes 19–21 |
 | Proof | Half real | 8 real logos in monochrome marquee; quotes are OBVIOUS placeholders awaiting Greg |
 | **Deploy/staging** | **Ready, push held** | Local `staging` branch committed. Runbook: `build/07-deploy-runbook.md` (incl. the gh account-switch gotcha). Push when copy + mobile are ready |
 | Cutover plan | Not started | Prereqs listed at the end of the runbook |

@@ -1,0 +1,44 @@
+---
+/**
+ * Shared shell for the legal pages (/v2/privacy, /v2/terms): header with the mark,
+ * a narrow reading column, and a footer link back. Content is slotted in.
+ */
+import V2Layout from "../../layouts/V2Layout.astro";
+import GTMark from "./GTMark.astro";
+interface Props { title: string; updated: string; }
+const { title, updated } = Astro.props;
+---
+
+<V2Layout title={`${title} — GT Strategies`}>
+  <header class="lg-head">
+    <a class="lg-brand" href="/v2" aria-label="Back to gregtoler.com"><GTMark height={32} /></a>
+    <a class="lg-back v2-mono" href="/v2">&larr; Back to the site</a>
+  </header>
+  <main class="lg-main">
+    <p class="v2-mono lg-kicker">GT Strategies</p>
+    <h1>{title}</h1>
+    <p class="v2-mono lg-updated">Last updated {updated}</p>
+    <div class="lg-body"><slot /></div>
+  </main>
+  <footer class="lg-foot v2-mono">&copy; {new Date().getFullYear()} GT Strategies &middot; <a href="mailto:greg@gregtoler.com">greg@gregtoler.com</a></footer>
+</V2Layout>
+
+<style>
+  .lg-head { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; }
+  .lg-brand { display: block; opacity: .72; }
+  .lg-back { color: var(--v2-ink-dim); }
+  .lg-back:hover { color: var(--v2-ink); }
+  .lg-main { max-width: 720px; margin: 0 auto; padding: 48px 32px 96px; }
+  .lg-kicker { color: var(--v2-light); margin: 0 0 12px; }
+  h1 { font-family: var(--v2-display); font-weight: 600; font-size: clamp(1.8rem, 3.4vw, 2.6rem); line-height: 1.1; margin: 0 0 10px; color: var(--v2-ink); }
+  .lg-updated { margin: 0 0 40px; }
+  .lg-body :global(h2) { font-family: var(--v2-display); font-weight: 600; font-size: 1.2rem; margin: 36px 0 10px; color: var(--v2-ink); }
+  .lg-body :global(p), .lg-body :global(li) { color: var(--v2-ink-dim); font-size: 15px; line-height: 1.7; }
+  .lg-body :global(p) { margin: 0 0 14px; }
+  .lg-body :global(ul) { margin: 0 0 14px; padding-left: 20px; }
+  .lg-body :global(a) { color: var(--v2-light); }
+  .lg-body :global(.note) { border-left: 1px solid var(--v2-light); padding-left: 16px; color: var(--v2-ink-faint); font-size: 13px; }
+  .lg-foot { max-width: 720px; margin: 0 auto; padding: 0 32px 48px; }
+  .lg-foot a { color: var(--v2-light); }
+  @media (max-width: 768px) { .lg-head { padding: 16px 20px; } .lg-main { padding: 32px 20px 72px; } }
+</style>

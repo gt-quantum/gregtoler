@@ -39,7 +39,7 @@
 
     const SPACING = 24;          // tighter lattice — 34 read as too coarse a pattern
     const BULGE_R = 88;           // 210 → 132 → 88. The dome kept reading as a spotlight.
-    const BULGE_STRENGTH = 0.30;  // subtler push, so it suggests a ball rather than announcing one
+    const BULGE_STRENGTH = 0.36;  // a touch more push than .30 — the lit dome needed more presence (Greg)
 
     let dpr = 1, W = 0, H = 0, cols = 0, rows = 0, offX = 0, offY = 0;
 
@@ -252,8 +252,8 @@
       ctx!.globalCompositeOperation = "lighter";
       for (let k = 0; k < hot.length; k += 3) {
         const heat = hot[k + 2];
-        const hr = 3 + heat * 9;
-        ctx!.globalAlpha = heat * 0.42;
+        const hr = 3 + heat * 11;
+        ctx!.globalAlpha = heat * 0.62;   // brighter, larger lit dots under the cursor
         ctx!.drawImage(hotSprite!, hot[k] - hr, hot[k + 1] - hr, hr * 2, hr * 2);
       }
       ctx!.globalCompositeOperation = "source-over";

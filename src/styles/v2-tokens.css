@@ -62,8 +62,8 @@
 
   /* ACCENT — locked (Greg, 2026-08-20): dark olive. Chosen from the researched
      audition (v2/build/06-accent-research.md); the widget is retired. */
-  --v2-light:      #8A9166;
-  --v2-light-soft: rgba(138, 145, 102, 0.11);
+  --v2-light:      #7A8058;   /* darkened a step from #8A9166 (Greg, pass 23): 4.3:1 on the ground */
+  --v2-light-soft: rgba(122, 128, 88, 0.13);
 
   /* type roles */
   /* Display: Barlow (DIN-influenced — the lettering heritage of technical drawings,
@@ -136,11 +136,18 @@
 /* ---------- mobile shell (≤860): V1's rail numbers — see v2/build/08-mobile-plan.md ---------- */
 @media (max-width: 860px) {
   .v2 {
-    --v2-rail: 60px;    /* V1: aside width 60, content margin-left 60 */
+    /* rail = V1's aside, widened and inset so the section NAMES fit centred on the
+       connector line (numerals didn't read once sections were named) */
+    --v2-rail-x: 10px;                                   /* inset from the screen edge */
+    --v2-rail-w: 98px;                                   /* "FRAMEWORK" at the header's 11px/.14em + air */
+    --v2-rail: calc(var(--v2-rail-x) + var(--v2-rail-w)); /* content padding-left */
     margin: 0;          /* the browser's 8px body margin was never reset; scoped here so
                            desktop stays pixel-identical to what was tuned */
   }
   .v2-wrap { padding: 0 16px; }   /* V1: content padding 24 16 32 16 */
+}
+@media (max-width: 640px) {
+  .v2 { --v2-rail-x: 0px; --v2-rail-w: 60px; }   /* icons fit V1's rail; the names needed the wider one */
 }
 
 .v2-mono {

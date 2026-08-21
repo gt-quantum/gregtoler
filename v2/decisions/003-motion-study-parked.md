@@ -35,3 +35,10 @@ is out of scope right now.
 Display face. The prototype has a live switcher across Archivo Black, Clash Display,
 Bricolage Grotesque, Cabinet Grotesk, Anybody, and Space Grotesk if a quick comparison is
 ever useful — but the real decision should be made against actual page copy, not a specimen.
+
+## Addendum 2026-08-20 — the "known gap" is closed
+
+Greg came back with a specific brief (name under the connected G–T bar → collapse to the mark →
+Strategies arrives). Study 02 does it with the **real** mark: a 4× trace of `public/logo.png`
+clip-sliced into G / bar / tip / stem, no redraw. See `build/10-logo-animation.md`. Study 01
+itself stays parked; its carry-forwards above are unchanged.
