@@ -723,3 +723,34 @@ not the reference Greg remembered). Built natively, no React/Tailwind.
   phone geometry identical to local.
 - Greg: "for the most part it's working and looks pretty good. There are some changes" —
   **unlisted; first question next session.**
+
+---
+
+# Session-A closing log (2026-08-20, night) — items after pass 21, this session
+
+Complements pass 22–23 (session B). Everything below is committed on staging:
+
+- **Main-boundary rhythm (7e7017a):** two-tier spacing — About+brands stay one tight
+  unit; Approach/Work/Contact each open with 128px. (Greg-tuned across three rounds.)
+- **Framework dot-bloom hold (2cd1d6d):** the backdrop focus bloom now holds for the
+  entire pinned stay and fades only on actual exit travel (was keyed to p0.84 inside
+  the pin — dimmed while the framework still filled the screen).
+- **Footer hairline (8b200dd):** removed the footer's full-bleed top border — a 1px
+  line over the drifting silk read as a stray dark/light artifact.
+- **About Option A → plain headshot (359fb48 + 06d7b24):** background-removal dropped;
+  raw greyscale photo (1200px/96KB), 6px corners, faint edge, contained in-column.
+  Mobile: contained 100%/max-420, centred, 30px gap — overriding the cutout-era
+  120%+negative-margin rule that oversized/clipped it on phones.
+- **Rail vs footer on mobile (1281db6 + 3dc9adf):** the fixed left rail + LinkedIn
+  get pushed up as the footer enters the viewport (rail visually ends at contact);
+  CSS guarantee behind it — footer stacks above the rail on GLASS (90% base + blur,
+  Greg-approved) so nothing can bleed through even if a frame drops.
+- **Horizontal-scroll audit method** (pass 21) is the reusable tool: same-origin
+  iframe probes per width + ancestor-chain clip walk. Caveat learned tonight: rAF is
+  throttled inside iframes, so scroll-driven JS can't be validated that way — only
+  geometry can. Scroll-behavior verification needs Greg's device.
+
+State: staging pushed (4b05be0/3a6d8ca/28f906f + this). Preview:
+staging.gregtoler.pages.dev/v2. First item tomorrow per Greg: his unlisted "some
+changes", then the standing queue in START-HERE (headline workshop, perf pass,
+real quotes/case studies, SLACK_WEBHOOK_URL before sharing the form).
