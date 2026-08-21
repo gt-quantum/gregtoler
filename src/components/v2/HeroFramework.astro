@@ -406,7 +406,8 @@ const capabilities = [
     function render() {
       const denom = stage!.offsetHeight - window.innerHeight;
       if (denom <= 0) return;
-      const p = clamp(-stage!.getBoundingClientRect().top / denom, 0, 1);
+      const pRaw = -stage!.getBoundingClientRect().top / denom;
+      const p = clamp(pRaw, 0, 1);
 
       const h = seg(p, 0.03, 0.15);
       hero!.style.opacity = String(1 - h);
@@ -433,7 +434,11 @@ const capabilities = [
       plane!.style.opacity = String(seg(p, 0.24, 0.38));
       axv!.style.setProperty("--sy", ease(seg(p, 0.34, 0.56)).toFixed(3));
 
-      (window as any).v2Backdrop?.setFocus(seg(p, 0.28, 0.48) * (1 - seg(p, 0.84, 0.98)));
+      // Bloom holds at full strength for the WHOLE pinned stay (p≤1) and only fades as
+      // the section physically leaves the frame (pRaw>1 = post-pin exit travel). It was
+      // keyed to p 0.84–0.98 before, which dimmed the dots while the framework was
+      // still fully on screen (Greg).
+      (window as any).v2Backdrop?.setFocus(seg(p, 0.28, 0.48) * (1 - seg(pRaw, 1.02, 1.22)));
 
       if (mode === "grid") {
         const la = seg(p, 0.40, 0.54);
