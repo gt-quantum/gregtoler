@@ -680,7 +680,10 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   @media (max-width: 860px) {
     .v2-foot {
       position: relative; z-index: 80;      /* rail + LinkedIn sit at 70 */
-      background: var(--v2-base);
+      /* glass, not flat black: silk ghosts through like the header/panels, but the
+         rail still can't read through it if the JS push ever drops a frame */
+      background: color-mix(in srgb, var(--v2-base) 90%, transparent);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     }
   }
 </style>
