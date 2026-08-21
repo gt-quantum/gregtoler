@@ -709,3 +709,17 @@ not the reference Greg remembered). Built natively, no React/Tailwind.
 - Gotcha logged: JS-created SVG nodes carry no Astro scope → style them via `:global()`.
 - Also this session: footer (+ /v2/privacy, /v2/terms drafts, LegalPage.astro), mobile
   rail tiers (names ≤860 in the header's exact type; icons ≤640), About stats + accent.
+
+# Pass 23 — close of day: accent darkened, staging live (2026-08-20, late)
+
+- Accent `#8A9166` → `#7A8058` (+ soft rgba .13). Cursor-lit dots: bulge .36, alpha .62,
+  radius +20%. Sprite reads the token, so lit dots darkened with it.
+- Approach: exit = "Start the conversation" pill (arrow node in front); band removed;
+  phone = left spine with left-aligned cards; comets per-line; draw spread across tall
+  sections. Work: tracing beam removed (rows + hover only). Footer sign-off "Yes, I built
+  this website."
+- **Pushed** `staging` (`4b05be0`, docs `3a6d8ca`) as `gt-quantum`; Cloudflare preview
+  `staging.gregtoler.pages.dev/v2` verified: latest markers present, `/api/qualify` 401-gated,
+  phone geometry identical to local.
+- Greg: "for the most part it's working and looks pretty good. There are some changes" —
+  **unlisted; first question next session.**
