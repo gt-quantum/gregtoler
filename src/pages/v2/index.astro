@@ -301,6 +301,11 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   /* the stacked A/B review variants share one section's worth of breathing room */
   .v2-about-a.v2-sec { padding-bottom: 28px; }
   .v2-about-b.v2-sec { padding-top: 28px; padding-bottom: 32px; }
+  /* …but the MAIN section boundaries breathe more (Greg): About+brands stay one unit,
+     with real distance before Approach, before Work, and before Contact. */
+  #approach.v2-sec { padding-top: 128px; }
+  #work.v2-sec { padding-top: 128px; }
+  #contact.v2-sec { padding-top: 128px; }
   /* Sections sit in the framework's centred column (--v2-measure, 880px), not the full
      1440 wrap — the hero/plane are ~800px centred and Greg wants the rest to match.
      .v2-wrap is content-box, so its 32px side padding sits outside this. KEEP. */
