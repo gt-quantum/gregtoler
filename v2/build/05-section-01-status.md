@@ -645,3 +645,54 @@ of air (28/28+32) instead of two. Verified: About + "Brands I've worked with" co
 in one viewport. Note: with both A/B variants stacked the About area is temporarily
 double-height — rhythm will tighten further automatically when the losing variant is
 deleted after review.
+
+# Pass 20 — intake: work-email gate, Claude qualification, LinkedIn reach (2026-08-20)
+
+- Step legends lose their numerals (the step strip already numbers them); step 1 card
+  collapses to its content (nav row hidden, no fieldset floor, empty status hidden).
+- "Best way to reach you" gains LinkedIn (asks for the URL if chosen).
+- **Work email required.** `src/lib/free-email-domains.js` (shared list, registrable-label
+  match) blocks gmail/yahoo/outlook/icloud/etc. client-side; `/api/contact` re-checks
+  when `source:"v2"` → 422. V1's form is untouched. Trade-off: solo operators on gmail
+  are blocked — flip by removing the two `isFreeEmail` checks.
+- **`/api/qualify`** (new, OpenAI `gpt-5-mini` via fetch, HMAC-gated): asks
+  whether the submission is a genuine request for Greg's services → `{qualified, reason}`.
+  The form calls it after `/api/contact` succeeds; calendar shows only on `true`.
+  Fails closed (no key / error / refusal → thank-you only).
+- **NEEDS GREG:** (1) `OPENAI_API_KEY` + `QUALIFY_SECRET` — Cloudflare Pages → Settings → Environment
+  variables (Production + Preview); locally `.dev.vars` at repo root (now gitignored).
+  (2) The booking embed: paste the iframe `src` into `BOOKING_URL` in
+  `ContactIntake.astro` (or hand me the embed code and I'll wire it).
+
+# Pass 21 — qualification live on OpenAI, booking wired (2026-08-20, late)
+
+- `/api/qualify` switched to OpenAI (`gpt-5-nano`, `reasoning_effort: minimal`, JSON mode,
+  600-token cap — the first run returned empty content because nano spent a 120-token cap
+  on reasoning). Checks name / work-email / message; all three must pass.
+- **Protection:** HMAC proof-of-submission token (`src/lib/qualify-token.js`) issued by
+  `/api/contact` after a Slack post, 5-min TTL, bound to the email; `/api/qualify` → 401
+  without it. Body cap 16KB, message cap 4,000 chars, 12s timeout, fails closed.
+- **Tested** (`scripts/qualify-test.mjs`): 6/6 correct — two real requests qualified, SEO
+  pitch / gibberish / printer support / recruiter rejected; no-token and forged-token → 401.
+  ~1–2s per call. Watch item: the name check is a touch eager ("could be a placeholder")
+  — harmless so far because those samples also fail on message.
+- Booking URL (Greg's Google appointment schedule) is in `ContactIntake.astro`; shows
+  beneath the confirmation only on `qualified: true`.
+- Local secrets in `.env` (gitignored). Cloudflare needs: OPENAI_API_KEY, QUALIFY_SECRET,
+  SLACK_WEBHOOK_URL, optional OPENAI_MODEL.
+
+---
+
+# Pass 21 — horizontal-scroll audit, all breakpoints (2026-08-20)
+
+Method: same-origin iframe probes of /v2 at 340/390/400/480/560/640/720/861/1024px,
+measuring scrollWidth overflow and walking each overflowing element's ancestor chain
+for the un-clipped culprit. Three found, three fixed:
+1. `.v2-atmos` (Option B portrait, fixed 793px) — clipped via `.v2-about-b{overflow:hidden}`
+2. `.v2-portrait img` (Option A, 560-696px, max-width:none + negative margins) —
+   same clip on `.v2-about-a`
+3. `.v2-beats` flowchart grid — stayed 3-across on phones (mobile pass predates the
+   flowchart). New ≤768 rule appended AFTER the peer's mobile blocks: boxes stack,
+   rails/per-box drops hide, diamond → riser → stack → merge arrow survives vertically.
+Verified 0px overflow at every probed width. (If the reviewer keeps a portrait variant,
+consider responsive image sizing instead of clipping as the finish-work.)

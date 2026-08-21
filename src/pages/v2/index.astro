@@ -307,7 +307,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       z-index: 70;
       padding: 7px;
     }
-    .v2-linkedin svg { width: 20px; height: 20px; }
+    .v2-linkedin svg { width: 22px; height: 22px; }
     .v2-linkedin::before {
       content: ""; position: absolute;
       top: -10px; left: 50%; transform: translateX(-50%);
@@ -332,6 +332,9 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
      behind the text; below ~890px it bled past the viewport and scrolled the whole
      page sideways. Clip it to its own section (art direction preserved, bleed gone). */
   .v2-about-b { overflow: hidden; }
+  /* …and Option A's portrait does the same thing: 560-696px img with max-width:none
+     and negative margins overflows any viewport under ~900px. Same clip. */
+  .v2-about-a { overflow: hidden; }
   #work.v2-sec { padding-top: 128px; }
   #contact.v2-sec { padding-top: 128px; }
   /* Sections sit in the framework's centred column (--v2-measure, 880px), not the full
@@ -614,14 +617,69 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   @media (max-width: 768px) {
     .v2-sec { padding-top: 64px; padding-bottom: 64px; }   /* top/bottom only — .v2-wrap owns the sides */
     .v2-sec-head { margin-bottom: 30px; }
-    .v2-beat { grid-template-columns: 32px 1fr; gap: 14px; padding: 24px 0; }
-    .v2-beat:hover { padding-left: 0; }
     .v2-logoset { gap: 40px; padding-right: 40px; }
     .v2-quotes { margin-top: 44px; gap: 28px; }
     .v2-stats { gap: 24px; }
-    .v2-workrow { flex-direction: column; gap: 6px; align-items: flex-start; }
+
+    /* --- Approach, drawn VERTICALLY: a trunk down the left, each beat branches out
+       to its box and returns to the trunk, then the trunk arrows on to the CTA. --- */
+    .v2-flow { --trunk: 7px; }                                   /* x of the trunk line */
+    .v2-fentry { display: flex; align-items: center; gap: 14px; text-align: left; padding: 0 0 4px; }
+    .v2-fentry .fdiamond { margin: 0 0 0 1px; flex: none; }     /* 12px rotated square centred on the trunk */
+    .v2-fbranch { display: none; }                              /* the horizontal distribution rail */
+    .v2-beats {
+      grid-template-columns: 1fr; gap: 22px;
+      position: relative; padding: 30px 0 0 38px; margin-top: 0;
+    }
+    .v2-beats::before {                                          /* the trunk */
+      content: ""; position: absolute; left: var(--trunk); top: -4px; bottom: -10px; width: 1px;
+      background: var(--v2-light); opacity: .55; box-shadow: 0 0 6px 0 var(--v2-light-soft);
+    }
+    .v2-beat { text-align: left; padding: 22px 18px 20px; }
+    .v2-beat:hover { transform: none; }
+    .v2-beat .fdrop {                                            /* OUT: trunk → box, arrow in */
+      left: auto; right: 100%; top: 30px; width: 30px; height: 1px; transform: none;
+    }
+    .v2-beat .fdrop::before {                                    /* junction dot on the trunk */
+      content: ""; position: absolute; left: -2px; top: 50%; width: 5px; height: 5px; border-radius: 50%;
+      transform: translate(-50%, -50%); background: var(--v2-light);
+      box-shadow: 0 0 0 2px var(--v2-light-soft), 0 0 8px 1px var(--v2-light);
+    }
+    .v2-beat .fdrop::after {                                     /* arrowhead pointing at the box */
+      left: auto; right: -1px; bottom: auto; top: 50%; transform: translate(100%, -50%);
+      border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent;
+      border-left: 6px solid var(--v2-light); border-right: 0;
+    }
+    .v2-beat::after {                                            /* IN: box → trunk return line */
+      content: ""; position: absolute; right: 100%; bottom: 22px; width: 30px; height: 1px;
+      background: var(--v2-light); opacity: .35;
+    }
+    .v2-fmerge { max-width: none; height: 44px; margin: 0; }
+    .v2-fmerge .rail { display: none; }
+    .v2-fmerge .drop { left: var(--trunk); top: 0; height: 34px; transform: none; }
+
+    /* --- Work rows: dot sits on the title's line, coord drops beneath --- */
+    .v2-workrow {
+      display: grid; grid-template-columns: 4px 1fr; gap: 6px 14px; align-items: baseline;
+    }
+    .v2-workrow .wdot { align-self: center; grid-row: 1; }
+    .v2-workrow .wtitle { grid-column: 2; }
+    .v2-workrow .wcoord { grid-column: 2; }
   }
 
+
+  /* Flowchart on small screens (appended after the mobile pass, which predates the
+     flowchart): boxes stack vertically; the horizontal distribution/merge rails and
+     per-box drops go away; diamond → riser → stacked boxes → single arrow survives,
+     so the flow still reads top-to-bottom. Fixes 3-across overflow at narrow widths. */
+  @media (max-width: 768px) {
+    .v2-beats { grid-template-columns: 1fr; gap: 30px; }
+    .v2-fbranch { max-width: none; height: 30px; }
+    .v2-fbranch .rail { display: none; }
+    .v2-beat .fdrop { display: none; }
+    .v2-fmerge { height: 46px; }
+    .v2-fmerge .rail { display: none; }
+  }
 </style>
 
 <script>
