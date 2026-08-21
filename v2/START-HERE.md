@@ -25,7 +25,7 @@
 | Hero headline | **INTERIM — workshop open** | "Most consultants hand you a deck. I hand you the fix." Greg approved NONE of the candidates; revisit |
 | Contact intake | **Built + gated (Greg: "perfect")** | `ContactIntake.astro`: step 1 auto-advances, ≥1 area, ≥40-char story, name*/work-email*/phone/LinkedIn, reach-method chips. Free mailboxes blocked (`lib/free-email-domains.js`, re-checked in `/api/contact`). `/api/qualify` (OpenAI gpt-5-nano, HMAC-token-gated, fails closed) decides whether the Google booking calendar shows after send — 6/6 on `scripts/qualify-test.mjs`. Both API routes now `prerender=false` (they were static → every POST 500'd, V1 too). **CF env needed before preview:** OPENAI_API_KEY, QUALIFY_SECRET, SLACK_WEBHOOK_URL (local `.env` has them, gitignored). Passes 19–21 |
 | Proof | Half real | 8 real logos in monochrome marquee; quotes are OBVIOUS placeholders awaiting Greg |
-| **Deploy/staging** | **Ready, push held** | Local `staging` branch committed. Runbook: `build/07-deploy-runbook.md` (incl. the gh account-switch gotcha). Push when copy + mobile are ready |
+| **Deploy/staging** | **PUSHED 2026-08-20** (`4b05be0`) | `origin/staging` live on github.com/gt-quantum/gregtoler. Runbook: `build/07-deploy-runbook.md`. Preview URL comes from Cloudflare Pages (dashboard → project → Deployments → `staging`); `/v2` is the route. **Before the form works on preview:** set OPENAI_API_KEY, QUALIFY_SECRET, SLACK_WEBHOOK_URL in CF env (Preview scope) |
 | Cutover plan | Not started | Prereqs listed at the end of the runbook |
 | V1 fabricated content | **Live on prod** | Audit found fake case studies/apps still shipping |
 
