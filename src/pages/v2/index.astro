@@ -45,7 +45,6 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
          .v2-optlabel spans when decided. Assets: public/images/v2/portrait-*.png,
          made by v2/build/prototypes/portrait/ (Vision segmentation + graded halo). -->
     <section class="v2-wrap v2-sec v2-about-a" id="about" aria-label="About">
-      <span class="v2-mono v2-optlabel">Option A &middot; portrait</span>
       <div class="v2-about-grid">
         <div class="v2-portrait"><img src="/images/v2/portrait-feather.png" alt="Greg Toler" width="1030" height="896" loading="lazy" decoding="async" /></div>
         <div>
@@ -66,7 +65,6 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
 
     <section class="v2-wrap v2-sec v2-about-b" id="about-b" aria-label="About (alternate)">
       <img class="v2-atmos" src="/images/v2/portrait-atmos.png" alt="" aria-hidden="true" width="793" height="448" loading="lazy" decoding="async" />
-      <span class="v2-mono v2-optlabel">Option B &middot; atmosphere</span>
       <div class="v2-about2">
         <div>
           <span class="v2-mono v2-aidx">About</span>
@@ -82,9 +80,9 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
           </div>
         </div>
         <dl class="v2-astats">
-          <div><dd>10+</dd><dt class="v2-mono">Years</dt></div>
-          <div><dd>40+</dd><dt class="v2-mono">Projects</dt></div>
-          <div><dd>12</dd><dt class="v2-mono">Tools built</dt></div>
+          <div><dd>12+</dd><dt class="v2-mono">Years building systems</dt></div>
+          <div><dd>50+</dd><dt class="v2-mono">Completed projects</dt></div>
+          <div><dd>15+</dd><dt class="v2-mono">Tools &amp; agents built</dt></div>
         </dl>
       </div>
     </section>
@@ -210,6 +208,32 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       <ContactIntake />
     </section>
   </main>
+
+  <footer class="v2-foot" aria-label="Site footer">
+    <div class="v2-wrap v2-foot-in">
+      <div class="v2-foot-brand">
+        <GTMark height={26} />
+        <p class="v2-foot-tag">Strategy and execution across go-to-market and operations.</p>
+        <a class="v2-foot-mail" href="mailto:greg@gregtoler.com">greg@gregtoler.com</a>
+      </div>
+      <nav class="v2-foot-nav" aria-label="Footer">
+        <a href="#framework">Framework</a>
+        <a href="#about">About</a>
+        <a href="#approach">Approach</a>
+        <a href="#work">Work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <nav class="v2-foot-nav" aria-label="Legal">
+        <a href="/v2/privacy">Privacy Policy</a>
+        <a href="/v2/terms">Terms of Use</a>
+        <a href="https://linkedin.com/in/gregtoler" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </nav>
+    </div>
+    <div class="v2-wrap v2-foot-base">
+      <span class="v2-mono">&copy; {new Date().getFullYear()} GT Strategies &middot; Greg Toler</span>
+      <span class="v2-mono">Yes, I built this website.</span>
+    </div>
+  </footer>
 </V2Layout>
 
 <style>
@@ -278,7 +302,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
        the bottom; box centred on the rail column (x=30) */
     .v2-linkedin {
       position: fixed;
-      left: calc(var(--v2-rail) / 2 - 17px);
+      left: calc(var(--v2-rail-x) + var(--v2-rail-w) / 2 - 17px);
       bottom: calc(24px + env(safe-area-inset-bottom, 0px));
       z-index: 70;
       padding: 7px;
@@ -304,6 +328,10 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   /* …but the MAIN section boundaries breathe more (Greg): About+brands stay one unit,
      with real distance before Approach, before Work, and before Contact. */
   #approach.v2-sec { padding-top: 128px; }
+  /* HORIZONTAL-SCROLL FIX: the Option B atmosphere portrait is a fixed-width image
+     behind the text; below ~890px it bled past the viewport and scrolled the whole
+     page sideways. Clip it to its own section (art direction preserved, bleed gone). */
+  .v2-about-b { overflow: hidden; }
   #work.v2-sec { padding-top: 128px; }
   #contact.v2-sec { padding-top: 128px; }
   /* Sections sit in the framework's centred column (--v2-measure, 880px), not the full
@@ -436,7 +464,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
 
   /* ---------- 05 proof ---------- */
   .v2-proof { text-align: center; }
-  .v2-proof .lbl { margin-bottom: 28px; }
+  .v2-proof .lbl { color: var(--v2-light); margin-bottom: 26px; }   /* accent, like every section index */
   .v2-logoscroll { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
   .v2-logotrack { display: flex; width: max-content; animation: v2marquee 42s linear infinite; }
   .v2-logoscroll:hover .v2-logotrack { animation-play-state: paused; }
@@ -501,7 +529,8 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   /* --- portrait review (temporary: two About variants stacked) --- */
   /* 1:1 with v2/build/prototypes/portrait-options.html options 02 and 03 — own classes,
      deliberately NOT .v2-sec-head (that centres and underlines; the mockups are left-set) */
-  .v2-optlabel { display: block; color: var(--v2-light); opacity: .7; margin-bottom: 40px; }
+  /* review: the two About variants sit further apart so each reads on its own */
+  .v2-about-b { margin-top: 120px; }
   .v2-aidx { color: var(--v2-light); display: block; margin-bottom: 10px; }
   .v2-ah2 {
     font-family: var(--v2-display); font-weight: 600; font-size: 2.7rem; line-height: 1.1;
@@ -518,18 +547,18 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   }
   .v2-about-b > :not(.v2-atmos) { position: relative; z-index: 1; }
   .v2-about-b .v2-ah2, .v2-about-b .v2-astats dd { text-shadow: 0 0 18px var(--v2-base), 0 0 6px var(--v2-base); }
-  .v2-about2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr); gap: 64px; align-items: center; }
+  .v2-about2 { display: grid; grid-template-columns: 3fr 2fr; gap: 64px; align-items: center; }   /* 60/40 */
   /* stacked: three readouts, centred both ways against the bio column */
-  .v2-astats { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; margin: 0; padding: 0; text-align: center; }
-  .v2-astats > div { display: flex; flex-direction: column; align-items: center; }
-  .v2-astats dd { font-family: var(--v2-display); font-weight: 600; font-size: 1.7rem; margin: 0; color: var(--v2-ink); }
+  .v2-astats { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 22px; margin: 0; padding: 0 0 0 56px; text-align: left; }   /* inset pushes the stats right without narrowing the bio */
+  .v2-astats > div { display: flex; flex-direction: column; align-items: flex-start; }
+  .v2-astats dd { font-family: var(--v2-display); font-weight: 600; font-size: 1.7rem; margin: 0; color: var(--v2-light); }   /* accent on the numbers only */
   .v2-astats dt { color: var(--v2-ink-faint); margin-top: 4px; }
   @media (max-width: 860px) {
     .v2-about-a .v2-about-grid, .v2-about2 { grid-template-columns: 1fr; gap: 0; }
     .v2-about-a .v2-portrait img { width: 120%; margin: -40px 0 -30px -14%; }
     .v2-ah2, .v2-about-a .v2-ah2 { font-size: 1.9rem; }
     .v2-about-b .v2-atmos { width: 640px; opacity: .4; }
-    .v2-astats { flex-direction: row; justify-content: flex-start; gap: 34px; margin-top: 20px; text-align: left; }
+    .v2-astats { flex-direction: row; justify-content: flex-start; gap: 34px; margin-top: 20px; padding-left: 0; text-align: left; }
     .v2-astats > div { align-items: flex-start; }
   }
 
@@ -553,6 +582,33 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
 
   /* ---------- 08 contact ---------- */
   #contact .v2-sec-head { margin-bottom: 34px; }
+
+  /* ---------- footer ---------- */
+  .v2-foot { border-top: 1px solid var(--v2-line); margin-top: 40px; padding: 64px 0 28px; }
+  .v2-foot-in {
+    max-width: var(--v2-measure);
+    display: grid; grid-template-columns: minmax(0, 1.6fr) auto auto; gap: 48px 72px; align-items: start;
+  }
+  .v2-foot-brand { opacity: .9; }
+  .v2-foot-brand :global(.v2-gtmark) { opacity: .72; }
+  .v2-foot-tag { color: var(--v2-ink-dim); font-size: 14px; margin: 16px 0 10px; max-width: 34ch; }
+  .v2-foot-mail { font-family: var(--v2-mono); font-size: 11px; letter-spacing: .1em; color: var(--v2-light); }
+  .v2-foot-nav { display: flex; flex-direction: column; gap: 12px; }
+  .v2-foot-nav a {
+    font-family: var(--v2-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--v2-ink-dim); transition: color .25s var(--v2-ease-out);
+  }
+  .v2-foot-nav a:hover { color: var(--v2-ink); }
+  .v2-foot-base {
+    max-width: var(--v2-measure);
+    display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    border-top: 1px solid var(--v2-line-soft); margin-top: 48px; padding-top: 22px;
+  }
+  @media (max-width: 768px) {
+    .v2-foot { padding: 48px 0 calc(24px + 60px); }   /* clears the rail's LinkedIn foot */
+    .v2-foot-in { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .v2-foot-brand { grid-column: 1 / -1; }
+  }
 
   /* ---------- sections 02–08 on phones — V1's density: single column, tighter rows ---------- */
   @media (max-width: 768px) {
