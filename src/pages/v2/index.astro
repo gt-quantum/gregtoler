@@ -138,7 +138,15 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       <!-- Approach as a FLOWCHART — Greg thinks in Lucid: boxes, connectors,
            arrows, decision points. This section IS a decision tree, so it's drawn
            as one: entry diamond → three branches → converge toward contact. -->
-      <div class="v2-flow">
+      <div class="v2-flow" id="v2-flow">
+        <!-- the whole diagram is ONE drawn path, computed from the boxes' real positions
+             (desktop: branches; phone: trunk). Draws in on scroll; a signal travels it. -->
+        <svg class="v2-flowsvg" aria-hidden="true">
+          <path class="fpath" d=""/>
+          <path class="fheads" d=""/>
+          <circle class="fsig" r="2.5"/>
+          <circle class="fsig two" r="2.5"/>
+        </svg>
         <div class="v2-fentry">
           <span class="fdiamond" aria-hidden="true"></span>
           <span class="v2-mono fentry-lab">Something's off</span>
@@ -191,9 +199,9 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
         <h2>Selected work</h2>
       </header>
       <ul class="v2-workrows">
-        <li class="v2-workrow"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">GTM &middot; Strategy</span></li>
-        <li class="v2-workrow"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">Ops &middot; Execution</span></li>
-        <li class="v2-workrow"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">Ops &middot; Strategy + Execution</span></li>
+        <li class="v2-workrow" style="--i:0"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">GTM &middot; Strategy</span></li>
+        <li class="v2-workrow" style="--i:1"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">Ops &middot; Execution</span></li>
+        <li class="v2-workrow" style="--i:2"><span class="wdot" aria-hidden="true"></span><span class="wtitle">[Placeholder &mdash; real case study]</span><span class="v2-mono wcoord">Ops &middot; Strategy + Execution</span></li>
       </ul>
       <p class="v2-worknote">Case studies are being written &mdash; each will plot back onto the map above.</p>
     </section>
@@ -446,6 +454,71 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
     border-top: 6px solid var(--v2-light); opacity: .8;
   }
 
+  /* ---------- approach + work: MOTION. One drawn path, boxes arrive as it reaches
+     them, a signal runs the route (the seam's grammar: draw, carry light, arrive). ---------- */
+  .v2-flowsvg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 2; }
+  .v2-flowsvg .fpath {
+    fill: none; stroke: var(--v2-light); stroke-width: 1; opacity: .6;
+    filter: drop-shadow(0 0 5px var(--v2-light-soft));
+    stroke-dasharray: var(--len, 1); stroke-dashoffset: var(--len, 1);
+  }
+  .v2-flow.is-in .fpath { transition: stroke-dashoffset 2.2s var(--v2-ease-out); stroke-dashoffset: 0; }
+  .v2-flowsvg .fheads { fill: var(--v2-light); opacity: 0; transition: opacity .5s var(--v2-ease-out) 1.6s; }
+  .v2-flow.is-in .fheads { opacity: .85; }
+  .v2-flowsvg .fsig {
+    fill: var(--v2-light); opacity: 0;
+    filter: drop-shadow(0 0 4px var(--v2-light)) drop-shadow(0 0 10px var(--v2-light-soft));
+    offset-path: var(--route); offset-rotate: 0deg;
+  }
+  .v2-flow.is-in .fsig { animation: v2signal 7s linear 2.4s infinite; }
+  .v2-flow.is-in .fsig.two { animation-delay: 5.9s; }
+  @keyframes v2signal {
+    0% { offset-distance: 0%; opacity: 0; } 4% { opacity: 1; } 96% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; }
+  }
+  /* the old CSS connectors only hold space now — the SVG draws the lines */
+  .v2-fbranch .riser, .v2-fbranch .rail, .v2-beat .fdrop, .v2-fmerge .rail, .v2-fmerge .drop { opacity: 0 !important; }
+  .v2-beat .fdrop::after, .v2-fmerge .drop::after { display: none; }
+  /* boxes arrive as the line reaches them */
+  .v2-flow.is-ready .v2-beat { opacity: 0; transform: translateY(14px); }
+  .v2-flow.is-in .v2-beat {
+    opacity: 1; transform: none;
+    transition: opacity .8s var(--v2-ease-out), transform .9s var(--v2-ease-out), border-color .35s var(--v2-ease-out);
+    transition-delay: calc(.55s + var(--i, 0) * .35s);
+  }
+  .v2-flow.is-in .v2-beat:hover { transform: translateY(-3px); transition-delay: 0s; }
+  .v2-flow.is-ready .v2-fentry { opacity: 0; transition: opacity .6s var(--v2-ease-out); }
+  .v2-flow.is-in .v2-fentry { opacity: 1; }
+
+  /* work rows: hairlines draw in sequence, the plot-dot lights when the line reaches it */
+  .v2-workrows.is-ready .v2-workrow { border-bottom-color: transparent; }
+  .v2-workrow::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+    background: var(--v2-line); transform: scaleX(0); transform-origin: left center;
+  }
+  .v2-workrow { position: relative; }
+  .v2-workrows.is-ready .v2-workrow .wtitle, .v2-workrows.is-ready .v2-workrow .wcoord { opacity: 0; transform: translateX(-8px); }
+  .v2-workrows.is-ready .v2-workrow .wdot { opacity: 0; transform: scale(.4); }
+  .v2-workrows.is-in .v2-workrow::after { transform: scaleX(1); transition: transform 1.1s var(--v2-ease-out) calc(var(--i, 0) * .28s); }
+  .v2-workrows.is-in .v2-workrow .wtitle, .v2-workrows.is-in .v2-workrow .wcoord {
+    opacity: 1; transform: none; transition: opacity .7s var(--v2-ease-out), transform .7s var(--v2-ease-out);
+    transition-delay: calc(.25s + var(--i, 0) * .28s);
+  }
+  .v2-workrows.is-in .v2-workrow .wdot {
+    opacity: 1; transform: none; transition: opacity .4s var(--v2-ease-out), transform .6s var(--v2-ease-out);
+    transition-delay: calc(.15s + var(--i, 0) * .28s);
+  }
+  .v2-workrow:hover .wdot { animation: v2pulse 1.6s var(--v2-ease-io) infinite; }
+  @keyframes v2pulse {
+    0%, 100% { box-shadow: 0 0 0 2px var(--v2-light-soft), 0 0 10px 2px var(--v2-light); }
+    50% { box-shadow: 0 0 0 5px var(--v2-light-soft), 0 0 18px 5px var(--v2-light); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .v2-flow.is-ready .v2-beat, .v2-flow.is-ready .v2-fentry { opacity: 1; transform: none; }
+    .v2-flowsvg .fpath { stroke-dashoffset: 0; } .v2-flowsvg .fheads { opacity: .85; } .v2-flowsvg .fsig { display: none; }
+    .v2-workrows.is-ready .v2-workrow * { opacity: 1 !important; transform: none !important; }
+    .v2-workrow::after { transform: scaleX(1); }
+  }
+
   /* ---------- 04 slim CTA band: centred, like the hero's scroll cue ---------- */
   .v2-ctaband {
     display: flex; flex-direction: column; align-items: center; gap: 16px;
@@ -587,7 +660,9 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   #contact .v2-sec-head { margin-bottom: 34px; }
 
   /* ---------- footer ---------- */
-  .v2-foot { border-top: 1px solid var(--v2-line); margin-top: 40px; padding: 64px 0 28px; }
+  /* no top rule — a full-bleed hairline over the drifting silk read as a stray
+     dark/light line above the footer (Greg). The spacing alone does the separating. */
+  .v2-foot { margin-top: 40px; padding: 64px 0 28px; }
   .v2-foot-in {
     max-width: var(--v2-measure);
     display: grid; grid-template-columns: minmax(0, 1.6fr) auto auto; gap: 48px 72px; align-items: start;
@@ -631,10 +706,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       grid-template-columns: 1fr; gap: 22px;
       position: relative; padding: 30px 0 0 38px; margin-top: 0;
     }
-    .v2-beats::before {                                          /* the trunk */
-      content: ""; position: absolute; left: var(--trunk); top: -4px; bottom: -10px; width: 1px;
-      background: var(--v2-light); opacity: .55; box-shadow: 0 0 6px 0 var(--v2-light-soft);
-    }
+
     .v2-beat { text-align: left; padding: 22px 18px 20px; }
     .v2-beat:hover { transform: none; }
     .v2-beat .fdrop {                                            /* OUT: trunk → box, arrow in */
@@ -650,10 +722,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent;
       border-left: 6px solid var(--v2-light); border-right: 0;
     }
-    .v2-beat::after {                                            /* IN: box → trunk return line */
-      content: ""; position: absolute; right: 100%; bottom: 22px; width: 30px; height: 1px;
-      background: var(--v2-light); opacity: .35;
-    }
+
     .v2-fmerge { max-width: none; height: 44px; margin: 0; }
     .v2-fmerge .rail { display: none; }
     .v2-fmerge .drop { left: var(--trunk); top: 0; height: 34px; transform: none; }
@@ -683,6 +752,76 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
 </style>
 
 <script>
+  // ---- Approach: one path through the real boxes; Work: staged reveal ----
+  (() => {
+    const flow = document.getElementById("v2-flow");
+    if (flow) {
+      const svg = flow.querySelector<SVGSVGElement>(".v2-flowsvg")!;
+      const path = svg.querySelector<SVGPathElement>(".fpath")!;
+      const heads = svg.querySelector<SVGPathElement>(".fheads")!;
+      const sigs = Array.from(svg.querySelectorAll<SVGCircleElement>(".fsig"));
+      const diamond = flow.querySelector<HTMLElement>(".fdiamond")!;
+      const beats = Array.from(flow.querySelectorAll<HTMLElement>(".v2-beat"));
+      const branch = flow.querySelector<HTMLElement>(".v2-fbranch")!;
+      const merge = flow.querySelector<HTMLElement>(".v2-fmerge")!;
+      beats.forEach((b, i) => b.style.setProperty("--i", String(i)));
+
+      const tri = (x: number, y: number, dir: "down" | "right") =>
+        dir === "down" ? `M${x - 3.5} ${y - 6}L${x + 3.5} ${y - 6}L${x} ${y}Z` : `M${x - 6} ${y - 3.5}L${x - 6} ${y + 3.5}L${x} ${y}Z`;
+
+      function build() {
+        const fr = flow!.getBoundingClientRect();
+        const rel = (r: DOMRect) => ({ l: r.left - fr.left, t: r.top - fr.top, r: r.right - fr.left, b: r.bottom - fr.top, cx: r.left - fr.left + r.width / 2, cy: r.top - fr.top + r.height / 2 });
+        const d = rel(diamond.getBoundingClientRect());
+        const bs = beats.map((b) => rel(b.getBoundingClientRect()));
+        const mr = rel(merge.getBoundingClientRect());
+        const phone = window.matchMedia("(max-width: 768px)").matches;
+        let main = "", route = "", hd = "";
+
+        if (!phone) {
+          const br = rel(branch.getBoundingClientRect());
+          const railY = br.t + 24, mergeY = mr.t + 26, endY = mr.b - 4;
+          const x0 = bs[0].cx, x2 = bs[bs.length - 1].cx, xm = bs[Math.floor(bs.length / 2)].cx;
+          main += `M${d.cx} ${d.b + 2}V${railY}M${x0} ${railY}H${x2}`;
+          bs.forEach((b) => { main += `M${b.cx} ${railY}V${b.t - 6}`; hd += tri(b.cx, b.t, "down"); });
+          bs.forEach((b) => { main += `M${b.cx} ${b.b}V${mergeY}`; });
+          main += `M${x0} ${mergeY}H${x2}M${xm} ${mergeY}V${endY - 6}`; hd += tri(xm, endY, "down");
+          route = `M${d.cx} ${d.b + 2}V${railY}H${xm}V${bs[1]?.t ?? bs[0].t}M${xm} ${bs[1]?.b ?? bs[0].b}V${endY - 6}`;
+        } else {
+          const tx = d.cx, endY = mr.b - 4;
+          main += `M${tx} ${d.b + 2}V${endY - 6}`; hd += tri(tx, endY, "down");
+          bs.forEach((b) => {
+            main += `M${tx} ${b.t + 30}H${b.l - 6}M${b.l} ${b.b - 22}H${tx}`;
+            hd += tri(b.l, b.t + 30, "right");
+          });
+          route = `M${tx} ${d.b + 2}V${endY - 6}`;
+        }
+        svg.setAttribute("viewBox", `0 0 ${fr.width} ${fr.height}`);
+        path.setAttribute("d", main); heads.setAttribute("d", hd);
+        const len = path.getTotalLength();
+        path.style.setProperty("--len", String(len));
+        sigs.forEach((c) => c.style.setProperty("--route", `path("${route}")`));
+      }
+
+      flow.classList.add("is-ready");
+      build();
+      let t: number | undefined;
+      window.addEventListener("resize", () => { window.clearTimeout(t); t = window.setTimeout(build, 120); });
+      document.fonts?.ready.then(build);
+      new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) { build(); flow!.classList.add("is-in"); }
+      }, { threshold: 0.2 }).observe(flow);
+    }
+
+    const rows = document.querySelector<HTMLElement>(".v2-workrows");
+    if (rows) {
+      rows.classList.add("is-ready");
+      new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) rows.classList.add("is-in");
+      }, { threshold: 0.3 }).observe(rows);
+    }
+  })();
+
   // dark-only: clear any stored day preference so nobody is stuck in the parked theme
   document.documentElement.removeAttribute("data-v2-theme");
   try { localStorage.removeItem("v2-theme"); } catch (e) {}
