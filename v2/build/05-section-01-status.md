@@ -589,3 +589,47 @@ Primitives documented in the CSS comment block for reuse: .fdiamond, .v2-beat bo
   replacing the pass-17 journey diagram while Greg sends it to a reviewer. Do NOT
   restore the journey markup until Greg picks; the journey version lives in git
   history (commit b4d320b) if it returns.
+
+---
+
+# Pass 19 — About A/B for review, portrait asset, intake rebuilt (2026-08-20, late)
+
+- **About = two stacked review variants** (Greg is sending to a reviewer): A portrait-left
+  (`public/images/v2/portrait-feather.png`), B atmosphere-behind + stacked stats
+  (`portrait-atmos.png`). Headline "I build the systems that help businesses run."
+  Journey diagram removed from About (recoverable from b4d320b). Delete the loser +
+  `.v2-optlabel` spans when decided; `id="about"` is on A.
+- **Portrait pipeline** in `v2/build/prototypes/portrait/`: Apple Vision person mask
+  (`segment.swift`), 85% colour on the body, neutral-grey halo at 36% with a left→right
+  balance, continuous 80px falloff, rounding anchored on the head (crown solid), bottom
+  fade. `portrait-options.html` = the 13-variant study Greg chose from.
+- **Sections all share `--v2-measure` (880px)** — re-added after a wholesale style
+  rewrite dropped it; Work rows and the intake card lost their own narrower caps.
+- **Intake rebuilt per Greg:** step 1 auto-advances (no Continue); step 2 needs ≥1;
+  step 3 needs ≥40 chars (live counter); step 4 = name*, email*, phone, LinkedIn,
+  "best way to reach you" (email/call/text, optional; call/text asks for a phone);
+  inputs box-sized inside the card; success state reveals an embedded booking calendar.
+  `api/contact.js` now carries phone + LinkedIn to Slack.
+- **NEEDS GREG:** `BOOKING_URL` in `ContactIntake.astro` is empty — paste the Google
+  Calendar appointment-schedule embed URL (Share → Embed, ends `?gv=true`). Until then
+  the calendar block stays hidden and the confirmation copy still shows.
+- **Tech debt (Greg's idea):** gate the calendar on an AI read of the message — show
+  booking only for substantive submissions. Today the gate is form validation only.
+  Sketch: POST the payload to a small endpoint that asks the model for
+  `{qualified: bool, reason}`; render the calendar on `qualified`. Needs an API key in CF
+  env and a fallback that shows the calendar if the call fails.
+
+---
+
+# Pass 19 — page reorder (Greg, 2026-08-20 late)
+
+New narrative order: Hero → Framework → **About** (both A/B review variants, moved up)
+→ **Proof** (logos marquee only — quote placeholders HIDDEN in a comment wrapper until
+real quotes exist) → Approach (flowchart) → CTA band (still the flow's terminator) →
+Selected work → Contact. Logic: who → what → the person → proof attached to the person
+→ how we'd work → examples → act.
+
+Nav reordered to match. Contact section + ContactIntake.astro deliberately untouched —
+another editor is working the form live. (Also fixed self-inflicted: a regex edit
+flattened SpineNav's items array onto its comment line, which blanked the entire nav;
+rebuilt cleanly.)

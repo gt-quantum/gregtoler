@@ -38,6 +38,96 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       <HeroFramework />
     </div>
 
+    <!-- 06 · ABOUT — V1's bio compressed to three short paragraphs; the human texture
+         cut from the plane lives here instead -->
+    <!-- PORTRAIT REVIEW: two treatments stacked (A: feathered portrait left, B: atmosphere
+         behind). Greg is sending this to a reviewer; delete the loser and the
+         .v2-optlabel spans when decided. Assets: public/images/v2/portrait-*.png,
+         made by v2/build/prototypes/portrait/ (Vision segmentation + graded halo). -->
+    <section class="v2-wrap v2-sec v2-about-a" id="about" aria-label="About">
+      <span class="v2-mono v2-optlabel">Option A &middot; portrait</span>
+      <div class="v2-about-grid">
+        <div class="v2-portrait"><img src="/images/v2/portrait-feather.png" alt="Greg Toler" width="1030" height="896" loading="lazy" decoding="async" /></div>
+        <div>
+          <span class="v2-mono v2-aidx">About</span>
+          <h2 class="v2-ah2">I build the systems that help businesses run.</h2>
+          <div class="v2-abio">
+            <p>I started in go-to-market operations &mdash; territory planning, pipeline, tech
+            stacks, the systems and politics of getting marketing and sales working together.
+            The work taught me that most operational problems aren't technology problems.
+            They're design problems.</p>
+            <p>That took me sideways into the operational layer: embedded COO for an agency,
+            productizing service delivery, building AI systems and custom tools that replace
+            expensive software.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="v2-wrap v2-sec v2-about-b" id="about-b" aria-label="About (alternate)">
+      <img class="v2-atmos" src="/images/v2/portrait-atmos.png" alt="" aria-hidden="true" width="793" height="448" loading="lazy" decoding="async" />
+      <span class="v2-mono v2-optlabel">Option B &middot; atmosphere</span>
+      <div class="v2-about2">
+        <div>
+          <span class="v2-mono v2-aidx">About</span>
+          <h2 class="v2-ah2">I build the systems that help businesses run.</h2>
+          <div class="v2-abio">
+            <p>I started in go-to-market operations &mdash; territory planning, pipeline, tech
+            stacks, the systems and politics of getting marketing and sales working together.
+            The work taught me that most operational problems aren't technology problems.
+            They're design problems.</p>
+            <p>That took me sideways into the operational layer: embedded COO for an agency,
+            productizing service delivery, building AI systems and custom tools that replace
+            expensive software.</p>
+          </div>
+        </div>
+        <dl class="v2-astats">
+          <div><dd>10+</dd><dt class="v2-mono">Years</dt></div>
+          <div><dd>40+</dd><dt class="v2-mono">Projects</dt></div>
+          <div><dd>12</dd><dt class="v2-mono">Tools built</dt></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- 05 · PROOF — monochrome logo scroll (real brands, from V1) + quote placeholders -->
+    <section class="v2-wrap v2-sec v2-proof" aria-label="Proof">
+      <p class="v2-mono lbl">Brands I've worked with</p>
+      <div class="v2-logoscroll" aria-hidden="false">
+        <div class="v2-logotrack">
+          {[0,1].map((dup) => (
+            <div class="v2-logoset" aria-hidden={dup === 1 ? "true" : undefined}>
+              <img src="/images/brands/state-farm.svg" alt={dup ? "" : "State Farm"} />
+              <img src="/images/brands/siemens.svg" alt={dup ? "" : "Siemens"} class="sm" />
+              <img src="/images/brands/BambooHR_logo.svg.png" alt={dup ? "" : "BambooHR"} />
+              <img src="/images/brands/certifid.svg" alt={dup ? "" : "CertifID"} />
+              <img src="/images/brands/nrev.svg" alt={dup ? "" : "nrev.ai"} />
+              <img src="/images/brands/medix.svg" alt={dup ? "" : "Medix"} />
+              <img src="/images/brands/sayers.svg" alt={dup ? "" : "Sayers"} />
+              <span class="v2-logotext">CRC Group</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- quotes: PLACEHOLDERS, deliberately obvious — real quotes come from Greg.
+           Never invent plausible praise (CLAUDE.md: don't invent proof). -->
+      <!-- QUOTES HIDDEN (Greg, reorder pass): placeholders parked until real
+           quotes exist. Unhide by removing this comment wrapper.
+            <div class="v2-quotes">
+        <figure class="v2-quote">
+          <span class="qhalo" aria-hidden="true"></span>
+          <blockquote>[Quote placeholder &mdash; Greg supplies a real client quote]</blockquote>
+          <figcaption class="v2-mono">[Name &middot; Role, Company]</figcaption>
+        </figure>
+        <figure class="v2-quote">
+          <span class="qhalo" aria-hidden="true"></span>
+          <blockquote>[Quote placeholder &mdash; Greg supplies a real client quote]</blockquote>
+          <figcaption class="v2-mono">[Name &middot; Role, Company]</figcaption>
+        </figure>
+      </div>
+      -->
+    </section>
+
     <!-- 03 · APPROACH — how I do it. Three beats, not boxes (brief rule).
          Copy = V1's pillar taglines, one line each (lines-not-paragraphs rule).
          Each beat carries a case-slot comment for embedded case links later, and a
@@ -92,84 +182,8 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
       <a class="v2-band-link" href="#contact">Tell me what's going on &rarr;</a>
     </section>
 
-    <!-- 05 · PROOF — monochrome logo scroll (real brands, from V1) + quote placeholders -->
-    <section class="v2-wrap v2-sec v2-proof" aria-label="Proof">
-      <p class="v2-mono lbl">Brands I've worked with</p>
-      <div class="v2-logoscroll" aria-hidden="false">
-        <div class="v2-logotrack">
-          {[0,1].map((dup) => (
-            <div class="v2-logoset" aria-hidden={dup === 1 ? "true" : undefined}>
-              <img src="/images/brands/state-farm.svg" alt={dup ? "" : "State Farm"} />
-              <img src="/images/brands/siemens.svg" alt={dup ? "" : "Siemens"} class="sm" />
-              <img src="/images/brands/BambooHR_logo.svg.png" alt={dup ? "" : "BambooHR"} />
-              <img src="/images/brands/certifid.svg" alt={dup ? "" : "CertifID"} />
-              <img src="/images/brands/nrev.svg" alt={dup ? "" : "nrev.ai"} />
-              <img src="/images/brands/medix.svg" alt={dup ? "" : "Medix"} />
-              <img src="/images/brands/sayers.svg" alt={dup ? "" : "Sayers"} />
-              <span class="v2-logotext">CRC Group</span>
-            </div>
-          ))}
-        </div>
-      </div>
 
-      <!-- quotes: PLACEHOLDERS, deliberately obvious — real quotes come from Greg.
-           Never invent plausible praise (CLAUDE.md: don't invent proof). -->
-      <div class="v2-quotes">
-        <figure class="v2-quote">
-          <span class="qhalo" aria-hidden="true"></span>
-          <blockquote>[Quote placeholder &mdash; Greg supplies a real client quote]</blockquote>
-          <figcaption class="v2-mono">[Name &middot; Role, Company]</figcaption>
-        </figure>
-        <figure class="v2-quote">
-          <span class="qhalo" aria-hidden="true"></span>
-          <blockquote>[Quote placeholder &mdash; Greg supplies a real client quote]</blockquote>
-          <figcaption class="v2-mono">[Name &middot; Role, Company]</figcaption>
-        </figure>
-      </div>
-    </section>
 
-    <!-- 06 · ABOUT — V1's bio compressed to three short paragraphs; the human texture
-         cut from the plane lives here instead -->
-    <section class="v2-wrap v2-sec" id="about" aria-label="About">
-      <header class="v2-sec-head">
-        <span class="v2-mono idx">About</span>
-        <h2>I build the systems that make businesses run.</h2>
-      </header>
-      <div class="v2-about">
-        <!-- the bio, DRAWN instead of told: the career is a traverse of the plane's
-             X axis, so it renders as one — three waypoints on the same glowing line.
-             One line of prose survives (the worldview line). -->
-        <div class="v2-journey" aria-label="Career: from go-to-market into operations">
-          <div class="v2-jline" aria-hidden="true"></div>
-          <div class="v2-jstops">
-            <div class="v2-jstop">
-              <span class="jdot" aria-hidden="true"></span>
-              <span class="v2-mono jlab">Go-to-market ops</span>
-              <span class="jdesc">Territory &middot; pipeline &middot; tech stacks</span>
-            </div>
-            <div class="v2-jstop">
-              <span class="jdot" aria-hidden="true"></span>
-              <span class="v2-mono jlab">Embedded operator</span>
-              <span class="jdesc">COO work &middot; productized delivery</span>
-            </div>
-            <div class="v2-jstop">
-              <span class="jdot" aria-hidden="true"></span>
-              <span class="v2-mono jlab">Builder</span>
-              <span class="jdesc">AI systems &middot; custom tools</span>
-            </div>
-          </div>
-        </div>
-        <p class="v2-about-line">Most operational problems aren't technology problems.
-        <em>They're design problems.</em></p>
-        <!-- stats as coordinate readouts, focus areas as one mono line — plane grammar -->
-        <dl class="v2-stats">
-          <div><dd>10+</dd><dt class="v2-mono">Years</dt></div>
-          <div><dd>40+</dd><dt class="v2-mono">Projects</dt></div>
-          <div><dd>12</dd><dt class="v2-mono">Tools built</dt></div>
-        </dl>
-        <p class="v2-focusline v2-mono">Operations &amp; process design &middot; AI &amp; automation &middot; GTM strategy &middot; Custom tools &amp; systems</p>
-      </div>
-    </section>
 
     <!-- 07 · WORK — "more examples" index. Thin BY DESIGN until real case studies
          exist (they may end up embedded in Approach instead — decisions pending). -->
@@ -280,6 +294,10 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   /* ---------- shared section chrome — the hero/framework's own grammar:
        centred compositions, a glowing seam-rule, mono coordinates ---------- */
   .v2-sec { padding-top: 120px; padding-bottom: 120px; }
+  /* Sections sit in the framework's centred column (--v2-measure, 880px), not the full
+     1440 wrap — the hero/plane are ~800px centred and Greg wants the rest to match.
+     .v2-wrap is content-box, so its 32px side padding sits outside this. KEEP. */
+  .v2-sec, .v2-ctaband { max-width: var(--v2-measure); }
   .v2-sec-head { margin-bottom: 56px; text-align: center; }
   .v2-sec-head .idx { color: var(--v2-light); display: block; margin-bottom: 12px; }
   .v2-sec-head h2 {
@@ -468,8 +486,43 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   .v2-stats dt { color: var(--v2-ink-faint); }
   .v2-focusline { color: var(--v2-ink-faint); letter-spacing: .14em; margin: 0; }
 
+  /* --- portrait review (temporary: two About variants stacked) --- */
+  /* 1:1 with v2/build/prototypes/portrait-options.html options 02 and 03 — own classes,
+     deliberately NOT .v2-sec-head (that centres and underlines; the mockups are left-set) */
+  .v2-optlabel { display: block; color: var(--v2-light); opacity: .7; margin-bottom: 40px; }
+  .v2-aidx { color: var(--v2-light); display: block; margin-bottom: 10px; }
+  .v2-ah2 {
+    font-family: var(--v2-display); font-weight: 600; font-size: 2.7rem; line-height: 1.1;
+    margin: 0 0 44px; max-width: 24ch; color: var(--v2-ink); text-align: left;
+  }
+  .v2-abio p { color: var(--v2-ink-dim); font-size: 15.5px; line-height: 1.7; margin: 0 0 18px; max-width: 58ch; }
+  .v2-about-a .v2-about-grid { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 36px; align-items: center; }
+  .v2-about-a .v2-portrait img { display: block; width: 560px; max-width: none; height: auto; margin: -70px 0 -80px -150px; opacity: .94; }
+  .v2-about-a .v2-ah2 { font-size: 2.3rem; }
+  .v2-about-b { position: relative; }
+  .v2-about-b .v2-atmos {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -52%);
+    width: 1200px; max-width: none; height: auto; opacity: .55; pointer-events: none; z-index: 0;
+  }
+  .v2-about-b > :not(.v2-atmos) { position: relative; z-index: 1; }
+  .v2-about-b .v2-ah2, .v2-about-b .v2-astats dd { text-shadow: 0 0 18px var(--v2-base), 0 0 6px var(--v2-base); }
+  .v2-about2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr); gap: 64px; align-items: center; }
+  /* stacked: three readouts, centred both ways against the bio column */
+  .v2-astats { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; margin: 0; padding: 0; text-align: center; }
+  .v2-astats > div { display: flex; flex-direction: column; align-items: center; }
+  .v2-astats dd { font-family: var(--v2-display); font-weight: 600; font-size: 1.7rem; margin: 0; color: var(--v2-ink); }
+  .v2-astats dt { color: var(--v2-ink-faint); margin-top: 4px; }
+  @media (max-width: 860px) {
+    .v2-about-a .v2-about-grid, .v2-about2 { grid-template-columns: 1fr; gap: 0; }
+    .v2-about-a .v2-portrait img { width: 120%; margin: -40px 0 -30px -14%; }
+    .v2-ah2, .v2-about-a .v2-ah2 { font-size: 1.9rem; }
+    .v2-about-b .v2-atmos { width: 640px; opacity: .4; }
+    .v2-astats { flex-direction: row; justify-content: flex-start; gap: 34px; margin-top: 20px; text-align: left; }
+    .v2-astats > div { align-items: flex-start; }
+  }
+
   /* ---------- 07 work: rows carry the plane's plot-dot ---------- */
-  .v2-workrows { list-style: none; margin: 0 auto; padding: 0; max-width: 720px; border-top: 1px solid var(--v2-line); }
+  .v2-workrows { list-style: none; margin: 0 auto; padding: 0; border-top: 1px solid var(--v2-line); }   /* full section measure, like every other row */
   .v2-workrow {
     display: flex; align-items: baseline; gap: 18px;
     padding: 22px 6px; border-bottom: 1px solid var(--v2-line);
@@ -484,7 +537,7 @@ import ContactIntake from "../../components/v2/ContactIntake.astro";
   }
   .v2-workrow .wtitle { flex: 1; }
   .v2-workrow .wcoord { color: var(--v2-light); opacity: .8; }
-  .v2-worknote { color: var(--v2-ink-faint); font-size: 13px; margin: 18px auto 0; max-width: 720px; text-align: center; }
+  .v2-worknote { color: var(--v2-ink-faint); font-size: 13px; margin: 18px auto 0; text-align: center; }
 
   /* ---------- 08 contact ---------- */
   #contact .v2-sec-head { margin-bottom: 34px; }
