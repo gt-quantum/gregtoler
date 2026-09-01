@@ -1,0 +1,77 @@
+---
+import "../styles/v2-tokens.css";
+import Backdrop from "../components/v2/Backdrop.astro";
+import Cursor from "../components/v2/Cursor.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Greg Toler — Strategy and execution across go-to-market and operations",
+  description = "I diagnose problems at the strategy level, then build the fix myself. Operating across go-to-market and operations, from framing the problem to shipping the system that solves it.",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://gregtoler.com");
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <meta name="robots" content="noindex, nofollow" />
+    <!-- ^ preview route only. Remove at cutover. -->
+
+    <!-- self-hosted fonts, preloaded. No third-party font domain. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/barlow-600.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/hanken-400.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/martian-mono-400.woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- paint the ground before CSS lands, and honour a stored theme with no flash -->
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem("v2-theme");
+          if (t) document.documentElement.setAttribute("data-v2-theme", t);
+        } catch (e) {}
+      })();
+    </script>
+    <style is:inline>
+      html { background: #17181A; }
+      html[data-v2-theme="day"] { background: #E8E8E6; }
+    </style>
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Greg Toler",
+      jobTitle: "Operator and builder",
+      description,
+      url: "https://gregtoler.com",
+      worksFor: { "@type": "ProfessionalService", name: "GT Strategies" },
+      knowsAbout: ["Revenue Operations", "Go-to-market strategy", "Business operations", "Automation", "Systems design"],
+    })} />
+  </head>
+
+  <body class="v2">
+    <Backdrop />
+    <Cursor />
+    <div class="v2-grain" aria-hidden="true"></div>
+    <slot />
+  </body>
+</html>

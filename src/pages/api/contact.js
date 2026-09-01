@@ -1,14 +1,30 @@
-const SLACK_WEBHOOK_URL = import.meta.env.SLACK_WEBHOOK_URL;
+import { isFreeEmail } from '../../lib/free-email-domains.js';
+import { signToken } from '../../lib/qualify-token.js';
 
-export async function POST({ request }) {
+// Without this the route is prerendered as STATIC and POST bodies are dropped
+// ("Unexpected end of JSON input") — the form could never submit.
+export const prerender = false;
+
+export async function POST({ request, locals }) {
+  const SLACK_WEBHOOK_URL = locals?.runtime?.env?.SLACK_WEBHOOK_URL ?? import.meta.env.SLACK_WEBHOOK_URL;
   try {
     const data = await request.json();
-    const { situation, involvement, message, name, email, contactMethod, phone, phoneType, bookingLink } = data;
+    const { situation, involvement, message, name, email, contactMethod, phone, phoneType, bookingLink, linkedin, source } = data;
+
+    // V2 intake requires a work address (the form blocks free mailboxes; re-checked here)
+    if (source === 'v2' && isFreeEmail(email)) {
+      return new Response(JSON.stringify({ error: 'work_email_required' }), {
+        status: 422,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     // Build contact method detail
     let contactDetail = contactMethod;
     if (contactMethod === 'phone' && phone) {
       contactDetail = `Phone (${phoneType || 'call'}): ${phone}`;
+    } else if (contactMethod === 'linkedin') {
+      contactDetail = `LinkedIn: ${linkedin || '(no URL given)'}`;
     } else if (contactMethod === 'video') {
       contactDetail = bookingLink ? `Video Call — their link: ${bookingLink}` : 'Video Call — use your calendar';
     } else {
@@ -39,6 +55,13 @@ export async function POST({ request }) {
             { type: 'mrkdwn', text: `*Contact Method:*\n${contactDetail}` },
           ],
         },
+        ...(phone || linkedin ? [{
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Phone:*\n${phone || '—'}` },
+            { type: 'mrkdwn', text: `*LinkedIn:*\n${linkedin || '—'}` },
+          ],
+        }] : []),
         {
           type: 'section',
           text: {
@@ -82,7 +105,11 @@ export async function POST({ request }) {
       });
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
+    // V2: hand back a short-lived proof-of-submission token so /api/qualify will
+    // run — it refuses calls that don't carry one (keeps the model key un-abusable)
+    const qualifySecret = locals?.runtime?.env?.QUALIFY_SECRET ?? import.meta.env.QUALIFY_SECRET;
+    const token = source === 'v2' ? await signToken(qualifySecret, email) : null;
+    return new Response(JSON.stringify({ ok: true, ...(token ? { token } : {}) }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

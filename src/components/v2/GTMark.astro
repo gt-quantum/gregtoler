@@ -1,0 +1,50 @@
+---
+/**
+ * The actual GT Strategies logo — public/logo.png, unmodified.
+ *
+ * Two earlier attempts here were wrong, both caught by Greg:
+ *   1. public/favicon.svg is a bad trace — its path is missing the T's crossbar, so it
+ *      renders as "GI".
+ *   2. Re-tracing logo.png with potrace RECREATED the logo instead of using it: the
+ *      counters in "a", "e" and "g" filled in solid and the GT strokes came out thicker
+ *      than the original.
+ *
+ * So use the real asset and recolour it with a filter — exactly what V1 does in
+ * src/components/layout/FluidSpineMenu.jsx. The artwork is never redrawn, only tinted.
+ * Replace this with a vector only if a genuine .svg source turns up.
+ */
+interface Props {
+  height?: number;
+  class?: string;
+}
+const { height = 28, class: className = "" } = Astro.props;
+
+// intrinsic size of public/logo.png — both set, so the box never shifts on load
+const NAT_W = 823;
+const NAT_H = 249;
+const width = Math.round(height * (NAT_W / NAT_H));
+---
+
+<img
+  class={`v2-gtmark ${className}`}
+  src="/logo.png"
+  alt="GT Strategies"
+  width={width}
+  height={height}
+  decoding="async"
+/>
+
+<style>
+  .v2-gtmark {
+    display: block; flex: none;
+    height: auto;
+    object-fit: contain;
+    /* brightness(0) flattens the artwork to black; invert() lifts it toward white.
+       V1's exact technique. Kept to two steps — longer chains proved unpredictable. */
+    filter: brightness(0) invert(0.92);
+    transition: filter .5s var(--v2-ease-io), opacity .3s var(--v2-ease-out);
+  }
+  :root[data-v2-theme="day"] .v2-gtmark {
+    filter: brightness(0) invert(0.13);
+  }
+</style>
