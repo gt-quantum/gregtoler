@@ -6,11 +6,14 @@ import Cursor from "../components/v2/Cursor.astro";
 interface Props {
   title?: string;
   description?: string;
+  /** Preview routes (/v2) stay hidden from search. The root splash passes `index`. */
+  robots?: string;
 }
 
 const {
   title = "Greg Toler — Strategy and execution across go-to-market and operations",
   description = "I diagnose problems at the strategy level, then build the fix myself. Operating across go-to-market and operations, from framing the problem to shipping the system that solves it.",
+  robots = "noindex, nofollow",
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://gregtoler.com");
@@ -25,8 +28,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://gregtoler.c
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
-    <meta name="robots" content="noindex, nofollow" />
-    <!-- ^ preview route only. Remove at cutover. -->
+    <meta name="robots" content={robots} />
 
     <!-- self-hosted fonts, preloaded. No third-party font domain. -->
     <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/barlow-600.woff2" crossorigin />

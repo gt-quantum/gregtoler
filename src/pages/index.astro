@@ -1,0 +1,204 @@
+---
+/**
+ * gregtoler.com — SPLASH (2026-09-01).
+ *
+ * One viewport, nothing else: the logo, what Greg does, and two ways to reach him.
+ * Replaces the V1 home at `/` (the V1 page is parked, not deleted, at
+ * `src/pages/_v1-home.astro` — the underscore keeps it out of routing). The V1
+ * sub-pages still exist at their old URLs but nothing links to them from here.
+ *
+ * "Work with me" swaps the hero for the V2 conversational intake (same form as
+ * `/v2#contact`, posts to /api/contact → Slack). `#contact` deep-links straight to it.
+ */
+import V2Layout from "../layouts/V2Layout.astro";
+import GTMark from "../components/v2/GTMark.astro";
+import ContactIntake from "../components/v2/ContactIntake.astro";
+
+const LINKEDIN = "https://www.linkedin.com/in/gregtoler";
+---
+
+<V2Layout
+  title="Greg Toler — Go-to-Market and Operations Support"
+  description="GT Strategies. Go-to-market and operations support for growing companies: strategy, systems, and hands-on execution from Greg Toler."
+  robots="index, follow"
+>
+  <a class="v2-skip" href="#main">Skip to content</a>
+
+  <main class="splash" id="main" data-view="hero">
+    <!-- ── the one screen ── -->
+    <section class="splash-hero" id="splash-hero" aria-label="Greg Toler — GT Strategies">
+      <GTMark height={56} class="splash-mark" />
+      <p class="v2-mono splash-eyebrow">Greg Toler &middot; GT Strategies</p>
+      <h1 class="splash-h1">Go-to-Market and Operations&nbsp;Support</h1>
+      <p class="splash-lede">Strategy, systems, and hands-on execution for teams that need it fixed, built, or scaled.</p>
+      <div class="splash-actions">
+        <a class="splash-btn primary" id="splash-work" href="#contact">
+          <span class="node" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+          <span>Work with me</span>
+        </a>
+        <a class="splash-btn ghost" href={LINKEDIN} target="_blank" rel="noopener noreferrer">
+          <span>Connect on LinkedIn</span>
+          <svg class="ext" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- ── the intake, revealed by "Work with me" ── -->
+    <section class="splash-form" id="contact" aria-label="Start a conversation" hidden>
+      <div class="splash-form-head">
+        <button type="button" class="splash-back v2-mono" id="splash-back">&larr; Back</button>
+        <GTMark height={22} />
+      </div>
+      <div class="splash-form-body">
+        <ContactIntake />
+      </div>
+    </section>
+  </main>
+
+  <footer class="splash-foot v2-mono" aria-label="Footer">
+    <span>&copy; {new Date().getFullYear()} GT Strategies</span>
+    <a href="mailto:greg@gregtoler.com">greg@gregtoler.com</a>
+  </footer>
+</V2Layout>
+
+<style>
+  /* ---------- shell: exactly one viewport ---------- */
+  /* body lives in the layout, so this must be :global — scoped it would never match */
+  :global(body.v2) { margin: 0; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+  .splash {
+    flex: 1 1 auto; min-height: 0;
+    display: grid; place-items: center;
+    padding: 24px 32px;
+  }
+  .splash-foot {
+    display: flex; justify-content: space-between; gap: 16px;
+    padding: 0 32px 22px;
+    color: var(--v2-ink-faint);
+  }
+  .splash-foot a:hover { color: var(--v2-ink); }
+
+  /* ---------- hero ---------- */
+  .splash-hero {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    max-width: 780px;
+    opacity: 0; transform: translateY(10px);
+    animation: splash-in .9s var(--v2-ease-out) .1s forwards;
+  }
+  .splash-hero[hidden] { display: none; }   /* display:flex would otherwise beat the attribute */
+  @keyframes splash-in { to { opacity: 1; transform: none; } }
+
+  .splash-hero :global(.splash-mark) { margin-bottom: 40px; }
+  .splash-eyebrow { color: var(--v2-light); margin: 0 0 22px; }
+  .splash-h1 {
+    font-family: var(--v2-display); font-weight: 600;
+    font-size: clamp(2rem, 5.2vw, 4.2rem);
+    line-height: 1.04; letter-spacing: -0.015em;
+    margin: 0; color: var(--v2-ink); max-width: 16ch;
+  }
+  /* the seam: a centred glowing rule, quoted from V2's section heads */
+  .splash-h1::after {
+    content: ""; display: block;
+    width: 140px; height: 1px; margin: 30px auto 0;
+    background: var(--v2-light);
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft);
+  }
+  .splash-lede {
+    font-size: clamp(.98rem, 1.5vw, 1.12rem); line-height: 1.62;
+    color: var(--v2-ink-dim); max-width: 46ch; margin: 26px 0 0;
+  }
+
+  .splash-actions {
+    display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; justify-content: center;
+    margin-top: 44px;
+  }
+  .splash-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--v2-ink); border-radius: 100px; cursor: pointer;
+    transition: border-color .35s var(--v2-ease-out), color .35s var(--v2-ease-out), background .35s var(--v2-ease-out);
+  }
+  .splash-btn.primary {
+    padding: 6px 24px 6px 6px;
+    border: 1px solid var(--v2-line);
+    background: color-mix(in srgb, var(--v2-surface) 85%, transparent);
+  }
+  .splash-btn .node {
+    display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--v2-line); color: var(--v2-light);
+    background: color-mix(in srgb, var(--v2-surface) 85%, transparent);
+    transition: border-color .35s var(--v2-ease-out), box-shadow .35s var(--v2-ease-out);
+  }
+  .splash-btn.primary:hover { border-color: var(--v2-light); }
+  .splash-btn.primary:hover .node {
+    border-color: var(--v2-light);
+    box-shadow: 0 0 0 3px var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft);
+  }
+  .splash-btn.ghost {
+    padding: 14px 6px; color: var(--v2-ink-dim); gap: 8px;
+    border-bottom: 1px solid transparent; border-radius: 0;
+  }
+  .splash-btn.ghost .ext { color: var(--v2-ink-faint); transition: color .35s, transform .35s var(--v2-ease-out); }
+  .splash-btn.ghost:hover { color: var(--v2-ink); border-bottom-color: var(--v2-light); }
+  .splash-btn.ghost:hover .ext { color: var(--v2-light); transform: translate(1px, -1px); }
+
+  /* ---------- form view ---------- */
+  .splash-form { width: 100%; max-width: 720px; display: flex; flex-direction: column; min-height: 0; max-height: calc(100dvh - 120px); }
+  .splash-form[hidden] { display: none; }
+  .splash-form-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .splash-back {
+    background: none; border: 0; padding: 8px 0; cursor: pointer;
+    color: var(--v2-ink-dim); transition: color .3s;
+  }
+  .splash-back:hover { color: var(--v2-ink); }
+  .splash-form-body { min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .splash[data-view="form"] .splash-form { animation: splash-in .6s var(--v2-ease-out) forwards; opacity: 0; }
+
+  /* ---------- small screens ---------- */
+  @media (max-width: 640px) {
+    .splash { padding: 20px 16px; }
+    .splash-foot { padding: 0 16px 16px; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
+    .splash-hero :global(.splash-mark) { margin-bottom: 28px; height: 44px; width: auto; }
+    .splash-actions { flex-direction: column; gap: 10px; margin-top: 34px; }
+    .splash-h1::after { margin-top: 22px; }
+    .splash-lede { margin-top: 20px; }
+  }
+  @media (max-height: 640px) {
+    .splash-hero :global(.splash-mark) { margin-bottom: 22px; }
+    .splash-lede { margin-top: 16px; }
+    .splash-actions { margin-top: 26px; }
+  }
+</style>
+
+<script>
+  (() => {
+    const main = document.getElementById("main")!;
+    const hero = document.getElementById("splash-hero")!;
+    const form = document.getElementById("contact")!;
+    const work = document.getElementById("splash-work")!;
+    const back = document.getElementById("splash-back")!;
+
+    const show = (view: "hero" | "form", push = true) => {
+      main.dataset.view = view;
+      hero.hidden = view === "form";
+      form.hidden = view === "hero";
+      if (push) history.replaceState(null, "", view === "form" ? "#contact" : window.location.pathname);
+      if (view === "form") {
+        const first = form.querySelector<HTMLElement>("input, textarea");
+        first?.focus({ preventScroll: true });
+      } else {
+        work.focus({ preventScroll: true });
+      }
+    };
+
+    work.addEventListener("click", (e) => { e.preventDefault(); show("form"); });
+    back.addEventListener("click", () => show("hero"));
+
+    // deep link: /#contact (and the intake's own ?situation= prefill still works)
+    if (window.location.hash.startsWith("#contact")) show("form", false);
+    window.addEventListener("hashchange", () => {
+      show(window.location.hash.startsWith("#contact") ? "form" : "hero", false);
+    });
+  })();
+</script>
