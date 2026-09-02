@@ -14,13 +14,16 @@ import GTMark from "../components/v2/GTMark.astro";
   robots="index, follow"
 >
   <a class="v2-skip" href="#main">Skip to content</a>
-  <header class="ex-top v2-wrap">
-    <a class="ex-home" href="/" aria-label="gregtoler.com home"><GTMark height={22} /></a>
-    <a class="ex-cta" href="/#contact"><span class="node" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>Work with me</span></a>
+  <header class="ex-nav">
+    <div class="ex-nav-in">
+      <a class="ex-home" href="/" aria-label="gregtoler.com home"><GTMark height={26} /></a>
+      <a class="ex-cta" href="/#contact"><span class="node" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>Work with me</span></a>
+    </div>
   </header>
 
+  <div class="ex-shell">
   <nav class="ex-toc" aria-label="On this page"><p class="v2-mono ex-toc-h">On this page</p><a class="ex-toc-sec" href="#b1">Core marketing ops</a><a class="ex-toc-item" href="#event-requests-into-jira-and-asana">Event requests into Jira and Asana</a><a class="ex-toc-item" href="#marketing-requests-into-revops">Marketing requests into RevOps</a><a class="ex-toc-sec" href="#b2">Marketing ops with automation</a><a class="ex-toc-item" href="#assessment-chatbot-into-marketo-salesforce-and-lemlist">Assessment chatbot into Marketo, Salesforce, and Lemlist</a><a class="ex-toc-item" href="#metabase-product-data-into-hubspot">Metabase product data into HubSpot</a><a class="ex-toc-item" href="#account-health-from-slack">Account health from Slack</a><a class="ex-toc-sec" href="#b3">Marketing ops with AI in the loop</a><a class="ex-toc-item" href="#paid-media-inside-claude">Paid media inside Claude</a><a class="ex-toc-item" href="#content-bot-in-slack">Content bot in Slack</a><a class="ex-toc-item" href="#venue-research-agent-for-customer-events">Venue research agent for customer events</a><a class="ex-toc-item" href="#weekly-competitor-roundup">Weekly competitor roundup</a><a class="ex-toc-item" href="#discovery-calls-into-help-center-and-website-drafts">Discovery calls into help center and website drafts</a><a class="ex-toc-sec" href="#b4">Custom tools</a><a class="ex-toc-item" href="#custom-dashboards-across-systems-that-do-not-report-together">Custom dashboards across systems that do not report together</a><a class="ex-toc-item" href="#account-map">Account map</a><a class="ex-toc-item" href="#research-agents-for-a-newsletter-and-tool-directory">Research agents for a newsletter and tool directory</a></nav>
-  <main id="main" class="ex-page v2-wrap">
+  <main id="main" class="ex-page">
     <section class="ex-hero">
       <p class="v2-mono ex-eyebrow">Greg Toler &middot; GT Strategies</p>
       <h1>How I work on marketing ops</h1>
@@ -117,6 +120,7 @@ import GTMark from "../components/v2/GTMark.astro";
 
 
   </main>
+  </div>
 
   <footer class="ex-foot v2-mono" aria-label="Footer">
     <span>&copy; {new Date().getFullYear()} GT Strategies</span>
@@ -127,9 +131,29 @@ import GTMark from "../components/v2/GTMark.astro";
 
 <style>
   :global(body.v2) { margin: 0; }
-  .ex-top { display: flex; align-items: center; justify-content: space-between; padding-top: 22px; padding-bottom: 6px; }
-  .ex-back:hover { color: var(--v2-ink); }
-  .ex-page { max-width: 1040px; padding-bottom: 80px; }
+  /* navbar */
+  .ex-nav { position: sticky; top: 0; z-index: 20; background: rgba(var(--v2-silk), .55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--v2-line); }
+  .ex-nav-in { max-width: 1300px; margin: 0 auto; padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .ex-home { display: inline-flex; align-items: center; height: 36px; }
+  .ex-cta { display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 16px 0 6px; border-radius: 999px; background: var(--v2-ink); color: var(--v2-base); font-family: var(--v2-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; }
+  .ex-cta .node { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--v2-base); color: var(--v2-ink); }
+  .ex-cta:hover { background: var(--v2-light); color: #fff; }
+  /* shell: toc column + content */
+  .ex-shell { max-width: 1300px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 40px; }
+  .ex-page { min-width: 0; max-width: 1040px; padding-bottom: 80px; }
+  .ex-toc { display: none; }
+  @media (min-width: 1200px) {
+    .ex-shell { grid-template-columns: 210px minmax(0, 1fr); }
+    .ex-toc { display: flex; flex-direction: column; gap: 2px; position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 100px); overflow: auto; padding-top: 40px; scrollbar-width: none; }
+    .ex-toc::-webkit-scrollbar { display: none; }
+  }
+  .ex-toc-h { margin: 0 0 8px; color: var(--v2-ink-faint); }
+  .ex-toc-sec { font-family: var(--v2-display); font-weight: 600; font-size: 13px; color: var(--v2-ink); margin: 12px 0 2px; }
+  .ex-toc-sec:first-of-type { margin-top: 0; }
+  .ex-toc-item { font-size: 12.5px; line-height: 1.35; color: var(--v2-ink-dim); padding: 3px 0 3px 10px; border-left: 1px solid var(--v2-line); }
+  .ex-toc-item:hover, .ex-toc-item.is-active { color: var(--v2-ink); border-left-color: var(--v2-light); }
+  .ex, .bucket { scroll-margin-top: 76px; }
+  @media (max-width: 640px) { .ex-nav-in, .ex-shell { padding: 0 16px; } }
   .ex-hero { padding: 40px 0 34px; border-bottom: 1px solid var(--v2-line); }
   .ex-eyebrow { color: var(--v2-light); margin: 0 0 18px; }
   .ex-hero h1 { font-family: var(--v2-display); font-size: clamp(30px, 4.2vw, 44px); line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.01em; }
@@ -162,21 +186,7 @@ import GTMark from "../components/v2/GTMark.astro";
   .stack { display: grid; gap: 14px; }
   .imgrow figure.flow { max-width: 100%; margin: 0; }
 
-  .ex-cta { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px 9px 10px; border-radius: 999px;
-    background: var(--v2-ink); color: var(--v2-base); font-family: var(--v2-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
-  .ex-cta .node { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--v2-base); color: var(--v2-ink); }
-  .ex-cta:hover { background: var(--v2-light); color: #fff; }
-  .ex-toc { position: fixed; left: 24px; top: 96px; width: 200px; max-height: calc(100vh - 130px); overflow: auto; display: none; flex-direction: column; gap: 2px; z-index: 5;
-    scrollbar-width: none; }
-  .ex-toc::-webkit-scrollbar { display: none; }
-  @media (min-width: 1480px) { .ex-toc { display: flex; } }
-  .ex-toc-h { margin: 0 0 8px; color: var(--v2-ink-faint); }
-  .ex-toc-sec { font-family: var(--v2-display); font-weight: 600; font-size: 13px; color: var(--v2-ink); margin: 12px 0 2px; }
-  .ex-toc-sec:first-of-type { margin-top: 0; }
-  .ex-toc-item { font-size: 12.5px; line-height: 1.35; color: var(--v2-ink-dim); padding: 3px 0 3px 10px; border-left: 1px solid var(--v2-line); }
-  .ex-toc-item:hover, .ex-toc-item.is-active { color: var(--v2-ink); border-left-color: var(--v2-light); }
-  .ex, .bucket { scroll-margin-top: 24px; }
-  .ex-foot { display: flex; justify-content: space-between; gap: 16px; padding: 0 32px 22px; color: var(--v2-ink-faint); max-width: 1040px; margin: 0 auto; }
+  .ex-foot { display: flex; justify-content: space-between; gap: 16px; padding: 0 32px 22px; color: var(--v2-ink-faint); max-width: 1300px; margin: 0 auto; }
   .ex-foot a:hover { color: var(--v2-ink); }
   @media (max-width: 640px) { .ex-foot { flex-direction: column; gap: 6px; align-items: center; text-align: center; padding: 0 16px 16px; } }
 </style>
