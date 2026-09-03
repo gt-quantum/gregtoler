@@ -76,6 +76,25 @@ const LINKEDIN = "https://www.linkedin.com/in/gregtoler";
           </div>
         </div>
       </div>
+      <div class="v2-proof">
+        <p class="v2-mono lbl">Brands I've worked with</p>
+        <div class="v2-logoscroll">
+          <div class="v2-logotrack">
+            {[0,1].map((dup) => (
+              <div class="v2-logoset" aria-hidden={dup === 1 ? "true" : undefined}>
+                <img src="/images/brands/state-farm.svg" alt={dup ? "" : "State Farm"} />
+                <img src="/images/brands/siemens.svg" alt={dup ? "" : "Siemens"} class="sm" />
+                <img src="/images/brands/BambooHR_logo.svg.png" alt={dup ? "" : "BambooHR"} />
+                <img src="/images/brands/certifid.svg" alt={dup ? "" : "CertifID"} />
+                <img src="/images/brands/nrev.svg" alt={dup ? "" : "nrev.ai"} />
+                <img src="/images/brands/medix.svg" alt={dup ? "" : "Medix"} />
+                <img src="/images/brands/sayers.svg" alt={dup ? "" : "Sayers"} />
+                <span class="v2-logotext">CRC Group</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- 03 · WORK — every example, plotted, linking into /examples -->
@@ -150,6 +169,21 @@ const LINKEDIN = "https://www.linkedin.com/in/gregtoler";
 </V2Layout>
 
 <style>
+  /* logo marquee, sits under the bio inside About (ported from staging's proof section) */
+  .v2-proof { text-align: center; margin-top: 88px; }
+  .v2-proof .lbl { color: var(--v2-light); margin: 0 0 26px; }
+  .v2-logoscroll { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  .v2-logotrack { display: flex; width: max-content; animation: v2marquee 42s linear infinite; }
+  .v2-logoscroll:hover .v2-logotrack { animation-play-state: paused; }
+  @keyframes v2marquee { to { transform: translateX(-50%); } }
+  .v2-logoset { display: flex; align-items: center; gap: 64px; padding-right: 64px; }
+  .v2-logoset img { height: 22px; width: auto; filter: brightness(0) invert(0.85); opacity: .5; transition: opacity .3s var(--v2-ease-out); }
+  .v2-logoset img.sm { height: 15px; }
+  .v2-logoset img:hover { opacity: .85; }
+  .v2-logotext { font-size: 14px; font-weight: 500; color: var(--v2-ink-dim); opacity: .6; white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { .v2-logotrack { animation: none; } }
+  @media (max-width: 768px) { .v2-proof { margin-top: 56px; } .v2-logoset { gap: 40px; padding-right: 40px; } }
+
   /* ---------- header ---------- */
   .v2-head {
     position: fixed; top: 0; left: 0; right: 0; z-index: 60;

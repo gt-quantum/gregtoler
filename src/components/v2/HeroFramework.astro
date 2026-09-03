@@ -25,7 +25,6 @@
  *
  * The dotted grid and drifting silk are NOT here — they're the global Backdrop.
  */
-import GTMark from "./GTMark.astro";
 import { pinned, QUADRANTS } from "../../lib/examples";
 
 const GRID_COLS = 12;
@@ -59,7 +58,6 @@ const exData = pinned.map((e) => ({
   <div class="v2-hold" id="v2-hold">
 
     <div class="v2-hero" id="v2-hero">
-      <GTMark height={56} class="splash-mark" />
       <p class="v2-mono splash-eyebrow">Greg Toler &middot; GT Strategies</p>
       <h1 class="splash-h1" id="v2-thesis">Go-to-Market and Operations&nbsp;Support</h1>
       <p class="splash-lede">Strategy, systems, and hands-on execution for teams that need it fixed, built, or scaled.</p>
@@ -167,7 +165,6 @@ const exData = pinned.map((e) => ({
   }
 
   /* ---------- the splash hero, ported ---------- */
-  .v2-hero :global(.splash-mark) { margin-bottom: 40px; }
   .splash-eyebrow { color: var(--v2-light); margin: 0 0 22px; }
   .splash-h1 {
     font-family: var(--v2-display); font-weight: 600;
@@ -509,12 +506,10 @@ const exData = pinned.map((e) => ({
   }
 
   @media (max-width: 640px) {
-    .v2-hero :global(.splash-mark) { margin-bottom: 28px; height: 44px; width: auto; }
     .splash-actions { flex-direction: column; gap: 10px; margin-top: 34px; }
     .splash-lede { margin-top: 52px; }
   }
   @media (max-height: 700px) {
-    .v2-hero :global(.splash-mark) { margin-bottom: 22px; }
     .splash-eyebrow { margin-bottom: 16px; }
     .splash-lede { margin-top: 46px; }
     .splash-actions { margin-top: 26px; }
