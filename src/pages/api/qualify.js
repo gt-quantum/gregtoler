@@ -38,22 +38,54 @@ qualified is true ONLY if all three pass.
 Respond with ONLY this JSON, nothing else:
 {"qualified": true|false, "checks": {"name": true|false, "email": true|false, "message": true|false}, "reason": "<one short sentence>"}`;
 
+// Run history lives in Slack: every verdict (pass, fail, or a fail-closed error) is
+// posted right after the submission it belongs to, so "why didn't the calendar show?"
+// is answerable from the channel. Best effort, never blocks a verdict.
+async function logToSlack(webhook, who, result) {
+  if (!webhook) return;
+  const mark = (v) => (v ? "✓" : "✗");
+  const c = result.checks || {};
+  const verdict = result.qualified ? "✅ Qualified → calendar shown" : "⛔ Not qualified → plain thank-you";
+  const checks = result.checks
+    ? `name ${mark(c.name)} · email ${mark(c.email)} · message ${mark(c.message)}`
+    : "checks not run";
+  try {
+    await fetch(webhook, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        blocks: [
+          { type: "context", elements: [{ type: "mrkdwn", text: `*Qualify:* ${verdict}\n${who}\n${checks}\n_${result.reason || ""}_` }] },
+        ],
+      }),
+    });
+  } catch (err) {
+    console.error("qualify: slack log failed", err?.message ?? err);
+  }
+}
+
 export async function POST({ request, locals }) {
   const env = locals?.runtime?.env ?? {};
   const apiKey = env.OPENAI_API_KEY ?? import.meta.env.OPENAI_API_KEY;
   const secret = env.QUALIFY_SECRET ?? import.meta.env.QUALIFY_SECRET;
   const model = env.OPENAI_MODEL ?? import.meta.env.OPENAI_MODEL ?? "gpt-5-nano";
-  const json = (body, status = 200) =>
-    new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+  const webhook = env.SLACK_WEBHOOK_URL ?? import.meta.env.SLACK_WEBHOOK_URL;
+  let who = "";
+  // every exit after the token check goes through here, so the verdict always reaches Slack
+  const json = async (body, status = 200) => {
+    if (status !== 401 && who) await logToSlack(webhook, who, body);
+    return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+  };
 
   try {
     if (Number(request.headers.get("content-length") || 0) > 16_000) return json({ qualified: false, reason: "too large" }, 413);
     const { token, situation, involvement, message, name, email, linkedin } = await request.json();
 
     if (!(await verifyToken(secret, token, email))) return json({ qualified: false, reason: "unauthorised" }, 401);
-    if (!apiKey) return json({ qualified: false, reason: "screening unavailable" });
+    who = `${String(name || "").slice(0, 100)} · ${String(email || "").slice(0, 200)}`;
+    if (!apiKey) return json({ qualified: false, reason: "screening unavailable (OPENAI_API_KEY missing)" });
     const text = String(message || "").slice(0, 4000);
-    if (text.trim().length < 40) return json({ qualified: false, reason: "too short" });
+    if (text.trim().length < 40) return json({ qualified: false, reason: "too short (message under 40 characters)" });
 
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 12_000);
@@ -84,7 +116,7 @@ export async function POST({ request, locals }) {
 
     if (!res.ok) {
       console.error("qualify: OpenAI", res.status);
-      return json({ qualified: false, reason: "screening error" });
+      return json({ qualified: false, reason: `screening error (OpenAI ${res.status})` });
     }
     const data = await res.json();
     const choice = data?.choices?.[0];
@@ -100,6 +132,6 @@ export async function POST({ request, locals }) {
     return json({ qualified, checks, reason: String(parsed.reason || "").slice(0, 200) });
   } catch (err) {
     console.error("qualify error:", err?.message ?? err);
-    return json({ qualified: false, reason: "screening error" });
+    return json({ qualified: false, reason: `screening error (${String(err?.message ?? err).slice(0, 120)})` });
   }
 }
