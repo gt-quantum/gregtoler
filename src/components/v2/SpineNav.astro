@@ -1,0 +1,282 @@
+---
+/**
+ * Horizontal spine nav — V1's FluidSpineMenu mechanic, laid on its side.
+ *
+ * V1 (src/components/layout/FluidSpineMenu.jsx) stacks the items vertically with a
+ * connector between each pair: dot — line — dot. Only the two connectors ADJACENT to
+ * the active item grow (flex-grow 0 → 1); the rest collapse to nothing. The active item
+ * therefore sits inside an expanding gap that springs open as you move between pages.
+ *
+ * This is the same rule (`shouldShowLineForIndex`) with flex-direction row, so the spine
+ * runs across the top instead of down the side. No framer-motion — flex-grow, opacity and
+ * margin are all CSS-transitionable, so this is ~1KB of vanilla JS instead of a React island.
+ */
+
+// Phone-width glyphs (≤768): line icons in the site's technical-drawing grammar,
+// 1.5px stroke, no fills except plotted points. Each echoes its section's own motif.
+const icons: Record<string, string> = {
+  framework: '<path d="M12 3v18M3 12h18"/><path d="M9.5 5.5 12 3l2.5 2.5M18.5 9.5 21 12l-2.5 2.5"/>',   // the two axes
+  about:     '<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',                          // the operator
+  work:      '<rect x="4" y="4" width="16" height="16" rx="1"/><circle cx="9" cy="14.5" r="1.6" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.6" fill="currentColor" stroke="none"/>', // plotted on the map
+  contact:   '<rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 7l9 6 9-6"/>',                 // mail
+};
+const items = [
+  // order mirrors the page: framework → about → work → contact
+  // (Approach is parked, so it is absent from the page and from this nav)
+  { id: "framework", label: "Framework", href: "#framework", n: "01" },
+  { id: "about",     label: "About",     href: "#about",     n: "02" },
+  { id: "work",      label: "Work",      href: "#work",      n: "03" },
+  { id: "contact",   label: "Contact",   href: "#contact",   n: "04" },
+];
+---
+
+<nav class="v2-spine" aria-label="Primary" data-active="-1">
+  {/* leading connector: opens when nothing is active (the hero), which pushes the whole
+      run to the right — the "menu slid right" state Greg asked for */}
+  <span class="v2-spine-link is-open" data-link="-1" aria-hidden="true">
+    <i class="d"></i><i class="ln"></i><i class="d"></i>
+  </span>
+  {items.map((item, i) => (
+    <>
+      <a class="v2-spine-item" href={item.href} data-i={i} aria-label={item.label}>
+        <span class="l">{item.label}</span>
+        <span class="n" aria-hidden="true">{item.n}</span>
+        <svg class="i" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={icons[item.id]} />
+      </a>
+      {i < items.length - 1 && (
+        <span class="v2-spine-link" data-link={i} aria-hidden="true">
+          <i class="d"></i><i class="ln"></i><i class="d"></i>
+        </span>
+      )}
+    </>
+  ))}
+</nav>
+
+<style>
+  .v2-spine {
+    display: flex; align-items: center;
+    flex: 1 1 auto; min-width: 0;
+    margin: 0;   /* no max-width: the wider the run, the more the connector stretch reads */
+  }
+
+  .v2-spine-item {
+    flex: 0 0 auto;
+    display: inline-flex; align-items: center;
+    padding: 6px 20px;   /* wider run — items breathe across the full header */
+    font-family: var(--v2-mono);
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--v2-ink-faint);
+    white-space: nowrap;
+    transition: color .35s var(--v2-ease-out);
+  }
+  .v2-spine-item:hover { color: var(--v2-ink-dim); }
+  .v2-spine-item[aria-current="true"] { color: var(--v2-ink); }
+  .v2-spine-item .n, .v2-spine-item .i { display: none; }   /* names on desktop; icons only at phone width */
+
+  /* the connector: dot — line — dot. Collapsed to zero unless adjacent to active. */
+  .v2-spine-link {
+    display: flex; align-items: center;
+    flex-grow: 0; flex-basis: 0; min-width: 0;
+    overflow: hidden; opacity: 0;
+    margin: 0;
+    transition:
+      flex-grow .7s var(--v2-ease-out),
+      opacity .3s linear,
+      margin .45s var(--v2-ease-out);
+  }
+  .v2-spine-link.is-open { flex-grow: 1; opacity: 1; margin: 0 18px; }
+
+  .v2-spine-link .d {
+    width: 3px; height: 3px; border-radius: 50%;
+    background: var(--v2-ink-faint); flex: none;
+  }
+  .v2-spine-link .ln {
+    height: 1px; flex: 1; min-width: 6px;
+    background: linear-gradient(90deg, var(--v2-line), var(--v2-ink-faint), var(--v2-line));
+  }
+
+  /* Small screens: the spine goes VERTICAL on the LEFT, under the logo — V1's own
+     sidebar layout. Same mechanic: only the connectors adjacent to the active item
+     open. Full rail height, socials at the bottom (see index.astro). */
+  @media (max-width: 860px) {
+    /* V1's mobile aside, number for number (SpineNavigation.jsx, isMobile branch):
+       60 wide, flush left, padding 16 8 24, 36px item boxes, collapsed connectors keep
+       their 10px so the stack sits on a 46px stride. Top = header (80) + V1's 4px of air.
+       Bottom stops above the foot (divider + LinkedIn, drawn in index.astro): 24 pad +
+       20 glyph + 16 + 1 + 12 = 73. */
+    .v2-spine {
+      position: fixed;
+      left: var(--v2-rail-x, 0px); top: 84px;
+      bottom: calc(73px + env(safe-area-inset-bottom, 0px));
+      width: var(--v2-rail-w, 60px);
+      padding: 16px 4px 0;
+      box-sizing: border-box;
+      transform: none;
+      z-index: 70;
+      flex-direction: column;
+      align-items: center;
+      flex: none;
+      height: auto;
+      margin: 0;
+    }
+    /* section NAMES, centred on the connector line — the header nav's exact type
+       (11px Martian, .14em, faint → dim on hover → ink when current), just vertical */
+    .v2-spine-item .l { display: block; }
+    .v2-spine-item .n { display: none; }
+    .v2-spine-item {
+      width: 100%; height: 36px; padding: 0 2px;
+      justify-content: center;
+      white-space: nowrap;      /* size, tracking, colours inherit from the desktop rule */
+    }
+    .v2-spine-link {
+      flex-direction: column;
+      align-items: center;
+      align-self: center;
+      flex-basis: auto;          /* NOT 0: the collapsed dot–line–dot keeps 3+4+3 = 10px */
+      margin: 0;
+      transition:
+        flex-grow .7s var(--v2-ease-out),
+        opacity .3s linear,
+        margin .45s var(--v2-ease-out);
+    }
+    .v2-spine-link.is-open { margin: 6px 0; }
+    .v2-spine-link .ln {
+      width: 1px; height: auto; flex: 1;
+      min-height: 4px; min-width: 0;
+      background: linear-gradient(180deg, var(--v2-line), var(--v2-ink-faint), var(--v2-line));
+    }
+  }
+
+  /* true phone: names → icons (V1's own move), rail back to V1's 60px. Same colour
+     rule as the words: faint, ink when current. */
+  @media (max-width: 640px) {
+    .v2-spine { padding: 16px 8px 0; }
+    .v2-spine-item .l { display: none; }
+    .v2-spine-item .i { display: block; width: 22px; height: 22px; }
+    .v2-spine-item { width: 40px; height: 40px; padding: 0; }
+  }
+</style>
+
+<script>
+  (() => {
+    const nav = document.querySelector<HTMLElement>(".v2-spine");
+    if (!nav) return;
+    const items = Array.from(nav.querySelectorAll<HTMLElement>(".v2-spine-item"));
+    // links are indexed from -1: index -1 is the leading connector before the first item
+    const links = Array.from(nav.querySelectorAll<HTMLElement>(".v2-spine-link"));
+    const linkIndex = (el: HTMLElement) => parseInt(el.dataset.link || "0", 10);
+
+    // V1's rule, unchanged: a connector opens if it sits immediately before the active
+    // item, or immediately after it (when the active item isn't last).
+    // active === -1 means "hero, no section yet", which opens only the leading connector
+    // and therefore pushes every item to the right.
+    const shouldOpen = (li: number, active: number) =>
+      li === active - 1 || (li === active && active < items.length - 1);
+
+    function setActive(active: number) {
+      items.forEach((el, i) =>
+        i === active ? el.setAttribute("aria-current", "true") : el.removeAttribute("aria-current")
+      );
+      links.forEach((el) => el.classList.toggle("is-open", shouldOpen(linkIndex(el), active)));
+      nav!.dataset.active = String(active);
+    }
+
+    setActive(-1);
+
+    // Follow the section actually in view — deterministic scroll tracker, not an
+    // IntersectionObserver. The Framework section is a 240vh pinned stage: an observer
+    // barely fires inside it (no boundary crossings while pinned) and its intersection
+    // ratio is structurally tiny next to normal-height sections, so Framework never won.
+    // Rule: active = the last section whose top has passed the viewport's midline;
+    // above 30vh of scroll nothing is active (the hero owns the top, items sit right).
+    const pairs = items
+      .map((el, i) => ({ i, t: document.querySelector<HTMLElement>(el.getAttribute("href") || "") }))
+      .filter((p): p is { i: number; t: HTMLElement } => !!p.t);
+
+    let tracking = true;
+    function trackScroll() {
+      if (!tracking) return;
+      const vh = window.innerHeight;
+      if (window.scrollY < vh * 0.3) { setActive(-1); return; }
+      const mid = window.scrollY + vh * 0.5;
+      let active = -1;
+      // walk sections in PAGE order, not nav order — the two differ (About sits above
+      // Work on the page), and "last section whose top passed the midline" only holds
+      // when the walk is top-to-bottom
+      for (const p of [...pairs].sort((a, b) => a.t.offsetTop - b.t.offsetTop)) {
+        if (p.t.offsetTop <= mid) active = p.i;
+      }
+      setActive(active);
+      pushOffFooter();
+    }
+
+    // Mobile rail vs footer: the rail is fixed, so the footer used to slide up BEHIND
+    // it. When the footer enters the viewport, push the rail (and the fixed LinkedIn
+    // at its foot) up by the overlap — the rail visually stops at the contact
+    // section's end and the footer owns the full width.
+    const footerEl = document.querySelector<HTMLElement>(".v2-foot");
+    const linkedinEl = document.querySelector<HTMLElement>(".v2-linkedin");
+    const mobileMq = window.matchMedia("(max-width: 860px)");
+    function pushOffFooter() {
+      if (!footerEl) return;
+      if (!mobileMq.matches) {
+        nav!.style.transform = ""; if (linkedinEl) linkedinEl.style.transform = "";
+        return;
+      }
+      const overlap = Math.max(0, window.innerHeight - footerEl.getBoundingClientRect().top);
+      nav!.style.transform = overlap > 0 ? `translateY(${-overlap}px)` : "";
+      if (linkedinEl) linkedinEl.style.transform = overlap > 0 ? `translateY(${-overlap}px)` : "";
+    }
+    mobileMq.addEventListener?.("change", pushOffFooter);
+    pushOffFooter();
+
+    let ticking = false;
+    window.addEventListener("scroll", () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { trackScroll(); ticking = false; });
+    }, { passive: true });
+    trackScroll();
+
+    // Clicks: the Framework anchor's TOP is the hero, so a plain jump lands on the
+    // hero and immediately deactivates again. Scroll to where the section actually
+    // pays off instead — the end of the pinned stage, where the grid sits settled.
+    // During the programmatic scroll the tracker is paused so the clicked item holds.
+    pairs.forEach((p) => {
+      items[p.i].addEventListener("click", (e) => {
+        e.preventDefault();
+        const vh = window.innerHeight;
+        const isPinned = p.t.offsetHeight > vh * 1.5;
+        const top = isPinned ? p.t.offsetTop + p.t.offsetHeight - vh : p.t.offsetTop;
+        tracking = false;
+        setActive(p.i);
+
+        // Native smooth scroll covers 2000px in ~500ms, which skips straight past the
+        // hero→framework morph — the signature moment. Pinned targets get a hand-driven
+        // scroll (~2.4s, easeInOut) so the sequence actually plays; normal sections
+        // keep the native behaviour.
+        if (isPinned && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          const from = window.scrollY;
+          const dist = top - from;
+          // Direction-aware: scrolling DOWN into the section plays the full morph
+          // (2.4s — the signature moment). Coming back UP from a later section the
+          // framework is already formed, so a slow drag is just friction: 1s.
+          const DUR = dist >= 0 ? 2400 : 1000;
+          let t0: number | null = null;
+          const easeIO = (t: number) => (t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+          const step = (ts: number) => {
+            if (t0 === null) t0 = ts;
+            const k = Math.min(1, (ts - t0) / DUR);
+            window.scrollTo(0, from + dist * easeIO(k));
+            if (k < 1) requestAnimationFrame(step);
+            else { tracking = true; trackScroll(); }
+          };
+          requestAnimationFrame(step);
+        } else {
+          window.scrollTo({ top, behavior: "smooth" });
+          window.setTimeout(() => { tracking = true; trackScroll(); }, 900);
+        }
+      });
+    });
+  })();
+</script>

@@ -6,11 +6,16 @@
  */
 import V2Layout from "../layouts/V2Layout.astro";
 import GTMark from "../components/v2/GTMark.astro";
+import { examples } from "../lib/examples";
+
+/** The text-only examples read their Problem and Build from src/lib/examples.ts so the copy exists once. */
+const byId = Object.fromEntries(examples.map((e) => [e.slug, e]));
+const ex = (slug: string) => byId[slug];
 ---
 
 <V2Layout
   title="Examples — Greg Toler"
-  description="Thirteen examples of marketing ops, automation, AI in the loop, and custom tools, each as the problem, what was built, and what it looked like."
+  description="Sixteen examples of marketing ops, automation, AI in the loop, and custom tools, each as the problem, what was built, and what it looked like."
   robots="index, follow"
 >
   <a class="v2-skip" href="#main">Skip to content</a>
@@ -22,12 +27,12 @@ import GTMark from "../components/v2/GTMark.astro";
   </header>
 
   <div class="ex-shell">
-  <nav class="ex-toc" aria-label="On this page"><p class="v2-mono ex-toc-h">On this page</p><a class="ex-toc-sec" href="#b1">Core marketing ops</a><a class="ex-toc-item" href="#event-requests-into-jira-and-asana">Event requests into Jira and Asana</a><a class="ex-toc-item" href="#marketing-requests-into-revops">Marketing requests into RevOps</a><a class="ex-toc-sec" href="#b2">Marketing ops with automation</a><a class="ex-toc-item" href="#assessment-chatbot-into-marketo-salesforce-and-lemlist">Assessment chatbot into Marketo, Salesforce, and Lemlist</a><a class="ex-toc-item" href="#metabase-product-data-into-hubspot">Metabase product data into HubSpot</a><a class="ex-toc-item" href="#account-health-from-slack">Account health from Slack</a><a class="ex-toc-sec" href="#b3">Marketing ops with AI in the loop</a><a class="ex-toc-item" href="#paid-media-inside-claude">Paid media inside Claude</a><a class="ex-toc-item" href="#content-bot-in-slack">Content bot in Slack</a><a class="ex-toc-item" href="#venue-research-agent-for-customer-events">Venue research agent for customer events</a><a class="ex-toc-item" href="#weekly-competitor-roundup">Weekly competitor roundup</a><a class="ex-toc-item" href="#discovery-calls-into-help-center-and-website-drafts">Discovery calls into help center and website drafts</a><a class="ex-toc-sec" href="#b4">Custom tools</a><a class="ex-toc-item" href="#custom-dashboards-across-systems-that-do-not-report-together">Custom dashboards across systems that do not report together</a><a class="ex-toc-item" href="#account-map">Account map</a><a class="ex-toc-item" href="#research-agents-for-a-newsletter-and-tool-directory">Research agents for a newsletter and tool directory</a></nav>
+  <nav class="ex-toc" aria-label="On this page"><p class="v2-mono ex-toc-h">On this page</p><a class="ex-toc-sec" href="#b1">Core marketing ops</a><a class="ex-toc-item" href="#event-requests-into-jira-and-asana">Event requests into Jira and Asana</a><a class="ex-toc-item" href="#marketing-requests-into-revops">Marketing requests into RevOps</a><a class="ex-toc-item" href="#account-scoring-and-tiering">Account scoring and tiering</a><a class="ex-toc-item" href="#competitive-landing-pages-from-closed-won-data">Competitive landing pages from closed-won data</a><a class="ex-toc-sec" href="#b2">Marketing ops with automation</a><a class="ex-toc-item" href="#assessment-chatbot-into-marketo-salesforce-and-lemlist">Assessment chatbot into Marketo, Salesforce, and Lemlist</a><a class="ex-toc-item" href="#metabase-product-data-into-hubspot">Metabase product data into HubSpot</a><a class="ex-toc-item" href="#account-health-from-slack">Account health from Slack</a><a class="ex-toc-item" href="#voice-notes-to-crm-and-drafted-follow-ups">Voice notes to CRM and drafted follow ups</a><a class="ex-toc-sec" href="#b3">Marketing ops with AI in the loop</a><a class="ex-toc-item" href="#paid-media-inside-claude">Paid media inside Claude</a><a class="ex-toc-item" href="#content-bot-in-slack">Content bot in Slack</a><a class="ex-toc-item" href="#venue-research-agent-for-customer-events">Venue research agent for customer events</a><a class="ex-toc-item" href="#weekly-competitor-roundup">Weekly competitor roundup</a><a class="ex-toc-item" href="#discovery-calls-into-help-center-and-website-drafts">Discovery calls into help center and website drafts</a><a class="ex-toc-sec" href="#b4">Custom tools</a><a class="ex-toc-item" href="#custom-dashboards-across-systems-that-do-not-report-together">Custom dashboards across systems that do not report together</a><a class="ex-toc-item" href="#account-map">Account map</a><a class="ex-toc-item" href="#research-agents-for-a-newsletter-and-tool-directory">Research agents for a newsletter and tool directory</a></nav>
   <main id="main" class="ex-page">
     <section class="ex-hero">
       <p class="v2-mono ex-eyebrow">Greg Toler &middot; GT Strategies</p>
       <h1>How I work on marketing ops</h1>
-      <p class="ex-lede">Make the systems of record work. Automate the handoffs. Put AI in the loop with a person keeping the decision. Build the tool when it does not exist. Thirteen examples below, each as the problem, what I built, and what it looked like. Companies are described, not named.</p>
+      <p class="ex-lede">Make the systems of record work. Automate the handoffs. Put AI in the loop with a person keeping the decision. Build the tool when it does not exist. Sixteen examples below, each as the problem, what I built, and what it looked like. Companies are described, not named.</p>
     </section>
 
 
@@ -43,6 +48,12 @@ import GTMark from "../components/v2/GTMark.astro";
     <div class="row noimg"><div class="txt"><div><h4>Problem</h4><p>Marketing worked in Asana and RevOps worked in Jira. Requests were retyped by hand, half arrived without the detail RevOps needed to act, and nobody in marketing could see progress once a ticket was in flight.</p></div><div><h4>Build</h4><p>Assigning a Marketing Ops task hands it to a task agent connected to Claude that pulls the full context of the project, the parent task, the linked docs, and the comments, into a properly written Jira ticket. When the context is not there, it assigns a needs context subtask back to the requester instead of filing a thin ticket. The sync runs both ways after that, so status, priority, and work progress on the Jira side show up on the Asana task, and updates on the Asana side land on the ticket.</p></div></div></div>
     <figure class="flow" data-flow="f02"></figure>
   </article>
+  {[ex("account-scoring-and-tiering"), ex("competitive-landing-pages-from-closed-won-data")].map((e) => (
+    <article class="ex" id={e.slug}>
+      <h3>{e.title}</h3>
+      <div class="row noimg"><div class="txt"><div><h4>Problem</h4><p>{e.problemFull}</p></div><div><h4>Build</h4><p>{e.buildFull}</p></div></div></div>
+    </article>
+  ))}
 </section>
 
 <section class="bucket" id="b2">
@@ -62,6 +73,12 @@ import GTMark from "../components/v2/GTMark.astro";
     <div class="row noimg"><div class="txt"><div><h4>Problem</h4><p>Checking an account's health meant a BI login and knowing the right saved question. Most people never looked.</p></div><div><h4>Build</h4><p>A Slack command takes an email or an org name, runs the same BI queries, and posts back a chart with a plain language summary. Users, activity over 45 days, activation waves, and the score with the reasons behind it.</p></div></div></div>
     <figure class="flow" data-flow="g_pmm_c"></figure>
   </article>
+  {[ex("voice-notes-to-crm-and-drafted-follow-ups")].map((e) => (
+    <article class="ex" id={e.slug}>
+      <h3>{e.title}</h3>
+      <div class="row noimg"><div class="txt"><div><h4>Problem</h4><p>{e.problemFull}</p></div><div><h4>Build</h4><p>{e.buildFull}</p></div></div></div>
+    </article>
+  ))}
 </section>
 
 <section class="bucket" id="b3">

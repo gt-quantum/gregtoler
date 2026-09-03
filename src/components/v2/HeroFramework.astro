@@ -1,0 +1,811 @@
+---
+/**
+ * V2 — Hero → Framework scroll morph, plus the in-place axis and example interactions.
+ *
+ * Ported from the `staging` branch and changed in three ways for main:
+ *   1. the hero content is the splash hero (mark, eyebrow, headline, lede, two buttons).
+ *      The splash's `.splash-h1::after` rule is gone: the seam element IS the rule under
+ *      the headline now, and JS positions it 26px below the h1's bottom.
+ *   2. radial pins, one per entry in `pinned`, sit on the plane at that example's x / y.
+ *   3. clicking a pin opens mode "ex", a third panel centred over the plane.
+ *
+ * THE SEAM: the rule under the headline is the SAME element that becomes the X axis.
+ * It never fades and is never re-created — it slides down and widens.
+ *
+ * THE AXIS MODES: clicking an axis does NOT drop you to a drawer further down the page.
+ * The framework rearranges in place —
+ *   mode "y":  the vertical axis slides LEFT; a panel stretches open to its right.
+ *   mode "x":  the horizontal axis (the seam) slides UP; a panel stretches open beneath.
+ *   mode "ex": nothing slides. The nodes, the seam and the axis words recede and the
+ *              example panel scales up over the middle of the plane.
+ * Clicking elsewhere, or Escape, returns to the full grid.
+ *
+ * NAMING: the sticky wrapper was `.v2-pin` on staging. `.v2-pin` is the example pin here,
+ * so the wrapper is `.v2-hold` / `#v2-hold`.
+ *
+ * The dotted grid and drifting silk are NOT here — they're the global Backdrop.
+ */
+import GTMark from "./GTMark.astro";
+import { pinned, QUADRANTS } from "../../lib/examples";
+
+const GRID_COLS = 12;
+const GRID_ROWS = 8;
+const cx = (i: number) => (i / GRID_COLS) * 100;
+const cy = (j: number) => (j / GRID_ROWS) * 100;
+
+const capabilities = [
+  { label: "GTM strategy",         i: 3, j: 2, t: 0.70 },
+  { label: "RevOps & BizOps",      i: 9, j: 2, t: 0.59 },
+  { label: "GTM execution",        i: 3, j: 6, t: 0.76 },
+  { label: "Systems & automation", i: 9, j: 6, t: 0.65 },
+];
+
+const LINKEDIN = "https://www.linkedin.com/in/gregtoler";
+
+/** pins fade in just after the nodes, staggered across a narrow band */
+const pinT = (i: number) =>
+  (pinned.length < 2 ? 0.78 : 0.72 + (i / (pinned.length - 1)) * 0.14).toFixed(3);
+
+const exData = pinned.map((e) => ({
+  slug: e.slug,
+  title: e.title,
+  coord: QUADRANTS[e.quadrant].coord,
+  problem: e.problem,
+  build: e.build,
+}));
+---
+
+<section class="v2-stage" id="v2-stage">
+  <div class="v2-hold" id="v2-hold">
+
+    <div class="v2-hero" id="v2-hero">
+      <GTMark height={56} class="splash-mark" />
+      <p class="v2-mono splash-eyebrow">Greg Toler &middot; GT Strategies</p>
+      <h1 class="splash-h1" id="v2-thesis">Go-to-Market and Operations&nbsp;Support</h1>
+      <p class="splash-lede">Strategy, systems, and hands-on execution for teams that need it fixed, built, or scaled.</p>
+      <div class="splash-actions">
+        <a class="splash-btn primary" id="splash-work" href="#contact">
+          <span class="node" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+          <span>Work with me</span>
+        </a>
+        <a class="splash-btn ghost" href={LINKEDIN} target="_blank" rel="noopener noreferrer">
+          <span>Connect on LinkedIn</span>
+          <svg class="ext" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="v2-seam" id="v2-seam" aria-hidden="true"></div>
+
+    <div class="v2-plane" id="v2-plane" data-mode="grid">
+      <div class="v2-axis-v" id="v2-axv" aria-hidden="true"></div>
+
+      <button class="v2-axlab v2-l-top" data-axis="y" aria-expanded="false" aria-controls="v2-panel-y">Strategy</button>
+      <button class="v2-axlab v2-l-bot" data-axis="y" aria-expanded="false" aria-controls="v2-panel-y">Execution</button>
+      <button class="v2-axlab v2-l-left" data-axis="x" aria-expanded="false" aria-controls="v2-panel-x">Go-to-market</button>
+      <button class="v2-axlab v2-l-right" data-axis="x" aria-expanded="false" aria-controls="v2-panel-x">Operations</button>
+
+      {capabilities.map((n) => (
+        <div class="v2-node" data-t={n.t} style={`left:${cx(n.i)}%;top:${cy(n.j)}%`}>
+          <span class="nt">{n.label}</span>
+        </div>
+      ))}
+
+      {pinned.map((e, i) => (
+        <button
+          class="v2-pin"
+          type="button"
+          data-slug={e.slug}
+          data-t={pinT(i)}
+          style={`left:${(e.x * 100).toFixed(2)}%;top:${(e.y * 100).toFixed(2)}%;--i:${i}`}
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="v2-panel-ex"
+        >
+          <span class="ring" aria-hidden="true"></span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="tip v2-mono">{e.title}</span>
+        </button>
+      ))}
+
+      <div class="v2-panel v2-panel-y" id="v2-panel-y" role="region" aria-label="Strategy to Execution">
+        <button class="v2-panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        <div class="inner">
+          <span class="poles v2-mono">Strategy &#10231; Execution</span>
+          <p>Strategy is naming the real problem and the shape of the answer. Execution is
+          building it so it holds up without me. Most people are anchored to one end. I work
+          the full height, which is why I can spot the problem and still be the one who
+          fixes it.</p>
+        </div>
+      </div>
+
+      <div class="v2-panel v2-panel-x" id="v2-panel-x" role="region" aria-label="Go-to-market to Operations">
+        <button class="v2-panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        <div class="inner">
+          <span class="poles v2-mono">GTM &#10231; Operations</span>
+          <p>I came up in go-to-market, then moved horizontally into the operational layer
+          underneath it. Same operator, wider surface. That range is why I can connect a
+          pipeline problem to the process and tooling actually causing it.</p>
+        </div>
+      </div>
+
+      <div class="v2-panel v2-panel-ex" id="v2-panel-ex" role="dialog" aria-modal="false" aria-labelledby="v2-ex-title">
+        <button class="v2-panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        <div class="inner">
+          <span class="poles v2-mono" id="v2-ex-coord"></span>
+          <h3 class="ex-title" id="v2-ex-title"></h3>
+          <p class="ex-lab v2-mono">Problem</p>
+          <p id="v2-ex-problem"></p>
+          <p class="ex-lab v2-mono">Build</p>
+          <p id="v2-ex-build"></p>
+          <a class="ex-more" id="v2-ex-more" href="/examples">See the full example &rarr;</a>
+        </div>
+      </div>
+
+      <p class="v2-hint v2-mono" id="v2-hint"><b>Click an axis</b> to break it down, <b>a pin</b> to see the work</p>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id="v2-ex-data" set:html={JSON.stringify(exData)}></script>
+
+<style>
+  .v2-stage { position: relative; height: 240vh; z-index: 1; }
+  .v2-hold {
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .v2-hero {
+    position: absolute; z-index: 5;
+    width: 100%; max-width: var(--v2-maxw); padding: 0 48px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+    will-change: opacity, transform;
+  }
+
+  /* ---------- the splash hero, ported ---------- */
+  .v2-hero :global(.splash-mark) { margin-bottom: 40px; }
+  .splash-eyebrow { color: var(--v2-light); margin: 0 0 22px; }
+  .splash-h1 {
+    font-family: var(--v2-display); font-weight: 600;
+    font-size: clamp(2rem, 5.2vw, 4.2rem);
+    line-height: 1.04; letter-spacing: -0.015em;
+    margin: 0; color: var(--v2-ink); max-width: 16ch;
+  }
+  /* NOTE: no .splash-h1::after here. The seam element is the rule under the headline,
+     and JS parks it at the h1's bottom + 26px. */
+  .splash-lede {
+    font-size: clamp(.98rem, 1.5vw, 1.12rem); line-height: 1.62;
+    color: var(--v2-ink-dim); max-width: 46ch;
+    margin: 56px 0 0;   /* leaves room for the seam, which sits 26px under the h1 */
+  }
+
+  .splash-actions {
+    display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; justify-content: center;
+    margin-top: 44px;
+  }
+  .splash-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--v2-ink); border-radius: 100px; cursor: pointer;
+    transition: border-color .35s var(--v2-ease-out), color .35s var(--v2-ease-out), background .35s var(--v2-ease-out);
+  }
+  .splash-btn.primary {
+    padding: 6px 24px 6px 6px;
+    border: 1px solid var(--v2-line);
+    background: color-mix(in srgb, var(--v2-surface) 85%, transparent);
+  }
+  .splash-btn .node {
+    display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--v2-line); color: var(--v2-light);
+    background: color-mix(in srgb, var(--v2-surface) 85%, transparent);
+    transition: border-color .35s var(--v2-ease-out), box-shadow .35s var(--v2-ease-out);
+  }
+  .splash-btn.primary:hover { border-color: var(--v2-light); }
+  .splash-btn.primary:hover .node {
+    border-color: var(--v2-light);
+    box-shadow: 0 0 0 3px var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft);
+  }
+  .splash-btn.ghost {
+    padding: 14px 6px; color: var(--v2-ink-dim); gap: 8px;
+    border-bottom: 1px solid transparent; border-radius: 0;
+  }
+  .splash-btn.ghost .ext { color: var(--v2-ink-faint); transition: color .35s, transform .35s var(--v2-ease-out); }
+  .splash-btn.ghost:hover { color: var(--v2-ink); border-bottom-color: var(--v2-light); }
+  .splash-btn.ghost:hover .ext { color: var(--v2-light); transform: translate(1px, -1px); }
+
+  /* ---------- the seam / X axis ---------- */
+  .v2-seam {
+    position: absolute; left: 50%; top: 0;
+    height: 1px; width: 140px;
+    background: var(--v2-light);
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft),
+                0 0 46px 6px var(--v2-light-soft);
+    transform: translate(-50%, 0);
+    z-index: 6; will-change: transform, width;
+    transition: opacity .5s var(--v2-ease-out);
+  }
+  .v2-seam::before, .v2-seam::after {
+    content: ""; position: absolute; top: 50%; width: 0; height: 0;
+    border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent;
+    opacity: var(--arrow, 0); transition: opacity .25s linear;
+  }
+  .v2-seam::before { left: -1px;  transform: translate(-100%, -50%); border-right: 7px solid var(--v2-light); }
+  .v2-seam::after  { right: -1px; transform: translate(100%, -50%);  border-left:  7px solid var(--v2-light); }
+
+  /* ---------- the plane ---------- */
+  .v2-plane {
+    position: absolute; z-index: 3;
+    height: min(56vh, 540px); aspect-ratio: 1.5 / 1; width: auto; max-width: 64vw;
+    opacity: 0; will-change: opacity;
+    --yx: 50%;   /* vertical axis: position across the plane */
+    --xy: 50%;   /* horizontal axis: position down the plane */
+  }
+
+  .v2-axis-v {
+    position: absolute; top: 0; bottom: 0; left: var(--yx); width: 1px;
+    background: var(--v2-light);
+    box-shadow: 0 0 6px 0 var(--v2-light-soft), 0 0 22px 2px var(--v2-light-soft),
+                0 0 46px 6px var(--v2-light-soft);
+    transform: translateX(-50%) scaleY(var(--sy, 0)); transform-origin: center;
+    opacity: .85;
+    transition: left .75s var(--v2-ease-out), opacity .5s var(--v2-ease-out);
+  }
+  .v2-axis-v::before, .v2-axis-v::after {
+    content: ""; position: absolute; left: 50%; width: 0; height: 0;
+    border-left: 3.5px solid transparent; border-right: 3.5px solid transparent;
+    opacity: var(--arrow, 0); transition: opacity .25s linear;
+  }
+  .v2-axis-v::before { top: -1px;    transform: translate(-50%, -100%); border-bottom: 7px solid var(--v2-light); }
+  .v2-axis-v::after  { bottom: -1px; transform: translate(-50%, 100%);  border-top:    7px solid var(--v2-light); }
+
+  .v2-axlab {
+    position: absolute; z-index: 9;
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--v2-ink-dim);
+    background: none; border: 0; padding: 5px 8px;
+    opacity: 0; white-space: nowrap;
+    transition: color .3s var(--v2-ease-out), left .75s var(--v2-ease-out),
+                top .75s var(--v2-ease-out), opacity .4s var(--v2-ease-out);
+  }
+  .v2-axlab:hover, .v2-axlab[aria-expanded="true"] { color: var(--v2-light); }
+  .v2-l-top   { top: -34px;    left: var(--yx); transform: translateX(-50%); }
+  .v2-l-bot   { bottom: -34px; left: var(--yx); transform: translateX(-50%); }
+  .v2-l-left  { right: 100%; top: var(--xy); transform: translateY(-50%); margin-right: 16px; }
+  .v2-l-right { left: 100%;  top: var(--xy); transform: translateY(-50%); margin-left: 16px; }
+
+  .v2-node {
+    position: absolute; transform: translate(-50%, -50%);
+    opacity: 0; text-align: center; pointer-events: none; z-index: 7;
+    will-change: opacity, transform;
+  }
+  .v2-node .nt {
+    font-family: var(--v2-display); font-weight: 500;
+    font-size: clamp(.8rem, 1.25vw, 1.05rem);
+    line-height: 1.05; color: var(--v2-ink);
+    text-shadow: 0 0 20px var(--v2-base), 0 0 7px var(--v2-base);
+  }
+
+  /* ---------- the example pins ---------- */
+  .v2-pin {
+    /* above .v2-panel (z-index 10): in mode "ex" the panel covers the whole plane, and
+       the pins have to stay clickable so one click swaps straight to another example */
+    position: absolute; z-index: 11;
+    width: 18px; height: 18px; padding: 0; margin: 0;
+    background: none; border: 0; cursor: pointer;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity .5s var(--v2-ease-out);
+  }
+  /* 44px tap target, no visual change */
+  .v2-pin::after { content: ""; position: absolute; inset: -14px; border-radius: 50%; }
+  /* the faint hover halo */
+  .v2-pin::before {
+    content: ""; position: absolute; inset: -9px; border-radius: 50%;
+    border: 1px solid var(--v2-light); opacity: 0;
+    transition: opacity .3s var(--v2-ease-out);
+  }
+  .v2-pin:hover::before, .v2-pin:focus-visible::before { opacity: .3; }
+  .v2-pin .dot {
+    position: absolute; left: 50%; top: 50%;
+    width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px;
+    border-radius: 50%; background: var(--v2-light);
+    box-shadow: 0 0 8px 0 var(--v2-light-soft), 0 0 18px 2px var(--v2-light-soft);
+  }
+  .v2-pin .ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 1px solid var(--v2-light); opacity: .5;
+    animation: v2-pin-breathe 3.2s var(--v2-ease-io) infinite;
+    animation-delay: calc(var(--i, 0) * .26s);
+  }
+  @keyframes v2-pin-breathe {
+    0%, 100% { transform: scale(.7);  opacity: .5; }
+    50%      { transform: scale(1.14); opacity: .12; }
+  }
+  .v2-pin:hover .ring, .v2-pin:focus-visible .ring { opacity: .85; }
+  .v2-pin[aria-expanded="true"] .ring { opacity: .9; animation-play-state: paused; }
+  .v2-pin .tip {
+    position: absolute; left: 50%; bottom: calc(100% + 9px);
+    transform: translateX(-50%);
+    width: max-content; max-width: 190px;
+    font-size: 10px; letter-spacing: .06em; line-height: 1.35;
+    color: var(--v2-ink); text-align: center;
+    background: color-mix(in srgb, var(--v2-surface) 94%, transparent);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--v2-line); border-radius: var(--v2-radius);
+    padding: 6px 10px; pointer-events: none;
+    opacity: 0; transition: opacity .25s var(--v2-ease-out);
+  }
+  .v2-pin:hover .tip, .v2-pin:focus-visible .tip { opacity: 1; }
+
+  /* whatever isn't the subject recedes */
+  .v2-node { transition: opacity .5s var(--v2-ease-out); }
+  .v2-plane[data-mode="y"] .v2-node,
+  .v2-plane[data-mode="x"] .v2-node,
+  .v2-plane[data-mode="ex"] .v2-node { opacity: 0 !important; }
+  .v2-plane[data-mode="y"] .v2-pin,
+  .v2-plane[data-mode="x"] .v2-pin { opacity: 0 !important; pointer-events: none; }
+  /* the example panel covers the whole plane, so every pin (the active one included)
+     gets out of the way rather than glowing through the copy. Reopen by closing first. */
+  .v2-plane[data-mode="ex"] .v2-pin { opacity: 0 !important; pointer-events: none; }
+  .v2-plane[data-mode="ex"] .v2-pin .tip { display: none; }
+  .v2-plane[data-mode="x"] .v2-axis-v,
+  .v2-plane[data-mode="ex"] .v2-axis-v { opacity: 0; }
+
+  /* ---------- in-place panels ---------- */
+  .v2-panel {
+    position: absolute; z-index: 10;
+    justify-content: center;   /* copy block sits centred in the box, not left-hugged */
+    opacity: 0; pointer-events: none;
+    background: color-mix(in srgb, var(--v2-surface) 92%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--v2-line);
+    border-radius: var(--v2-radius);
+    display: flex; align-items: center;
+    transition: transform .8s var(--v2-ease-out), opacity .4s var(--v2-ease-out);
+  }
+  .v2-panel-close {
+    position: absolute; top: 14px; right: 14px; z-index: 2;
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    color: var(--v2-ink-faint);
+    background: none; border: 1px solid var(--v2-line); border-radius: 50%;
+    transition: color .25s var(--v2-ease-out), border-color .25s var(--v2-ease-out),
+                transform .25s var(--v2-ease-out);
+  }
+  .v2-panel-close:hover { color: var(--v2-ink); border-color: var(--v2-light); transform: rotate(90deg); }
+  .v2-panel-close svg { display: block; }
+
+  .v2-panel .inner { padding: 48px 64px; opacity: 0; transition: opacity .35s var(--v2-ease-out); }
+  .v2-panel .poles { display: block; color: var(--v2-light); margin-bottom: 16px; font-size: 11px; }
+  .v2-panel p {
+    color: var(--v2-ink-dim);
+    font-size: clamp(15px, 1.35vw, 19px);
+    line-height: 1.7; margin: 0; max-width: 64ch;
+  }
+
+  /* the example panel's own copy stack */
+  .v2-panel-ex .inner {
+    width: 100%; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .ex-title {
+    font-family: var(--v2-display); font-weight: 600;
+    font-size: clamp(1.15rem, 2.1vw, 1.7rem); line-height: 1.15;
+    letter-spacing: -0.01em; color: var(--v2-ink);
+    margin: 0 0 22px; max-width: 26ch;
+  }
+  .v2-panel-ex .ex-lab {
+    font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--v2-ink-faint); margin: 0 0 6px;
+  }
+  .v2-panel-ex .ex-lab + p { margin: 0 0 22px; font-size: clamp(14px, 1.15vw, 16px); }
+  .ex-more {
+    display: inline-block; margin-top: 4px;
+    font-family: var(--v2-mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--v2-light);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s var(--v2-ease-out);
+  }
+  .ex-more:hover { border-bottom-color: var(--v2-light); }
+
+  /* The open window spans the GRID — i.e. the viewport — not the plane's own box.
+     calc(50% - 50vw/vh) escapes the plane outward to the viewport edge, padded to
+     clear the header (top) and breathe elsewhere. */
+  .v2-panel-y {
+    left: var(--yx);
+    right: calc(50% - 50vw + 240px);        /* == EDGE_X — same span as the x-panel */
+    top: 5%; bottom: 5%;
+    margin-left: 64px;                      /* clears the STRATEGY/EXECUTION labels, which are
+                                               centred on the axis and were clipping the box */
+    transform-origin: left center; transform: scaleX(.015);
+  }
+  .v2-panel-x {
+    top: var(--xy);
+    /* the Y panel is the size Greg wants both to be: width vw-544, height 90% of the
+       plane. Same box here, centred under the raised line. */
+    left: calc(50% - 50vw + 272px);
+    right: calc(50% - 50vw + 272px);
+    height: 90%;
+    bottom: auto;
+    margin-top: 26px;
+    transform-origin: top center; transform: scaleY(.015);
+  }
+  /* the example panel does not ride an axis — it just opens over the middle */
+  .v2-panel-ex {
+    left: calc(50% - 50vw + 272px);
+    right: calc(50% - 50vw + 272px);
+    /* the plane is only ~56vh tall and the copy is longer than an axis blurb, so the
+       box escapes to the VIEWPORT: 96px clears the header, 48px breathes at the foot */
+    top: calc(50% - 50vh + 96px);
+    bottom: calc(50% - 50vh + 48px);
+    transform-origin: center; transform: scale(.96);
+  }
+  .v2-plane[data-mode="y"] .v2-panel-y { opacity: 1; pointer-events: auto; transform: scaleX(1); }
+  .v2-plane[data-mode="x"] .v2-panel-x { opacity: 1; pointer-events: auto; transform: scaleY(1); }
+  .v2-plane[data-mode="ex"] .v2-panel-ex { opacity: 1; pointer-events: auto; transform: scale(1); }
+  .v2-plane[data-mode="y"] .v2-panel-y .inner,
+  .v2-plane[data-mode="x"] .v2-panel-x .inner,
+  .v2-plane[data-mode="ex"] .v2-panel-ex .inner { opacity: 1; transition-delay: .3s; }
+
+  .v2-plane.is-live { pointer-events: auto; }
+  .v2-hint {
+    position: absolute; bottom: -62px; left: 50%; transform: translateX(-50%);
+    opacity: 0; transition: opacity .5s var(--v2-ease-out);
+    white-space: nowrap; margin: 0; letter-spacing: .14em;
+  }
+  .v2-plane.is-live .v2-hint { opacity: 1; }
+  .v2-plane[data-mode="y"] .v2-hint,
+  .v2-plane[data-mode="x"] .v2-hint,
+  .v2-plane[data-mode="ex"] .v2-hint { opacity: 0; }
+  .v2-hint b { color: var(--v2-ink-dim); font-weight: 400; }
+
+  @media (max-width: 860px) {
+    /* Rail-aware geometry. The hold stays full-width; the absolutely-positioned hero and
+       plane get INSETS. Padding on the hold shifted their static position by the whole
+       rail width, not half, and pushed both off the right edge of a phone. */
+    .v2-hold { height: 100dvh; }   /* iOS: no jump when the URL bar collapses */
+    .v2-hero { left: 0; right: 0; width: auto; max-width: none; padding: 0 16px; }
+    .v2-plane {
+      left: 0; right: 0; margin: 0 auto;   /* over-constrained + auto margins = centred in the column */
+      width: min(calc(100% - 32px), calc(min(52dvh, 420px) / 1.15));
+      height: auto; aspect-ratio: 1 / 1.15; max-width: none;
+    }
+
+    /* the side labels hang OUTSIDE the plane on desktop; on small screens there is no
+       outside. Tuck them inside, sitting just above their end of the axis line. */
+    .v2-l-left  { right: auto; left: 2px;  top: calc(var(--xy) - 22px); transform: none; margin: 0; }
+    .v2-l-right { left: auto;  right: 2px; top: calc(var(--xy) - 22px); transform: none; margin: 0; }
+    /* 44px tap targets without moving the visible text */
+    .v2-axlab::after { content: ""; position: absolute; inset: -11px; }
+    .v2-node .nt { font-size: .78rem; }
+    .v2-pin .tip { max-width: 42vw; font-size: 9px; }
+
+    /* Panels. The desktop boxes span axis → viewport edge; a phone has no edge to span
+       to (both collapsed to 2px). Bottom sheet over the content column instead. */
+    .v2-panel, .v2-panel-y, .v2-panel-x, .v2-panel-ex {
+      position: fixed; top: auto; height: auto; margin: 0;
+      left: calc(var(--v2-rail, 0px) + 16px); right: 16px;
+      bottom: max(16px, env(safe-area-inset-bottom, 0px));
+      max-height: 58dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      transform-origin: bottom center; transform: scaleY(.015);
+    }
+    .v2-plane[data-mode="y"] .v2-panel-y,
+    .v2-plane[data-mode="x"] .v2-panel-x,
+    .v2-plane[data-mode="ex"] .v2-panel-ex { transform: scaleY(1); }
+    .v2-panel .inner { padding: 22px 20px 20px; }
+    .v2-panel p { font-size: 15px; line-height: 1.6; }
+    .v2-panel-ex .inner { max-height: none; overflow: visible; }
+    .v2-panel-close { width: 40px; height: 40px; top: 10px; right: 10px; }
+    .ex-title { font-size: 1.1rem; margin-bottom: 16px; padding-right: 44px; }
+  }
+
+  /* phone density */
+  @media (max-width: 768px) {
+    .v2-stage { height: 260vh; }
+    .splash-lede { margin-top: 52px; font-size: 15px; max-width: 34ch; }
+  }
+
+  @media (max-width: 640px) {
+    .v2-hero :global(.splash-mark) { margin-bottom: 28px; height: 44px; width: auto; }
+    .splash-actions { flex-direction: column; gap: 10px; margin-top: 34px; }
+    .splash-lede { margin-top: 52px; }
+  }
+  @media (max-height: 700px) {
+    .v2-hero :global(.splash-mark) { margin-bottom: 22px; }
+    .splash-eyebrow { margin-bottom: 16px; }
+    .splash-lede { margin-top: 46px; }
+    .splash-actions { margin-top: 26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .v2-stage { height: auto; }
+    .v2-hold { position: relative; height: auto; flex-direction: column; gap: 90px; padding: 90px 0; }
+    .v2-hero { position: relative; }
+    .v2-plane { position: relative; opacity: 1 !important; }
+    .v2-seam { display: none; }
+    .v2-pin .ring { animation: none; }
+  }
+</style>
+
+<script>
+  (() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const $ = (id: string) => document.getElementById(id);
+
+    const stage = $("v2-stage"), hold = $("v2-hold"), hero = $("v2-hero"),
+          thesis = $("v2-thesis"), seam = $("v2-seam"),
+          plane = $("v2-plane"), axv = $("v2-axv");
+    if (!stage || !hold || !hero || !thesis || !seam || !plane || !axv) return;
+
+    const labs = Array.from(plane.querySelectorAll<HTMLElement>(".v2-axlab"));
+    const marks = Array.from(plane.querySelectorAll<HTMLElement>(".v2-node"));
+    const pins = Array.from(plane.querySelectorAll<HTMLButtonElement>(".v2-pin"));
+
+    const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
+    const seg = (p: number, a: number, b: number) => clamp((p - a) / (b - a), 0, 1);
+    const ease = (t: number) => (t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    type Mode = "grid" | "y" | "x" | "ex";
+    let mode: Mode = "grid";
+
+    /* ---------- the example panel ---------- */
+    type Ex = { slug: string; title: string; coord: string; problem: string; build: string };
+    let exData: Ex[] = [];
+    try { exData = JSON.parse($("v2-ex-data")?.textContent || "[]"); } catch { exData = []; }
+
+    const exPanel = $("v2-panel-ex");
+    const exInner = exPanel?.querySelector<HTMLElement>(".inner") ?? null;
+    const exClose = exPanel?.querySelector<HTMLButtonElement>(".v2-panel-close") ?? null;
+    const exCoord = $("v2-ex-coord"), exTitle = $("v2-ex-title"),
+          exProblem = $("v2-ex-problem"), exBuild = $("v2-ex-build");
+    const exMore = $("v2-ex-more") as HTMLAnchorElement | null;
+
+    let activeSlug: string | null = null;
+    let lastPin: HTMLButtonElement | null = null;
+    let swapTimer = 0;
+
+    function fillEx(slug: string) {
+      const d = exData.find((x) => x.slug === slug);
+      if (!d) return;
+      if (exCoord) exCoord.textContent = d.coord;
+      if (exTitle) exTitle.textContent = d.title;
+      if (exProblem) exProblem.textContent = d.problem;
+      if (exBuild) exBuild.textContent = d.build;
+      if (exMore) exMore.href = "/examples#" + d.slug;
+      if (exInner) exInner.scrollTop = 0;
+    }
+
+    function markPins() {
+      pins.forEach((p) => {
+        const on = mode === "ex" && p.dataset.slug === activeSlug;
+        p.setAttribute("aria-expanded", String(on));
+      });
+    }
+
+    /* px offsets from the viewport edges when an axis is opened out */
+    const EDGE_X = 240;
+
+    let xyPin = 0;        // seam's target Y within the hold, kept for render()
+
+    // ≤860 the panel is a bottom sheet, not attached to the axis
+    const mobile = () => window.matchMedia("(max-width: 860px)").matches;
+
+    function applyMode(next: Mode) {
+      const prev = mode;
+      mode = next;
+      if (next !== "grid") (window as any).v2Backdrop?.setFocus(0);
+      plane!.dataset.mode = next;
+
+      const pr = hold!.getBoundingClientRect();
+      const plr = plane!.getBoundingClientRect();
+
+      // --yx / --xy are plane-relative; convert the viewport-edge targets into
+      // plane coordinates so labels and panels ride with the axis.
+      // Mode "ex" leaves both axes exactly where they are.
+      if (next === "y") {
+        plane!.style.setProperty("--yx", mobile() ? "16%" : (EDGE_X - (plr.left - pr.left)).toFixed(1) + "px");
+      } else {
+        plane!.style.setProperty("--yx", "50%");
+      }
+      if (next === "x" && mobile()) {
+        plane!.style.setProperty("--xy", "12%");
+        xyPin = (plr.top - pr.top) + plr.height * 0.12;
+      } else if (next === "x") {
+        const unitH = 26 + plr.height * 0.9;        // gap below line + panel height
+        const edgeY = Math.max(96, (pr.height - unitH) / 2);
+        plane!.style.setProperty("--xy", (edgeY - (plr.top - pr.top)).toFixed(1) + "px");
+        xyPin = edgeY;
+      } else {
+        plane!.style.setProperty("--xy", "50%");
+        xyPin = (plr.top - pr.top) + plr.height * 0.5;
+      }
+
+      // the inactive axis's labels get out of the way — they were ghosting through
+      // the open panel's copy. In mode "ex" no axis is the subject, so all four go.
+      labs.forEach((l) => {
+        const active = next === "grid" || l.dataset.axis === next;
+        l.style.opacity = active ? "1" : "0";
+        l.setAttribute("aria-expanded", String(next !== "grid" && l.dataset.axis === next));
+      });
+
+      if (next !== "ex") activeSlug = null;
+      markPins();
+
+      if (prev === "ex" && next !== "ex" && lastPin) {
+        const p = lastPin; lastPin = null;
+        p.focus({ preventScroll: true });
+      }
+      render();
+    }
+
+    function openEx(pin: HTMLButtonElement) {
+      const slug = pin.dataset.slug || "";
+      if (mode === "ex" && activeSlug === slug) { seamEase(); applyMode("grid"); return; }
+
+      const wasOpen = mode === "ex";
+      activeSlug = slug;
+      lastPin = pin;
+
+      if (wasOpen && exInner) {
+        // swap without a close/reopen flicker
+        window.clearTimeout(swapTimer);
+        exInner.style.transitionDelay = "0s";
+        exInner.style.transitionDuration = ".15s";
+        exInner.style.opacity = "0";
+        swapTimer = window.setTimeout(() => {
+          fillEx(slug);
+          exInner.style.opacity = "1";
+          swapTimer = window.setTimeout(() => {
+            exInner.style.transitionDelay = "";
+            exInner.style.transitionDuration = "";
+            exInner.style.opacity = "";
+          }, 200);
+        }, 150);
+        markPins();
+        return;
+      }
+
+      fillEx(slug);
+      seamEase();
+      applyMode("ex");
+      window.setTimeout(() => exClose?.focus({ preventScroll: true }), 380);
+    }
+
+    function render() {
+      const denom = stage!.offsetHeight - window.innerHeight;
+      if (denom <= 0) return;
+      const pRaw = -stage!.getBoundingClientRect().top / denom;
+      const p = clamp(pRaw, 0, 1);
+
+      const h = seg(p, 0.03, 0.15);
+      hero!.style.opacity = String(1 - h);
+      hero!.style.transform = `translateY(${-h * 44}px)`;
+      hero!.style.pointerEvents = h > 0.6 ? "none" : "auto";
+
+      const m = ease(seg(p, 0.06, 0.44));   // the signature stretch
+      seam!.style.setProperty("--arrow", seg(p, 0.38, 0.48).toFixed(3));
+      axv!.style.setProperty("--arrow", seg(p, 0.48, 0.58).toFixed(3));
+
+      const pr = hold!.getBoundingClientRect();
+      const tr = thesis!.getBoundingClientRect();
+      const plr = plane!.getBoundingClientRect();
+
+      const seamY0 = tr.bottom - pr.top + 26;
+      // the seam always terminates at its labels — plane width, never wider
+      const seamY1 = mode === "x" ? xyPin : (plr.top - pr.top) + plr.height * 0.5;
+      const seamW0 = Math.min(160, tr.width * 0.28);
+
+      seam!.style.width = lerp(seamW0, plr.width, m).toFixed(1) + "px";
+      seam!.style.transform = `translate(-50%, ${lerp(seamY0, seamY1, m).toFixed(1)}px)`;
+      seam!.style.opacity = (mode === "y" || mode === "ex") ? "0" : "1";
+
+      plane!.style.opacity = String(seg(p, 0.24, 0.38));
+      axv!.style.setProperty("--sy", ease(seg(p, 0.34, 0.56)).toFixed(3));
+
+      // Bloom holds at full strength for the WHOLE pinned stay and only fades as the
+      // section physically leaves the frame.
+      if (mode === "grid") {
+        (window as any).v2Backdrop?.setFocus(seg(p, 0.28, 0.48) * (1 - seg(pRaw, 1.02, 1.22)));
+      }
+
+      if (mode === "grid") {
+        const la = seg(p, 0.40, 0.54);
+        labs.forEach((l) => { l.style.opacity = String(la); });
+      }
+
+      // while a panel is open the nodes and pins are driven by CSS, not by scroll
+      if (mode === "grid") {
+        marks.forEach((mk) => {
+          const t = parseFloat(mk.dataset.t || "0.8");
+          const o = seg(p, t, t + 0.06);
+          mk.style.opacity = o.toFixed(3);
+          mk.style.transform = `translate(-50%, calc(-50% + ${((1 - o) * 9).toFixed(1)}px)) scale(${(0.94 + o * 0.06).toFixed(3)})`;
+        });
+        pins.forEach((pn) => {
+          const t = parseFloat(pn.dataset.t || "0.78");
+          const o = seg(p, t, t + 0.06);
+          pn.style.opacity = o.toFixed(3);
+        });
+      }
+
+      plane!.classList.toggle("is-live", p >= 0.80);
+    }
+
+    if (window.matchMedia("(hover: none)").matches) {
+      const b = $("v2-hint")?.querySelector("b");
+      if (b) b.textContent = "Tap an axis";
+    }
+
+    if (reduce) {
+      plane.style.opacity = "1";
+      axv.style.setProperty("--sy", "1");
+      labs.forEach((l) => { l.style.opacity = "1"; });
+      marks.forEach((mk) => { mk.style.opacity = "1"; mk.style.transform = "translate(-50%,-50%)"; });
+      pins.forEach((pn) => { pn.style.opacity = "1"; });
+      plane.classList.add("is-live");
+      (window as any).v2Backdrop?.setFocus(1);
+    } else {
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { render(); ticking = false; });
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", render);
+      document.fonts?.ready.then(render);
+      render();
+    }
+
+    // seam transitions only while switching modes — never during scroll, or the
+    // scroll morph would lag behind the wheel
+    const seamEase = () => {
+      seam!.style.transition = "transform .8s var(--v2-ease-out), width .8s var(--v2-ease-out), opacity .5s var(--v2-ease-out)";
+      window.setTimeout(() => { seam!.style.transition = "opacity .5s var(--v2-ease-out)"; }, 850);
+    };
+
+    labs.forEach((l) => {
+      l.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const axis = (l.dataset.axis || "y") as "y" | "x";
+        seamEase();
+        applyMode(mode === axis ? "grid" : axis);
+      });
+    });
+
+    pins.forEach((pn) => {
+      pn.addEventListener("click", (e) => { e.stopPropagation(); openEx(pn); });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (mode === "grid") return;
+      const t = e.target as Element | null;
+      if (t?.closest?.(".v2-axlab") || t?.closest?.(".v2-pin") || t?.closest?.(".v2-panel")) return;
+      seamEase();
+      applyMode("grid");
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mode !== "grid") { seamEase(); applyMode("grid"); }
+    });
+    plane.querySelectorAll<HTMLElement>(".v2-panel-close").forEach((b) =>
+      b.addEventListener("click", (e) => { e.stopPropagation(); seamEase(); applyMode("grid"); })
+    );
+
+    // "Work with me" just scrolls. The spine nav owns the tracker; don't fight it.
+    document.getElementById("splash-work")?.addEventListener("click", (e) => {
+      const target = document.getElementById("contact");
+      if (!target) return;
+      e.preventDefault();
+      const top = target.getBoundingClientRect().top + window.scrollY;
+      const from = window.scrollY;
+      window.scrollTo({ top, behavior: "smooth" });
+      // some browsers have smooth scrolling switched off entirely, and then the call
+      // above is a silent no-op. Land the user on the form either way.
+      window.setTimeout(() => { if (window.scrollY === from) window.scrollTo(0, top); }, 260);
+    });
+  })();
+</script>
