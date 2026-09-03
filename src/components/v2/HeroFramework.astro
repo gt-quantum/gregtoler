@@ -466,7 +466,7 @@ const exData = pinned.map((e) => ({
     .v2-hold { height: 100dvh; }   /* iOS: no jump when the URL bar collapses */
     .v2-hero { left: 0; right: 0; width: auto; max-width: none; padding: 0 16px; }
     .v2-plane {
-      left: 0; right: 0; margin: 0 auto;   /* over-constrained + auto margins = centred in the column */
+      left: 0; right: 0; margin: 44px auto 0;   /* over-constrained + auto margins = centred in the column; the top margin makes room for the hint above the map, clear of the header */
       width: min(calc(100% - 32px), calc(min(52dvh, 420px) / 1.15));
       height: auto; aspect-ratio: 1 / 1.15; max-width: none;
     }
@@ -480,18 +480,26 @@ const exData = pinned.map((e) => ({
     .v2-node .nt { font-size: .78rem; }
     .v2-pin .tip { max-width: 42vw; font-size: 9px; }
 
+    /* The hint reads BEFORE the map on a phone (Greg): it sits above the Strategy label,
+       wraps to two lines, and keeps the same scroll reveal as everything else. */
+    .v2-hint {
+      bottom: auto; top: -84px;
+      white-space: normal; text-align: center; line-height: 1.7;
+      width: calc(100% + 24px); max-width: 34ch; font-size: 10px;
+    }
+
     /* Panels. The desktop boxes span axis → viewport edge; a phone has no edge to span
-       to (both collapsed to 2px). Bottom sheet over the content column instead. */
+       to (both collapsed to 2px). A centred sheet over the content column instead, at
+       the same vertical middle the map itself sits at (Greg). */
     .v2-panel, .v2-panel-y, .v2-panel-x, .v2-panel-ex {
-      position: fixed; top: auto; height: auto; margin: 0;
+      position: fixed; top: 50%; bottom: auto; height: auto; margin: 0;
       left: calc(var(--v2-rail, 0px) + 16px); right: 16px;
-      bottom: max(16px, env(safe-area-inset-bottom, 0px));
-      max-height: 58dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
-      transform-origin: bottom center; transform: scaleY(.015);
+      max-height: min(72dvh, calc(100dvh - 120px)); overflow-y: auto; -webkit-overflow-scrolling: touch;
+      transform-origin: center; transform: translateY(-50%) scale(.96);
     }
     .v2-plane[data-mode="y"] .v2-panel-y,
     .v2-plane[data-mode="x"] .v2-panel-x,
-    .v2-plane[data-mode="ex"] .v2-panel-ex { transform: scaleY(1); }
+    .v2-plane[data-mode="ex"] .v2-panel-ex { transform: translateY(-50%) scale(1); }
     .v2-panel .inner { padding: 22px 20px 20px; }
     .v2-panel p { font-size: 15px; line-height: 1.6; }
     .v2-panel-ex .inner { max-height: none; overflow: visible; }
