@@ -1,0 +1,14 @@
+# V1 site retired 2026-09-14. Old URLs land on the matching V2 section.
+/about        /#about     301
+/about/       /#about     301
+/contact      /#contact   301
+/contact/     /#contact   301
+/work         /#work      301
+/work/        /#work      301
+/work/*       /examples   301
+/services     /examples   301
+/services/    /examples   301
+/content      /examples   301
+/content/*    /examples   301
+/resources    /examples   301
+/resources/*  /examples   301
