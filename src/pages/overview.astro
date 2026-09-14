@@ -1,0 +1,955 @@
+---
+/**
+ * /overview — the talk deck as a page. Same markup as the standalone deck
+ * (positioning/deck in the GT Strategies folder), with the site's ContactIntake
+ * dropped into the last slide so a submission goes through /api/contact and
+ * /api/qualify exactly like the home page form. The PDF lives at
+ * public/overview/gt-strategies-deck.pdf and the footer links to it.
+ */
+import "../styles/v2-tokens.css";
+import ContactIntake from "../components/v2/ContactIntake.astro";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Greg Toler — Overview</title>
+    <meta name="description" content="How GT Strategies works: go-to-market and operations, strategy through execution, and how people start." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/barlow-600.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/hanken-400.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/martian-mono-400.woff2" crossorigin />
+    <style is:inline>html { background: #17181A; }</style>
+    <style is:global>
+  /* ---- tokens: carried from gregtolerdotcom v2-tokens.css. Dark only, the site's night palette ---- */
+  :root {
+    --base: #17181A; --surface: #1E1F22; --line: #2A2B2E; --line-soft: #212225; --dot: #45474B;
+    --ink: #D8DADC; --ink-dim: #909297; --ink-faint: #66686D;
+    --light: #7A8058; --light-soft: rgba(122,128,88,.13);
+    --mark-filter: brightness(0) invert(0.92);
+    --display: "Barlow", "Arial Narrow", system-ui, sans-serif;
+    --sans: "Hanken Grotesk", system-ui, sans-serif;
+    --mono: "Martian Mono", ui-monospace, SFMono-Regular, monospace;
+    --ease-out: cubic-bezier(.16,1,.3,1); --ease-io: cubic-bezier(.65,0,.35,1);
+    color-scheme: dark;
+  }
+
+  html { font-size: clamp(12px, 0.5vw + 0.6vh, 17px); }
+  html, body { height: 100%; min-height: 100dvh; }
+  body {
+    margin: 0; background: var(--base); color: var(--ink);
+    font-family: var(--sans); line-height: 1.55; -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  ::selection { background: var(--light-soft); color: var(--ink); }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--light); outline-offset: 3px; border-radius: 2px; }
+
+  /* the site's backdrop, drawn once: silk sheets, lamp blooms, dotted lattice */
+  .backdrop {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-color: var(--base);
+    background-image: radial-gradient(var(--dot) 1px, transparent 1.3px);
+    background-size: 24px 24px; background-position: 12px 12px; opacity: .55;
+  }
+  /* a slide frame: thin rule top and bottom, so it reads as a page rather than the site */
+  .bar { border-bottom: 1px solid var(--line-soft); padding-bottom: 14px; }
+  .foot { border-top: 1px solid var(--line-soft); padding-top: 14px; }
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 90; opacity: .35; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  }
+
+  .mono { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+
+  /* ---- deck shell ---- */
+  .deck { position: relative; z-index: 1; height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; }
+  .bar { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px 0; }
+  .bar img { height: 22px; width: auto; filter: var(--mark-filter); display: block; }
+  .bar .where { display: flex; gap: 18px; align-items: center; }
+  .bar .where b { color: var(--ink-dim); font-weight: 400; }
+
+  .stage { position: relative; min-height: 0; }
+  .slide {
+    position: absolute; inset: 0; padding: 24px 32px; box-sizing: border-box;
+    display: grid; align-content: safe center; justify-items: center; text-align: center;
+    max-width: 1440px; margin: 0 auto; width: 100%;
+    overflow-y: auto; overscroll-behavior: contain;
+    opacity: 0; pointer-events: none; transform: translateY(8px);
+    transition: opacity .45s var(--ease-out), transform .6s var(--ease-out);
+  }
+  .slide.on { opacity: 1; pointer-events: auto; transform: none; }
+
+  .foot { display: flex; align-items: center; justify-content: space-between; padding: 0 32px 16px; }
+  .foot .keys { display: flex; gap: 6px; }
+  .foot .nav { display: flex; gap: 8px; }
+  .foot button {
+    background: color-mix(in srgb, var(--surface) 85%, transparent); border: 1px solid var(--line); border-radius: 100px; padding: 8px 16px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-dim); cursor: pointer; transition: color .35s var(--ease-out), border-color .35s var(--ease-out);
+  }
+  .foot button:hover { color: var(--ink); border-color: var(--light); }
+  .foot .keys button { padding: 8px 11px; }
+  .foot .dl { display: inline-flex; align-items: center; padding: 8px 16px; border: 1px solid transparent; border-radius: 100px; font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); margin-right: 8px; transition: color .35s, border-color .35s; }
+  .foot .dl:hover { color: var(--ink); border-color: var(--light); }
+  .foot .keys button.k-on { color: var(--ink); border-color: var(--light); }
+
+  /* ---- type ---- */
+  .eyebrow { margin: 0 0 16px; color: var(--light); }
+  h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: -.015em; line-height: 1.04; }
+  h1 { font-size: clamp(2rem, 3.6vw + 1vh, 4.2rem); max-width: 16ch; }
+  h2 { font-size: clamp(1.5rem, 2.2vw + 1vh, 2.6rem); max-width: 22ch; }
+  h3 { font-size: 1.3rem; font-weight: 500; }
+  .lede { color: var(--ink-dim); font-size: clamp(.98rem, 1.5vw, 1.12rem); line-height: 1.62; max-width: 46ch; margin: 0; text-wrap: pretty; }
+
+  /* the splash hero, ported: seam rule under the headline, then lede, then the two actions */
+  .hero { display: grid; justify-items: center; }
+  .hero .eyebrow { margin-bottom: 22px; }
+  .seam { width: 72px; height: 1px; background: var(--light); margin: 26px 0 30px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; justify-content: center; margin-top: 44px; }
+  .splash-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink); border-radius: 100px; cursor: pointer; background: none; border: 0;
+    transition: border-color .35s var(--ease-out), color .35s var(--ease-out), background .35s var(--ease-out);
+  }
+  .splash-btn.primary { padding: 6px 24px 6px 6px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 85%, transparent); }
+  .splash-btn .node-ic {
+    display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--line); color: var(--light); background: color-mix(in srgb, var(--surface) 85%, transparent);
+    transition: border-color .35s var(--ease-out), box-shadow .35s var(--ease-out);
+  }
+  .splash-btn.primary:hover { border-color: var(--light); }
+  .splash-btn.primary:hover .node-ic { border-color: var(--light); box-shadow: 0 0 0 3px var(--light-soft), 0 0 22px 2px var(--light-soft); }
+  .splash-btn.ghost { padding: 14px 6px; color: var(--ink-dim); gap: 8px; border-bottom: 1px solid transparent; border-radius: 0; }
+  .splash-btn.ghost .ext { color: var(--ink-faint); transition: color .35s, transform .35s var(--ease-out); }
+  .splash-btn.ghost:hover { color: var(--ink); border-bottom-color: var(--light); }
+  .splash-btn.ghost:hover .ext { color: var(--light); transform: translate(1px, -1px); }
+
+  /* ---- slide 02: context left, the plane right ---- */
+  .s-map { grid-template-columns: minmax(0, 1fr); }
+  .map-grid { width: 100%; display: grid; grid-template-columns: minmax(300px, 38%) minmax(0, 1fr); gap: 48px; align-items: center; }
+  .map-copy { text-align: left; display: grid; gap: 18px; justify-items: start; }
+  .map-copy .eyebrow { margin: 0; }
+  .map-copy h2 { max-width: 16ch; font-size: clamp(1.6rem, 2.2vw + 1vh, 2.8rem); }
+  .map-copy p { margin: 0; color: var(--ink-dim); font-size: 1.15rem; line-height: 1.65; max-width: 40ch; text-wrap: pretty; }
+  .map-copy .hint { margin: 8px 0 0; text-align: left; }
+  .more { color: var(--ink-faint); border-bottom: 1px solid transparent; transition: color .3s, border-color .3s; }
+  .more:hover { color: var(--ink); border-bottom-color: var(--light); }
+  .map-copy .more { margin-top: 4px; }
+  .plane-wrap { width: 100%; display: grid; grid-template-columns: 1fr; justify-items: center; }
+  .plane {
+    position: relative; aspect-ratio: 12 / 7.2;
+    width: min(100%, 980px, calc((100dvh - 230px) * 12 / 7.2));
+    margin: 0 auto;
+    background-image: radial-gradient(var(--dot) 1px, transparent 1.2px);
+    background-size: calc(100% / 12) calc(100% / 8); background-position: 0 0;
+  }
+  .ax-h, .ax-v { position: absolute; background: var(--line); }
+  .ax-h { left: 0; right: 0; top: 50%; height: 1px; }
+  .ax-v { top: 0; bottom: 0; left: 50%; width: 1px; }
+  .axlab {
+    position: absolute; z-index: 9; background: none; border: 0; padding: 5px 8px; cursor: pointer;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-dim);
+    white-space: nowrap; transition: color .3s;
+    text-shadow: 0 0 14px var(--base), 0 0 6px var(--base);
+  }
+  .axlab:hover, .axlab[aria-expanded="true"] { color: var(--light); }
+  .l-top { left: 50%; top: -4px; transform: translate(-50%, -50%); }
+  .l-bot { left: 50%; bottom: -4px; transform: translate(-50%, 50%); }
+  .l-left { left: 0; top: 50%; transform: translate(-6px, -50%); }
+  .l-right { right: 0; top: 50%; transform: translate(6px, -50%); }
+  .l-left, .l-right { background: var(--base); }
+
+  .node {
+    position: absolute; transform: translate(-50%, -50%); text-align: center; z-index: 8;
+    background: none; border: 0; padding: 8px 12px; cursor: pointer; color: var(--ink);
+    font-family: var(--display); font-weight: 500; font-size: clamp(.85rem, 1.4vw, 1.15rem); line-height: 1.05;
+    text-shadow: 0 0 20px var(--base), 0 0 7px var(--base);
+    transition: opacity .5s var(--ease-out), color .3s;
+  }
+  .node::before {
+    content: ""; display: block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ink-faint); margin: 0 auto 10px; transition: background .3s, box-shadow .3s;
+  }
+  .node:hover, .node[aria-expanded="true"] { color: var(--light); }
+  .node:hover::before, .node[aria-expanded="true"]::before { background: var(--light); box-shadow: 0 0 12px 2px var(--light-soft); }
+
+  .pin {
+    position: absolute; z-index: 11; width: 18px; height: 18px; padding: 0; margin: 0;
+    background: none; border: 0; cursor: pointer; transform: translate(-50%, -50%);
+    transition: opacity .5s var(--ease-out);
+  }
+  .pin::after { content: ""; position: absolute; inset: -12px; border-radius: 50%; }
+  .pin .dot {
+    position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px;
+    border-radius: 50%; background: var(--light);
+    box-shadow: 0 0 8px 0 var(--light-soft), 0 0 18px 2px var(--light-soft);
+  }
+  .pin .ring {
+    position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--light); opacity: .5;
+    animation: breathe 3.2s var(--ease-io) infinite; animation-delay: calc(var(--i, 0) * .26s);
+  }
+  @keyframes breathe { 0%,100% { transform: scale(.7); opacity: .5 } 50% { transform: scale(1.14); opacity: .12 } }
+  .pin:hover .ring, .pin[aria-expanded="true"] .ring { opacity: .9; animation-play-state: paused; }
+  .pin .tip {
+    position: absolute; left: 50%; bottom: calc(100% + 9px); transform: translateX(-50%);
+    width: max-content; max-width: 190px; font-size: 10px; letter-spacing: .06em; line-height: 1.35;
+    color: var(--ink); text-align: center; text-transform: none;
+    background: color-mix(in srgb, var(--surface) 94%, transparent); border: 1px solid var(--line); border-radius: 2px;
+    padding: 6px 10px; pointer-events: none; opacity: 0; transition: opacity .25s;
+  }
+  .pin:hover .tip, .pin:focus-visible .tip { opacity: 1; }
+
+  /* in-place modes, same rearrangement as the site */
+  .plane:not([data-mode="grid"]) .node, .plane:not([data-mode="grid"]) .pin { opacity: 0; pointer-events: none; }
+  .plane[data-mode="x"] .ax-v, .plane[data-mode="ex"] .ax-v, .plane[data-mode="q"] .ax-v,
+  .plane[data-mode="y"] .ax-h, .plane[data-mode="ex"] .ax-h, .plane[data-mode="q"] .ax-h { opacity: 0; }
+  .plane[data-mode="x"] .l-top, .plane[data-mode="x"] .l-bot, .plane[data-mode="y"] .l-left, .plane[data-mode="y"] .l-right,
+  .plane[data-mode="ex"] .axlab, .plane[data-mode="q"] .axlab { opacity: 0; }
+  .plane[data-mode="y"] .ax-v, .plane[data-mode="y"] .l-top, .plane[data-mode="y"] .l-bot { left: 10%; }
+  .plane[data-mode="x"] .ax-h, .plane[data-mode="x"] .l-left, .plane[data-mode="x"] .l-right { top: 10%; }
+  .ax-v, .l-top, .l-bot { transition: left .75s var(--ease-out), opacity .4s; }
+  .ax-h, .l-left, .l-right { transition: top .75s var(--ease-out), opacity .4s; }
+
+  .panel {
+    position: absolute; z-index: 10; opacity: 0; pointer-events: none;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--line); border-radius: 2px;
+    display: flex; align-items: center; justify-content: center; text-align: left;
+    transition: transform .8s var(--ease-out), opacity .4s var(--ease-out);
+  }
+  .panel .inner { padding: 36px 48px; opacity: 0; transition: opacity .35s; max-width: 100%; box-sizing: border-box; }
+  .panel .poles { display: block; color: var(--light); margin-bottom: 14px; font-size: 11px; }
+  .panel p { color: var(--ink-dim); font-size: 1.05rem; line-height: 1.65; margin: 0; max-width: 58ch; text-wrap: pretty; }
+  .panel-y { left: 10%; right: 6%; top: 8%; bottom: 8%; margin-left: 48px; transform-origin: left center; transform: scaleX(.015); }
+  .panel-x { left: 6%; right: 6%; top: 10%; bottom: 6%; margin-top: 36px; transform-origin: center top; transform: scaleY(.02); }
+  .panel-ex, .panel-q { left: 8%; right: 8%; top: 6%; bottom: 6%; transform-origin: center; transform: scale(.92); }
+  .plane[data-mode="y"] .panel-y, .plane[data-mode="x"] .panel-x, .plane[data-mode="ex"] .panel-ex, .plane[data-mode="q"] .panel-q { opacity: 1; pointer-events: auto; transform: none; }
+  .plane[data-mode="y"] .panel-y .inner, .plane[data-mode="x"] .panel-x .inner, .plane[data-mode="ex"] .panel-ex .inner, .plane[data-mode="q"] .panel-q .inner { opacity: 1; transition-delay: .3s; }
+  .panel-ex .inner, .panel-q .inner { width: 100%; max-height: 100%; overflow-y: auto; }
+  .ex-title { font-family: var(--display); font-weight: 600; font-size: 1.5rem; line-height: 1.15; margin: 0 0 18px; max-width: 30ch; }
+  .ex-lab { display: block; margin: 14px 0 4px; letter-spacing: .18em; }
+  .panel-q .q-title { margin: 0 0 10px; }
+  .panel-q .q-lede { margin: 0 0 18px; }
+  .panel-q .q-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; max-width: 58ch; }
+  .panel-q .q-list li { color: var(--ink-dim); font-size: 1.05rem; line-height: 1.5; padding-left: 18px; position: relative; text-wrap: pretty; }
+  .panel-q .q-list li::before { content: ""; position: absolute; left: 0; top: .65em; width: 5px; height: 5px; border-radius: 50%; background: var(--light); }
+  .panel-close {
+    position: absolute; top: 12px; right: 12px; z-index: 2; width: 32px; height: 32px; display: grid; place-items: center;
+    color: var(--ink-faint); background: none; border: 1px solid var(--line); border-radius: 50%; cursor: pointer;
+    transition: color .25s, border-color .25s, transform .25s;
+  }
+  .panel-close:hover { color: var(--ink); border-color: var(--light); transform: rotate(90deg); }
+  .hint { margin: 34px 0 0; text-align: center; }
+  .hint b { color: var(--ink-dim); font-weight: 400; }
+
+  /* ---- shared blocks ---- */
+  .wrap { width: min(100%, 1180px); margin-top: 26px; }
+  .fnodes { display: grid; gap: 14px; position: relative; width: 100%; }
+  .fnodes.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fnodes.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .fnodes.chain { gap: 28px; }
+  .fnode {
+    border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 80%, transparent);
+    padding: 18px 20px; min-width: 0; display: grid; gap: 4px; position: relative; text-align: center;
+  }
+  .fnode b { font-family: var(--display); font-weight: 600; font-size: 1.25rem; line-height: 1.1; }
+  .fnode small { display: block; color: var(--ink-dim); font-size: .92rem; line-height: 1.45; text-wrap: pretty; }
+  .fnodes.chain .fnode + .fnode::before { content: ""; position: absolute; top: 50%; right: 100%; width: 28px; height: 1px; background: var(--light); }
+  .fnodes.chain .fnode + .fnode::after {
+    content: ""; position: absolute; top: 50%; right: calc(100% + 1px); width: 5px; height: 5px;
+    border-top: 1px solid var(--light); border-right: 1px solid var(--light); transform: translateY(-50%) rotate(45deg);
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .chips span { border: 1px solid var(--line); padding: 8px 14px; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); }
+  .chips.lit span { border-color: var(--light); color: var(--ink); }
+  .note { margin: 22px 0 0; color: var(--ink-dim); font-size: 1rem; max-width: 64ch; text-wrap: pretty; }
+
+  /* ---- slide 03: bottom-up or top-down, two cards that jump to their slides ---- */
+  .ways { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; width: min(100%, 1180px); margin-top: 26px; }
+  .way {
+    display: grid; grid-template-columns: minmax(150px, 34%) 1fr; gap: 24px; align-items: center; text-align: left;
+    border: 1px solid var(--line); padding: 22px 24px; min-width: 0;
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+    transition: border-color .35s var(--ease-out);
+  }
+  button.way { cursor: pointer; }
+  button.way:hover { border-color: var(--light); }
+  .way svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .way .half { fill: var(--light-soft); }
+  .way .ax { stroke: var(--line); stroke-width: 1; }
+  .way .arr { fill: none; stroke: var(--light); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .way text { font-family: var(--mono); font-size: 5.5px; letter-spacing: .14em; fill: var(--ink-faint); text-transform: uppercase; }
+  .way-copy { display: grid; gap: 6px; min-width: 0; }
+  .way-copy .mono { color: var(--light); }
+  .way-copy h3 { font-size: clamp(1.6rem, 2.6vw, 2.4rem); font-weight: 600; }
+  .way-copy .tag { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1.05rem; margin: 0; }
+  .way-copy p { margin: 0; color: var(--ink-dim); font-size: .95rem; text-wrap: pretty; }
+  .way-copy .go { margin-top: 6px; color: var(--ink-faint); }
+  button.way:hover .go { color: var(--light); }
+  .net line { stroke: var(--light); stroke-width: .8; opacity: .55; }
+  .net .n { fill: var(--ink-faint); }
+  .net .n.lit { fill: var(--light); }
+  .way-copy ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 3px; }
+  .way-copy li { color: var(--ink-dim); font-size: .92rem; padding-left: 14px; position: relative; }
+  .way-copy li::before { content: ""; position: absolute; left: 0; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--light); }
+
+  /* ---- slide 04: fix, build, scale ---- */
+  .starts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: min(100%, 1180px); margin-top: 26px; }
+  .start { border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 70%, transparent); padding: 22px 20px 24px; min-width: 0; display: grid; gap: 8px; justify-items: center; }
+  .start .mono { color: var(--light); }
+  .start h3 { font-size: clamp(2rem, 3.4vw, 3.2rem); font-weight: 600; }
+  .start .tag { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1rem; margin: 0; }
+  .start p:not(.tag) { margin: 0; color: var(--ink-dim); font-size: .92rem; line-height: 1.5; text-wrap: pretty; }
+
+  /* ---- slide 05: the department, people to technology ---- */
+  .lens .l1 { border-color: var(--light); background: color-mix(in srgb, var(--light) 16%, transparent); }
+  .lens .l2 { border-color: var(--light); background: color-mix(in srgb, var(--light) 36%, transparent); }
+  .lens .l2 small { color: var(--ink); opacity: .85; }
+  .outcomes, .deliverables { margin-top: 24px; display: grid; gap: 10px; justify-items: center; }
+  .note.intro { margin: 0 0 6px; }
+  .fnode .deliv { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); color: var(--ink-dim); font-size: .88rem; line-height: 1.4; text-wrap: pretty; }
+  .fnode .deliv em { font-style: normal; display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 2px; }
+  button.fnode { cursor: pointer; font: inherit; color: inherit; transition: border-color .35s var(--ease-out), background .35s var(--ease-out); }
+  button.fnode:hover { border-color: var(--ink); }
+  button.fnode .go { margin-top: 6px; color: var(--ink-faint); }
+  button.fnode:hover .go { color: var(--ink); }
+  .fnode.lit { border-color: var(--light); background: color-mix(in srgb, var(--light) 16%, transparent); }
+  .link-next { margin-top: 18px; }
+  @media print { button.fnode .go, .link-next { display: none; } }
+
+  /* ---- slide 06: the four As and what each one has to improve ---- */
+  .gate { width: min(100%, 1180px); margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line); display: grid; gap: 12px; justify-items: center; }
+  .gate-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; width: 100%; }
+  .gate-item { border: 1px solid var(--line); padding: 12px 14px; display: grid; gap: 3px; min-width: 0; }
+  .gate-item b { font-family: var(--display); font-weight: 600; font-size: 1.05rem; }
+  .gate-item small { color: var(--ink-dim); font-size: .85rem; line-height: 1.4; text-wrap: pretty; }
+
+  /* ---- slide 08: the site's own intake, dropped in ---- */
+  .intake-host { width: 100%; text-align: left; font-family: var(--sans); }
+  .intake-host .v2-intake { max-width: none; }
+  .close-grid { width: 100%; display: grid; grid-template-columns: minmax(280px, 36%) minmax(0, 1fr); gap: 40px; align-items: center; }
+  .close-copy { text-align: left; display: grid; justify-items: start; }
+  .close-copy .seam { margin: 22px 0 22px; }
+  .close-copy .actions { justify-content: flex-start; margin-top: 18px; }
+  .intake, .intake * { box-sizing: border-box; }
+  .intake {
+    text-align: left; width: 100%;
+    border: 1px solid var(--line); border-radius: 2px;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    padding: 22px 26px 20px;
+  }
+  .intake fieldset { border: 0; padding: 0; margin: 0 0 14px; min-width: 0; }
+  .intake legend { padding: 0; margin: 0 0 8px; color: var(--ink-dim); }
+  .sit-grid, .chip-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { position: relative; cursor: pointer; }
+  .chip input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .chip span {
+    display: inline-block; border: 1px solid var(--line); border-radius: 100px; padding: 6px 12px;
+    font-size: .85rem; color: var(--ink-dim); background: color-mix(in srgb, var(--surface) 85%, transparent);
+    transition: border-color .25s, color .25s, background .25s;
+  }
+  .chip:hover span { border-color: var(--light); color: var(--ink); }
+  .chip input:checked + span { border-color: var(--light); color: var(--ink); background: var(--light-soft); }
+  .chip input:focus-visible + span { outline: 2px solid var(--light); outline-offset: 2px; }
+  .intake textarea, .intake input[type="text"], .intake input[type="email"], .intake input[type="tel"], .intake input[type="url"] {
+    width: 100%; font: inherit; font-size: .92rem; color: var(--ink); background: color-mix(in srgb, var(--base) 70%, transparent);
+    border: 1px solid var(--line); border-radius: 2px; padding: 8px 10px; transition: border-color .25s;
+  }
+  .intake textarea:focus, .intake input:focus { outline: none; border-color: var(--light); }
+  .intake textarea { resize: vertical; min-height: 64px; }
+  .who { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-bottom: 10px; }
+  .who label { display: grid; gap: 3px; font-family: var(--mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+  .req { color: var(--light); }
+  .opt { color: var(--ink-faint); opacity: .7; text-transform: none; letter-spacing: 0; font-family: var(--sans); font-size: 11px; }
+  .reach { display: grid; gap: 6px; }
+  .field-err { margin: 0 0 8px; color: #C48A7A; font-size: .9rem; }
+  .intake-nav { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .intake-nav .status { margin: 0; }
+  .intake-done, .intake-fallback { display: grid; gap: 10px; justify-items: start; }
+  .intake-done h3, .intake-fallback h3 { font-size: 1.3rem; font-weight: 600; }
+  .intake-done p, .intake-fallback p { margin: 0; color: var(--ink-dim); }
+  .intake-done a:not(.splash-btn) { color: var(--ink); border-bottom: 1px solid var(--light); }
+  @media (max-width: 1000px) { .close-grid { grid-template-columns: 1fr; gap: 20px; } .close-copy { justify-items: center; text-align: center; } .close-copy .actions { justify-content: center; } }
+  @media (max-width: 600px) { .who { grid-template-columns: 1fr; } }
+
+  @media (max-width: 1100px) { .ways { grid-template-columns: 1fr; gap: 16px; } .gate-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 1000px) {
+    .map-grid { grid-template-columns: 1fr; gap: 20px; }
+    .map-copy { justify-items: center; text-align: center; }
+    .map-copy .hint { text-align: center; }
+    .plane { width: min(100%, calc((100dvh - 330px) * 12 / 7.2)); }
+  }
+  @media (max-width: 900px) {
+    .fnodes.n3, .fnodes.n4, .starts { grid-template-columns: 1fr; }
+    .fnodes.chain { gap: 12px; }
+    .fnodes.chain .fnode + .fnode::before, .fnodes.chain .fnode + .fnode::after { display: none; }
+  }
+  @media (max-width: 860px) {
+    .slide { padding: 20px 16px; }
+    .bar, .foot { padding-left: 16px; padding-right: 16px; }
+    .foot .keys { display: none; }
+    .panel .inner { padding: 22px 20px; }
+    .panel-y, .panel-x, .panel-ex, .panel-q { left: 3%; right: 3%; top: 3%; bottom: 3%; margin: 0; }
+  }
+  @media (max-width: 640px) { .way { grid-template-columns: 1fr; } .way svg { max-width: 180px; margin: 0 auto; } }
+  .appendix { display: none; }
+
+  /* ---- print: one slide per page, then the appendix. Chrome renders the PDF from this. ---- */
+  @page { size: 13.333in 7.5in; margin: 0; }
+  @media print {
+    html { font-size: 13px; }
+    html, body { height: auto; overflow: visible; background: #17181A; }
+    .backdrop, .grain, .foot, .bar { display: none; }
+    .deck { height: auto; display: block; }
+    .stage { display: block; }
+    .slide {
+      position: relative; inset: auto; opacity: 1; transform: none; pointer-events: auto; overflow: visible;
+      height: 7.5in; width: 13.333in; max-width: none; padding: .6in .8in; box-sizing: border-box;
+      break-after: page; page-break-after: always; align-content: center;
+      background: #17181A radial-gradient(#45474B 1px, transparent 1.3px) 12px 12px / 24px 24px;
+    }
+    .slide::before { content: ""; position: absolute; left: .8in; top: .45in; width: 1.1in; height: .3in; background: url("/logo.png") left center / contain no-repeat; filter: brightness(0) invert(0.92); }
+    .slide[data-name="Intro"] .actions, .slide[data-name="Work with me"] .actions { display: flex; }
+    .pin .ring { animation: none; }
+    .pin .tip { display: none; }
+    .map-copy .hint { display: none; }
+    .way .go { display: none; }
+    .intake { display: none; }
+    .close-grid { grid-template-columns: 1fr; }
+    .close-copy { justify-items: center; text-align: center; }
+    .close-copy .actions { justify-content: center; }
+    .print-cta { display: flex !important; }
+    .appendix { display: block; }
+    .slide { padding-top: 1in; }
+    .apage { padding-top: 1.2in; }
+    .map-grid { grid-template-columns: 4in 1fr !important; gap: .5in; }
+    .map-copy { justify-items: start !important; text-align: left !important; }
+    .plane { width: 7.2in !important; }
+    .ways { grid-template-columns: 1fr 1fr !important; gap: .3in; }
+    .way { grid-template-columns: 1.6in 1fr !important; }
+    .way svg { max-width: none; }
+    .starts { grid-template-columns: 1fr 1fr 1fr !important; }
+    .fnodes.n3 { grid-template-columns: repeat(3, 1fr) !important; }
+    .fnodes.n4 { grid-template-columns: repeat(4, 1fr) !important; }
+    .fnodes.chain { gap: 28px !important; }
+    .fnodes.chain .fnode + .fnode::before, .fnodes.chain .fnode + .fnode::after { display: block !important; }
+    .gate-row { grid-template-columns: repeat(5, 1fr) !important; }
+    .close-grid { grid-template-columns: 1fr !important; }
+    .who { grid-template-columns: 1fr 1fr; }
+    .aex { grid-template-columns: 1fr 1fr 1fr; }
+    .apage {
+      position: relative; height: 7.5in; width: 13.333in; padding: .7in .8in; box-sizing: border-box;
+      break-after: page; page-break-after: always; overflow: hidden;
+      background: #17181A radial-gradient(#45474B 1px, transparent 1.3px) 12px 12px / 24px 24px;
+    }
+    .apage::before { content: ""; position: absolute; left: .8in; top: .45in; width: 1.1in; height: .3in; background: url("/logo.png") left center / contain no-repeat; filter: brightness(0) invert(0.92); }
+    .apage:last-child { break-after: auto; page-break-after: auto; }
+    .apage h2 { margin: 0 0 18px; }
+    .apage h3 { font-size: 1.05rem; font-weight: 600; margin: 12px 0 4px; }
+    .apage p { color: var(--ink-dim); font-size: .95rem; line-height: 1.5; margin: 0; max-width: 70ch; text-wrap: pretty; }
+    .acol { columns: 2; column-gap: 40px; }
+    .acol h3:first-child { margin-top: 0; }
+    .aquads { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 36px; }
+    .aquad .mono { color: var(--light); display: block; margin-bottom: 4px; }
+    .aquad ul { margin: 6px 0 0; padding-left: 16px; color: var(--ink-dim); font-size: .92rem; }
+    .anote { margin-bottom: 14px !important; }
+    .anote a, .aexi a { color: var(--ink); border-bottom: 1px solid var(--light); }
+    .aex { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px 24px; }
+    .aexi { break-inside: avoid; }
+    .aexi .mono { color: var(--light); display: block; margin-bottom: 2px; }
+    .aexi h3 { margin: 0 0 3px; font-size: .95rem; }
+    .aexi p { font-size: .78rem; line-height: 1.4; }
+    .aexi p b { color: var(--ink); font-weight: 500; }
+  }
+  .print-cta { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+</style>
+  </head>
+  <body>
+
+
+<div class="backdrop" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="deck">
+  <header class="bar">
+    <img src="/logo.png" alt="GT Strategies">
+    <div class="where mono"><span id="slide-name">Intro</span><b id="slide-count">1 / 11</b></div>
+  </header>
+
+  <main class="stage" id="stage">
+
+    <!-- 01 -->
+    <section class="slide" data-name="Intro">
+      <div class="hero">
+        <p class="eyebrow mono">Greg Toler &middot; GT Strategies</p>
+        <h1>Go-to-Market and Operations&nbsp;Support</h1>
+        <div class="seam" aria-hidden="true"></div>
+        <p class="lede">Strategy, systems, and hands-on execution for teams that need it fixed, built, or scaled.</p>
+        <div class="actions">
+          <a class="splash-btn primary" href="https://gregtoler.com/#contact" target="_blank" rel="noopener noreferrer">
+            <span class="node-ic" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            <span>Work with me</span>
+          </a>
+          <a class="splash-btn ghost" href="https://www.linkedin.com/in/gregtoler" target="_blank" rel="noopener noreferrer">
+            <span>Connect on LinkedIn</span>
+            <svg class="ext" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 the framework -->
+    <section class="slide s-map" data-name="The framework">
+      <div class="map-grid">
+        <div class="map-copy">
+          <p class="eyebrow mono">What I do</p>
+          <h2>Go-to-market and operations, strategy through execution</h2>
+          <p>I help companies fix, build, and scale how they sell and how they run. The plan and the build, hands on, handed off so it runs without me.</p>
+          <p>Every engagement sits somewhere on this map.</p>
+          <a class="more mono" href="https://gregtoler.com/examples" target="_blank" rel="noopener noreferrer">All the examples at gregtoler.com/examples &rarr;</a>
+        </div>
+        <div class="plane-wrap">
+          <div class="plane" id="plane" data-mode="grid">
+            <div class="ax-h" aria-hidden="true"></div>
+            <div class="ax-v" aria-hidden="true"></div>
+
+            <button class="axlab l-top" data-axis="y" aria-expanded="false" aria-controls="panel-y">Strategy</button>
+            <button class="axlab l-bot" data-axis="y" aria-expanded="false" aria-controls="panel-y">Execution</button>
+            <button class="axlab l-left" data-axis="x" aria-expanded="false" aria-controls="panel-x">Go-to-market</button>
+            <button class="axlab l-right" data-axis="x" aria-expanded="false" aria-controls="panel-x">Operations</button>
+
+            <button class="node" type="button" data-q="tl" style="left:25%;top:25%" aria-haspopup="dialog" aria-expanded="false">GTM strategy</button>
+            <button class="node" type="button" data-q="tr" style="left:75%;top:25%" aria-haspopup="dialog" aria-expanded="false">RevOps &amp; BizOps</button>
+            <button class="node" type="button" data-q="bl" style="left:25%;top:75%" aria-haspopup="dialog" aria-expanded="false">GTM execution</button>
+            <button class="node" type="button" data-q="br" style="left:75%;top:75%" aria-haspopup="dialog" aria-expanded="false">Systems &amp; automation</button>
+
+            <div id="pins"></div>
+
+            <div class="panel panel-y" id="panel-y" role="region" aria-label="Strategy to Execution">
+              <button class="panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+              <div class="inner">
+                <span class="poles mono">Strategy / Execution</span>
+                <p>Strategy is the top half. Deciding what to change and why. Which accounts, which processes, which systems, in what order. Execution is the bottom half. Doing the work. Building the tool, writing the automation, fixing the process, and handing it off so it runs without me. Most consultants do one or the other. I do both, so the plan and the build come from the same person.</p>
+              </div>
+            </div>
+
+            <div class="panel panel-x" id="panel-x" role="region" aria-label="Go-to-market to Operations">
+              <button class="panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+              <div class="inner">
+                <span class="poles mono">GTM / Operations</span>
+                <p>Go-to-market is the left half. Anything that finds a buyer and moves them forward. Targeting, campaigns, content, paid media, sales follow-up. Operations is the right half. Anything that runs underneath. The CRM and its data, reporting, the systems that connect teams, automation and AI. Most problems sit on the line between the two. A pipeline problem is usually a process or tooling problem underneath, so I work both sides.</p>
+              </div>
+            </div>
+
+            <div class="panel panel-ex" role="dialog" aria-modal="false">
+              <button class="panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+              <div class="inner">
+                <span class="poles mono ex-coord"></span>
+                <h3 class="ex-title"></h3>
+                <span class="ex-lab mono">Problem</span>
+                <p class="ex-problem"></p>
+                <span class="ex-lab mono">Build</span>
+                <p class="ex-build"></p>
+              </div>
+            </div>
+
+            <div class="panel panel-q" role="dialog" aria-modal="false">
+              <button class="panel-close" type="button" aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+              <div class="inner">
+                <span class="poles mono q-coord"></span>
+                <h3 class="ex-title q-title"></h3>
+                <p class="q-lede"></p>
+                <ul class="q-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 how people work with me -->
+    <section class="slide" data-name="How people work with me">
+      <p class="eyebrow mono">How people work with me</p>
+      <h2>Bottom-up or top-down</h2>
+      <div class="ways">
+        <button class="way" type="button" data-go="Bottom-up">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <rect x="0" y="50" width="100" height="50" class="half"/>
+            <line x1="0" y1="50" x2="100" y2="50" class="ax"/><line x1="50" y1="0" x2="50" y2="100" class="ax"/>
+            <text x="50" y="7" text-anchor="middle">Strategy</text><text x="50" y="97" text-anchor="middle">Execution</text>
+            <path d="M50 62 V22" class="arr"/><path d="M45 28 L50 22 L55 28" class="arr"/>
+          </svg>
+          <div class="way-copy">
+            <span class="mono">Start on the execution half</span>
+            <h3>Bottom-up</h3>
+            <p class="tag">You know what needs to be fixed, built, or scaled.</p>
+            <p>Something specific. You have the details and need someone to execute.</p>
+            <span class="mono go">See how it starts &rarr;</span>
+          </div>
+        </button>
+        <button class="way" type="button" data-go="Top-down">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <rect x="0" y="0" width="100" height="50" class="half"/>
+            <line x1="0" y1="50" x2="100" y2="50" class="ax"/><line x1="50" y1="0" x2="50" y2="100" class="ax"/>
+            <text x="50" y="7" text-anchor="middle">Strategy</text><text x="50" y="97" text-anchor="middle">Execution</text>
+            <path d="M50 38 V78" class="arr"/><path d="M45 72 L50 78 L55 72" class="arr"/>
+          </svg>
+          <div class="way-copy">
+            <span class="mono">Start on the strategy half</span>
+            <h3>Top-down</h3>
+            <p class="tag">You know something needs to change, not what is broken.</p>
+            <p>Strategic review first. Execution once a plan is in place.</p>
+            <span class="mono go">See how it starts &rarr;</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- 04 bottom-up: fix, build, scale -->
+    <section class="slide" data-name="Bottom-up">
+      <p class="eyebrow mono">Bottom-up</p>
+      <h2>Most people start with a project</h2>
+      <div class="starts">
+        <div class="start">
+          <span class="mono">Something is broken</span>
+          <h3>Fix it</h3>
+          <p class="tag">Make what exists work better.</p>
+          <p>Leads stalling, a ten-step process that should be three, hours going to work that should be automated. I find where it breaks and rebuild it. Implemented, not recommended.</p>
+        </div>
+        <div class="start">
+          <span class="mono">It does not exist yet</span>
+          <h3>Build it</h3>
+          <p class="tag">Make something new that needs to exist.</p>
+          <p>Off the shelf does not solve it, or custom is faster and cheaper. Applications, automations, AI systems, integrations, dashboards, internal tools.</p>
+        </div>
+        <div class="start">
+          <span class="mono">It works, by hand</span>
+          <h3>Scale it</h3>
+          <p class="tag">Make what works scale.</p>
+          <p>It works, but it depends on one person doing it by hand. I document it, systematize the delivery, and train the team to run it.</p>
+        </div>
+      </div>
+      <p class="note">Execution first. A specific thing, a specific problem. It often grows into how we scale it and look at the whole.</p>
+    </section>
+
+    <!-- 05 top-down: the department review -->
+    <section class="slide" data-name="Top-down">
+      <p class="eyebrow mono">Top-down</p>
+      <h2>Review the department</h2>
+      <p class="note intro">One function at a time, I review the people, the process, and the technology, in that order. Each review is measured against what the business needs most right now: more revenue, lower cost, or less risk.</p>
+      <div class="wrap">
+        <div class="fnodes n3 chain lens">
+          <div class="fnode l0">
+            <span class="mono">Review 1</span>
+            <b>People</b>
+            <small>Are the right people in the right seats, doing the right things consistently?</small>
+            <span class="deliv"><em>Comes out of it</em> Roles, owners, and what good looks like for each.</span>
+          </div>
+          <button class="fnode l1" type="button" data-go="Process">
+            <span class="mono">Review 2</span>
+            <b>Process</b>
+            <small>Is the work written down, and does it run the same way every time?</small>
+            <span class="deliv"><em>Comes out of it</em> Documented processes, improved and owned.</span>
+            <span class="mono go">See the process work &rarr;</span>
+          </button>
+          <button class="fnode l2" type="button" data-go="Technology and AI">
+            <span class="mono">Review 3</span>
+            <b>Technology</b>
+            <small>Can tools, automation, and AI make the process faster, bigger, and better?</small>
+            <span class="deliv"><em>Comes out of it</em> The build plan, evaluated through the four As.</span>
+            <span class="mono go">See how I evaluate it &rarr;</span>
+          </button>
+        </div>
+        <div class="outcomes">
+          <span class="mono">Measured against</span>
+          <div class="chips lit"><span>Increase revenue</span><span>Decrease cost</span><span>Reduce risk</span></div>
+        </div>
+      </div>
+      <p class="note">They compound. The right people, doing a documented process, with technology applied to all of it. Once the plan and the rollout are in place, the work moves down into execution.</p>
+    </section>
+
+    <!-- 05b top-down: process -->
+    <section class="slide" data-name="Process">
+      <p class="eyebrow mono">Top-down &middot; Process</p>
+      <h2>Document it, then improve it</h2>
+      <div class="wrap">
+        <div class="fnodes n3 chain">
+          <div class="fnode"><b>Review</b><small>Walk the work as it is actually done today. Find where it slows down, breaks, or depends on one person.</small></div>
+          <div class="fnode"><b>Document</b><small>Write it down as a process the team can follow. Steps, handoffs, owners, and the checks along the way.</small></div>
+          <div class="fnode lit"><b>Improve</b><small>Cut steps, fix the handoffs, add the checks that were missing. Iterate until it holds without me.</small></div>
+        </div>
+        <div class="deliverables">
+          <span class="mono">What you get</span>
+          <div class="chips lit"><span>Process documentation</span><span>SOPs and checklists</span><span>Roles and owners</span><span>An improvement backlog</span></div>
+        </div>
+      </div>
+      <p class="note">Process scales without adding people. Once it is written down and improved, technology has something to run. That is the next review.</p>
+      <button class="splash-btn ghost link-next" type="button" data-go="Technology and AI"><span>Next, technology and AI</span><svg class="ext" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </section>
+
+    <!-- 06 technology and AI -->
+    <section class="slide" data-name="Technology and AI">
+      <p class="eyebrow mono">Top-down &middot; Technology</p>
+      <h2>How I evaluate technology and AI</h2>
+      <p class="note intro">Only once the process is documented and improved. Then, for each piece of it, four questions in order.</p>
+      <div class="wrap">
+        <div class="fnodes n4 chain">
+          <div class="fnode"><b>Applications</b><small>Tools that do not exist today and should.</small></div>
+          <div class="fnode"><b>Automations</b><small>What is already in place, made faster and more reliable.</small></div>
+          <div class="fnode"><b>Assistance</b><small>AI in the work, with a person in the loop.</small></div>
+          <div class="fnode"><b>Autonomous</b><small>AI end to end, inside clear bounds.</small></div>
+        </div>
+      </div>
+      <div class="gate">
+        <span class="mono">What each one has to improve</span>
+        <div class="gate-row">
+          <div class="gate-item"><b>Quality</b><small>Is the output better?</small></div>
+          <div class="gate-item"><b>Time</b><small>Is it done sooner?</small></div>
+          <div class="gate-item"><b>Scale</b><small>Does it handle more without more people?</small></div>
+          <div class="gate-item"><b>Efficiency</b><small>Does each unit cost less?</small></div>
+          <div class="gate-item"><b>Multi over point</b><small>Does it serve more than one workflow?</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 one-off or strategy -->
+    <section class="slide" data-name="One-off or strategy">
+      <p class="eyebrow mono">Bottom-up and top-down, in AI terms</p>
+      <h2>A one-off workflow, or a strategy</h2>
+      <div class="ways">
+        <div class="way">
+          <svg viewBox="0 0 100 100" aria-hidden="true" class="net">
+            <circle cx="50" cy="50" r="5" class="n lit"/>
+          </svg>
+          <div class="way-copy">
+            <span class="mono">One-off workflow</span>
+            <h3>Solves a specific problem</h3>
+            <p>One workflow, one job. It stays on its own, and that is fine when the problem is contained.</p>
+          </div>
+        </div>
+        <div class="way">
+          <svg viewBox="0 0 100 100" aria-hidden="true" class="net">
+            <line x1="50" y1="50" x2="22" y2="26"/><line x1="50" y1="50" x2="78" y2="24"/><line x1="50" y1="50" x2="20" y2="70"/><line x1="50" y1="50" x2="76" y2="76"/><line x1="50" y1="50" x2="52" y2="16"/><line x1="50" y1="50" x2="48" y2="86"/>
+            <line x1="22" y1="26" x2="52" y2="16"/><line x1="78" y1="24" x2="52" y2="16"/><line x1="20" y1="70" x2="48" y2="86"/><line x1="76" y1="76" x2="48" y2="86"/>
+            <circle cx="22" cy="26" r="3" class="n"/><circle cx="78" cy="24" r="3" class="n"/><circle cx="20" cy="70" r="3" class="n"/><circle cx="76" cy="76" r="3" class="n"/><circle cx="52" cy="16" r="3" class="n"/><circle cx="48" cy="86" r="3" class="n"/>
+            <circle cx="50" cy="50" r="6" class="n lit"/>
+          </svg>
+          <div class="way-copy">
+            <span class="mono">Strategy</span>
+            <h3>All the components working together</h3>
+            <p>One view of the business, and each build makes the next one cheaper.</p>
+            <ul>
+              <li>Shared components</li>
+              <li>Shared context</li>
+              <li>Shared data, one source of truth</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 close: the site's intake form ---->
+    <section class="slide" data-name="Work with me">
+      <div class="close-grid">
+        <div class="close-copy">
+          <p class="eyebrow mono">Work with me</p>
+          <h2>Fix it, build it, or scale it.</h2>
+          <div class="seam" aria-hidden="true"></div>
+          <p class="lede">Pick the thing that is costing you the most right now. Tell me what is going on and I will read it today and reply within one business day.</p>
+          <div class="actions">
+            <a class="splash-btn primary print-cta" href="https://gregtoler.com/#contact">
+              <span class="node-ic" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              <span>Start at gregtoler.com</span>
+            </a>
+            <a class="splash-btn ghost" href="https://www.linkedin.com/in/gregtoler" target="_blank" rel="noopener noreferrer">
+              <span>Connect on LinkedIn</span>
+              <svg class="ext" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="v2 intake-host"><ContactIntake /></div>
+      </div>
+    </section>
+
+    <!-- print only: the detail behind the clicks, as pages -->
+    <section class="appendix" aria-label="Details">
+      <div class="apage">
+        <p class="eyebrow mono">The axes</p>
+        <h2>How I think about the map</h2>
+        <div class="acol">
+          <h3>Strategy / Execution</h3>
+          <p>Strategy is the top half. Deciding what to change and why. Which accounts, which processes, which systems, in what order. Execution is the bottom half. Doing the work. Building the tool, writing the automation, fixing the process, and handing it off so it runs without me. Most consultants do one or the other. I do both, so the plan and the build come from the same person.</p>
+          <h3>GTM / Operations</h3>
+          <p>Go-to-market is the left half. Anything that finds a buyer and moves them forward. Targeting, campaigns, content, paid media, sales follow-up. Operations is the right half. Anything that runs underneath. The CRM and its data, reporting, the systems that connect teams, automation and AI. Most problems sit on the line between the two. A pipeline problem is usually a process or tooling problem underneath, so I work both sides.</p>
+        </div>
+      </div>
+      <div class="apage">
+        <p class="eyebrow mono">The four quadrants</p>
+        <h2>What each one looks like</h2>
+        <div class="aquads" id="aquads"></div>
+      </div>
+      <div class="apage">
+        <p class="eyebrow mono">The pins, 1 of 2</p>
+        <h2>Twelve examples, problem then build</h2>
+        <p class="anote">Each one is written up in full at <a href="https://gregtoler.com/examples">gregtoler.com/examples</a>.</p>
+        <div class="aex" id="aex1"></div>
+      </div>
+      <div class="apage">
+        <p class="eyebrow mono">The pins, 2 of 2</p>
+        <h2>Twelve examples, problem then build</h2>
+        <p class="anote">Each one is written up in full at <a href="https://gregtoler.com/examples">gregtoler.com/examples</a>.</p>
+        <div class="aex" id="aex2"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="keys mono" id="keys" aria-label="Slides"></div>
+    <div class="nav">
+      <a class="dl" id="dl" href="/overview/gt-strategies-deck.pdf" download>Download the PDF</a>
+      <button type="button" id="prev" aria-label="Previous">&larr; Back</button>
+      <button type="button" id="next" aria-label="Next">Next &rarr;</button>
+    </div>
+  </footer>
+</div>
+
+<script is:inline>
+  /* the pins, verbatim from src/lib/examples.ts (the twelve the site pins) */
+  const EX = [
+    {q:"GTM, Strategy", x:.15, y:.20, t:"Account scoring and tiering", p:"Target lists were built by gut feel or by whichever vendor tag happened to be populated, and paid audiences inherited the same noise.", b:"A composite fit score across every account in the registry, rolled into four tiers with the features weighted in the open, so a rep can argue with a tier instead of a black box."},
+    {q:"GTM, Strategy", x:.36, y:.36, t:"Competitive landing pages from closed-won data", p:"Paid search was bidding on competitor names and landing on the homepage. Comparison pages did not exist and the team disagreed about tone.", b:"Researched why deals were won against each competitor in the CRM, built three pages from that, and wired a CMS template so new variants are a prompt away, with the funnel tracked end to end."},
+    {q:"GTM, Strategy", x:.30, y:.12, t:"Paid media inside Claude", p:"Multiple paid platforms, a team that was not technical enough to run them, and an agency being paid mostly to click buttons. Nobody could say what was live or pacing without waiting on a report.", b:"Three production MCP servers connect Google, LinkedIn, and Microsoft Ads to Claude, and a skill agent carries the ad playbooks and company context, so the team asks for a strategy or a budget shift and the same agent builds and deploys it."},
+    {q:"Ops, Strategy", x:.62, y:.14, t:"Custom dashboards across systems that do not report together", p:"The CRM, the marketing automation tool, the sequencing tool, the phone system, and the work management tool each reported on themselves and none agreed on who had been contacted or which form fill became a meeting.", b:"Read only pulls from every source joined on the person and the account, then the dashboard the team actually needs built on that model, and finally the schema promoted to a hosted database so the full funnel reports without a script."},
+    {q:"Ops, Strategy", x:.88, y:.34, t:"Metabase product data into HubSpot", p:"Product usage lived in the BI tool. The CRM got a hand built CSV once a week, so outreach, lifecycle emails, and account health all ran on stale data.", b:"Saved BI cards queried on a schedule and written to CRM properties on the contact and the company, matched on a user id so reruns update instead of duplicate, feeding trial scoring, lifecycle emails, and a paid health score."},
+    {q:"Ops, Strategy", x:.66, y:.40, t:"Account health from Slack", p:"Checking an account's health meant a BI login and knowing the right saved question. Most people never looked.", b:"A Slack command takes an email or an org name, runs the same BI queries, and posts back a chart with a plain language summary and the score with the reasons behind it."},
+    {q:"GTM, Execution", x:.13, y:.64, t:"Assessment chatbot into Marketo, Salesforce, and Lemlist", p:"A target list of 140 accounts needed a reason to engage beyond a whitepaper, and reps needed owned, warm leads without hand routing.", b:"A chatbot on the landing page adapts its questions as the visitor answers, turns the submission into a personalized audit, updates the marketing automation person, and in parallel routes the lead to an owner and enrolls it in that owner's sequence with copy drawn from the same answers."},
+    {q:"GTM, Execution", x:.36, y:.84, t:"Content bot in Slack", p:"Marketing had produced hundreds of articles, guides, and videos. Sales could not find them, so they asked in Slack and waited, or sent nothing.", b:"A content repository indexed and wired to a retrieval layer and a model behind a Slack app. A rep asks a plain question and the bot answers from approved content and lists the exact pieces to share."},
+    {q:"GTM, Execution", x:.16, y:.90, t:"Voice notes to CRM and drafted follow ups", p:"Event follow up died in the gap between the conversation and the laptop. Notes were lost, contacts never created, emails sent days late.", b:"A voice note from the phone is transcribed, matched to the event, written to the contact record, and turned into a personalized follow up waiting in the rep's drafts. Nothing sends without the rep."},
+    {q:"Ops, Execution", x:.64, y:.62, t:"Event requests into Jira and Asana", p:"About ten event requests a week arrived by email in no fixed format. Every one had to be retyped into the ticketing system and chased for whatever was missing.", b:"A script watches a folder. Drop the email in and it reads the thread, creates the record and the tasks with eleven fields filled, asks the requester for anything missing, and updates only what changed when the answer comes back."},
+    {q:"Ops, Execution", x:.88, y:.72, t:"Marketing requests into RevOps", p:"Marketing worked in Asana and RevOps worked in Jira. Requests were retyped by hand, half arrived without enough detail, and nobody could see progress once a ticket was in flight.", b:"Assigning a task hands it to an agent that pulls the full project context into a properly written ticket, sends a needs context subtask back when the detail is not there, and syncs status both ways after that."},
+    {q:"Ops, Execution", x:.62, y:.90, t:"Research agents for a newsletter and tool directory", p:"Two founders were doing a weekly newsletter and a tool directory's research and writing by hand, which left little time for sales, customers, and events.", b:"A set of agents behind an orchestrator does the research and the writing at scale, with a quality gate, a hallucination check, and a newsletter draft waiting for approval. The founders review rather than write."}
+  ];
+  const SLUGS = ["account-scoring-and-tiering", "competitive-landing-pages-from-closed-won-data", "paid-media-inside-claude", "custom-dashboards-across-systems-that-do-not-report-together", "metabase-product-data-into-hubspot", "account-health-from-slack", "assessment-chatbot-into-marketo-salesforce-and-lemlist", "content-bot-in-slack", "voice-notes-to-crm-and-drafted-follow-ups", "event-requests-into-jira-and-asana", "marketing-requests-into-revops", "research-agents-for-a-newsletter-and-tool-directory"];
+  const QUAD = {
+    tl: { coord: "GTM, Strategy", title: "GTM strategy", lede: "Deciding who to sell to and how to reach them, with the data to back it. The target list, the positioning, and the channel plan, so the team is not guessing.",
+          items: ["Account scoring, tiering, and target lists", "Positioning and competitive pages from closed-won evidence", "Paid media plans the team can actually run"] },
+    tr: { coord: "Ops, Strategy", title: "RevOps & BizOps", lede: "Making the CRM, the marketing tools, and the product data agree, so the reporting is right and the team trusts the numbers it runs on.",
+          items: ["CRM, marketing automation, and product data joined up", "Dashboards across tools that do not report together", "Account health, lifecycle, and pipeline reporting"] },
+    bl: { coord: "GTM, Execution", title: "GTM execution", lede: "The campaigns, pages, content, and follow-up that reach a buyer, built so they work end to end and get measured.",
+          items: ["Landing pages, chatbots, and lead routing that work end to end", "Content reps can find and send", "Event follow-up that happens the same day"] },
+    br: { coord: "Ops, Execution", title: "Systems & automation", lede: "The plumbing underneath. Integrations, automation, agents, and internal tools, built to run without me and documented so the team owns them.",
+          items: ["Requests moving between teams without retyping", "Agents that research, draft, and wait for approval", "Integrations, MCP servers, and custom internal tools"] }
+  };
+
+  const plane = document.getElementById('plane');
+  function setMode(m) {
+    plane.dataset.mode = m;
+    plane.querySelectorAll('.axlab').forEach(a => a.setAttribute('aria-expanded', String(m === a.dataset.axis)));
+    if (m !== 'ex') plane.querySelectorAll('.pin').forEach(p => p.setAttribute('aria-expanded', 'false'));
+    if (m !== 'q') plane.querySelectorAll('.node').forEach(n => n.setAttribute('aria-expanded', 'false'));
+  }
+  function openEx(i, btn) {
+    const e = EX[i];
+    plane.querySelector('.ex-coord').textContent = e.q;
+    plane.querySelector('.ex-title').textContent = e.t;
+    plane.querySelector('.ex-problem').textContent = e.p;
+    plane.querySelector('.ex-build').textContent = e.b;
+    setMode('ex');
+    plane.querySelectorAll('.pin').forEach(p => p.setAttribute('aria-expanded', String(p === btn)));
+  }
+  function openQuad(key, btn) {
+    const q = QUAD[key];
+    plane.querySelector('.q-coord').textContent = q.coord;
+    plane.querySelector('.q-title').textContent = q.title;
+    plane.querySelector('.q-lede').textContent = q.lede;
+    const ul = plane.querySelector('.q-list'); ul.innerHTML = '';
+    q.items.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+    setMode('q');
+    plane.querySelectorAll('.node').forEach(n => n.setAttribute('aria-expanded', String(n === btn)));
+  }
+  const host = document.createElement('div');
+  EX.forEach((e, i) => {
+    const b = document.createElement('button');
+    b.className = 'pin'; b.type = 'button';
+    b.style.cssText = `left:${(e.x*100).toFixed(2)}%;top:${(e.y*100).toFixed(2)}%;--i:${i}`;
+    b.setAttribute('aria-haspopup', 'dialog'); b.setAttribute('aria-expanded', 'false');
+    b.innerHTML = '<span class="ring" aria-hidden="true"></span><span class="dot" aria-hidden="true"></span><span class="tip mono"></span>';
+    b.querySelector('.tip').textContent = e.t;
+    b.addEventListener('click', ev => { ev.stopPropagation(); openEx(i, b); });
+    host.appendChild(b);
+  });
+  document.getElementById('pins').replaceWith(host);
+  plane.querySelectorAll('.axlab').forEach(a => a.addEventListener('click', ev => { ev.stopPropagation(); setMode(plane.dataset.mode === a.dataset.axis ? 'grid' : a.dataset.axis); }));
+  plane.querySelectorAll('.node').forEach(n => n.addEventListener('click', ev => { ev.stopPropagation(); openQuad(n.dataset.q, n); }));
+  plane.querySelectorAll('.panel-close').forEach(c => c.addEventListener('click', ev => { ev.stopPropagation(); setMode('grid'); }));
+  plane.querySelectorAll('.panel').forEach(p => p.addEventListener('click', ev => ev.stopPropagation()));
+  plane.addEventListener('click', () => setMode('grid'));
+
+  /* ---- print appendix content ---- */
+  (() => {
+    const aq = document.getElementById('aquads');
+    Object.values(QUAD).forEach(q => {
+      const d = document.createElement('div'); d.className = 'aquad';
+      d.innerHTML = `<span class="mono"></span><h3></h3><p></p><ul></ul>`;
+      d.querySelector('.mono').textContent = q.coord; d.querySelector('h3').textContent = q.title; d.querySelector('p').textContent = q.lede;
+      q.items.forEach(t => { const li = document.createElement('li'); li.textContent = t; d.querySelector('ul').appendChild(li); });
+      aq.appendChild(d);
+    });
+    EX.forEach((e, i) => {
+      const ax = document.getElementById(i < 6 ? 'aex1' : 'aex2');
+      const d = document.createElement('div'); d.className = 'aexi';
+      d.innerHTML = `<span class="mono"></span><h3><a></a></h3><p><b>Problem.</b> <span class="p"></span></p><p><b>Build.</b> <span class="b"></span></p>`;
+      d.querySelector('.mono').textContent = e.q;
+      const a = d.querySelector('a'); a.textContent = e.t; a.href = 'https://gregtoler.com/examples#' + SLUGS[i];
+      d.querySelector('.p').textContent = e.p; d.querySelector('.b').textContent = e.b;
+      ax.appendChild(d);
+    });
+  })();
+
+  /* ---- deck navigation ---- */
+  const slides = [...document.querySelectorAll('.slide')];
+  const keys = document.getElementById('keys');
+  let cur = 0;
+  slides.forEach((s, i) => {
+    const k = document.createElement('button'); k.type = 'button'; k.textContent = String(i + 1).padStart(2, '0');
+    k.setAttribute('aria-label', s.dataset.name); k.addEventListener('click', () => go(i));
+    keys.appendChild(k);
+  });
+  function go(i) {
+    if (typeof i === 'string') i = slides.findIndex(s => s.dataset.name === i);
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, j) => s.classList.toggle('on', j === cur));
+    keys.querySelectorAll('button').forEach((k, j) => k.classList.toggle('k-on', j === cur));
+    document.getElementById('slide-name').textContent = slides[cur].dataset.name;
+    document.getElementById('slide-count').textContent = `${cur + 1} / ${slides.length}`;
+    setMode('grid');
+  }
+  document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(isNaN(+b.dataset.go) ? b.dataset.go : +b.dataset.go)));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.addEventListener('keydown', ev => {
+    if (ev.target.closest('input, textarea')) return;
+    if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown') { ev.preventDefault(); go(cur + 1); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); go(cur - 1); }
+    else if (ev.key === 'Escape') { setMode('grid'); }
+    else if (ev.key === 'Home') { go(0); }
+    else if (ev.key === 'End') { go(slides.length - 1); }
+  });
+  go(0);
+
+</script>
+
+  </body>
+</html>
