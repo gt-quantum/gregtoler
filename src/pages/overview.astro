@@ -269,7 +269,26 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   .chips.lit span { border-color: var(--light); color: var(--ink); }
   .note { margin: 22px 0 0; color: var(--ink-dim); font-size: 1rem; max-width: 64ch; text-wrap: pretty; }
 
-  /* ---- slide 03: bottom-up or top-down, two cards that jump to their slides ---- */
+  /* ---- slide 03: the four quadrants as tiles, laid out like the map ---- */
+  .qgrid { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; width: min(100%, 980px); margin: 26px 34px 0; padding: 22px 0; }
+  .qax { position: absolute; color: var(--ink-faint); }
+  .qax-top { top: 0; left: 50%; transform: translate(-50%, -50%); }
+  .qax-bot { bottom: 0; left: 50%; transform: translate(-50%, 50%); }
+  .qax-left { left: 0; top: 50%; transform: translate(-100%, -50%) rotate(-90deg); transform-origin: right center; margin-left: -14px; }
+  .qax-right { right: 0; top: 50%; transform: translate(100%, -50%) rotate(90deg); transform-origin: left center; margin-right: -14px; }
+  .qtile { border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 75%, transparent); padding: 20px 24px; text-align: left; min-width: 0; }
+  .qtile h3 { font-size: 1.35rem; font-weight: 600; margin-bottom: 10px; }
+  .qtile ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; }
+  .qtile li { color: var(--ink-dim); font-size: 1rem; padding-left: 16px; position: relative; }
+  .qtile li::before { content: ""; position: absolute; left: 0; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--light); }
+  .slide > .more { margin-top: 18px; }
+  .net .dash { stroke-dasharray: 2 3; opacity: .45; }
+  .net .n.dim { fill: var(--ink-faint); opacity: .5; }
+  .exlink { margin: 6px 0 0 !important; color: var(--ink-dim); font-size: .92rem; line-height: 1.5; text-wrap: pretty; }
+  .exlink em { font-style: normal; display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--light); margin-bottom: 2px; }
+  @media (max-width: 760px) { .qgrid { grid-template-columns: 1fr; margin: 20px 0 0; } .qax-left, .qax-right { display: none; } }
+
+  /* ---- slide 04: bottom-up or top-down ---- */
   .ways { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; width: min(100%, 1180px); margin-top: 26px; }
   .way {
     display: grid; grid-template-columns: minmax(150px, 34%) 1fr; gap: 24px; align-items: center; text-align: left;
@@ -305,6 +324,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   .start h3 { font-size: clamp(2rem, 3.4vw, 3.2rem); font-weight: 600; }
   .start .tag { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1rem; margin: 0; }
   .start p:not(.tag) { margin: 0; color: var(--ink-dim); font-size: .92rem; line-height: 1.5; text-wrap: pretty; }
+  .start { text-align: center; }
 
   /* ---- slide 05: the department, people to technology ---- */
   .lens .l1 { border-color: var(--light); background: color-mix(in srgb, var(--light) 16%, transparent); }
@@ -483,7 +503,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
 <div class="deck">
   <header class="bar">
     <img src="/logo.png" alt="GT Strategies">
-    <div class="where mono"><span id="slide-name">Intro</span><b id="slide-count">1 / 11</b></div>
+    <div class="where mono"><span id="slide-name">Intro</span><b id="slide-count">1 / 9</b></div>
   </header>
 
   <main class="stage" id="stage">
@@ -577,45 +597,71 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
       </div>
     </section>
 
-    <!-- 03 how people work with me -->
+    <!-- 03 what that looks like -->
+    <section class="slide" data-name="What that looks like">
+      <p class="eyebrow mono">What that looks like</p>
+      <h2>Concrete work in each quadrant</h2>
+      <div class="qgrid">
+        <span class="qax qax-top mono">Strategy</span>
+        <span class="qax qax-bot mono">Execution</span>
+        <span class="qax qax-left mono">Go-to-market</span>
+        <span class="qax qax-right mono">Operations</span>
+        <div class="qtile">
+          <h3>GTM strategy</h3>
+          <ul><li>TAM and account scoring reports</li><li>Full go-to-market strategy</li><li>Marketing and sales management</li></ul>
+        </div>
+        <div class="qtile">
+          <h3>RevOps &amp; BizOps</h3>
+          <ul><li>Dashboards and revenue reporting</li><li>Revenue and product strategy</li><li>Organizational support</li></ul>
+        </div>
+        <div class="qtile">
+          <h3>GTM execution</h3>
+          <ul><li>Campaigns and content</li><li>Marketing automations and lead routing</li><li>Everything in between</li></ul>
+        </div>
+        <div class="qtile">
+          <h3>Systems &amp; automation</h3>
+          <ul><li>Tech and system integrations</li><li>Building dashboards</li><li>Onboarding workflows and internal tools</li></ul>
+        </div>
+      </div>
+      <a class="more mono" href="https://gregtoler.com/examples" target="_blank" rel="noopener noreferrer">Sixteen worked examples at gregtoler.com/examples &rarr;</a>
+    </section>
+
+    <!-- 04 how people work with me -->
     <section class="slide" data-name="How people work with me">
       <p class="eyebrow mono">How people work with me</p>
       <h2>Bottom-up or top-down</h2>
       <div class="ways">
-        <button class="way" type="button" data-go="Bottom-up">
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <rect x="0" y="50" width="100" height="50" class="half"/>
-            <line x1="0" y1="50" x2="100" y2="50" class="ax"/><line x1="50" y1="0" x2="50" y2="100" class="ax"/>
-            <text x="50" y="7" text-anchor="middle">Strategy</text><text x="50" y="97" text-anchor="middle">Execution</text>
-            <path d="M50 62 V22" class="arr"/><path d="M45 28 L50 22 L55 28" class="arr"/>
+        <div class="way">
+          <svg viewBox="0 0 100 100" aria-hidden="true" class="net">
+            <line x1="50" y1="52" x2="24" y2="30" class="dash"/><line x1="50" y1="52" x2="76" y2="30" class="dash"/><line x1="50" y1="52" x2="50" y2="84" class="dash"/>
+            <circle cx="24" cy="30" r="3" class="n dim"/><circle cx="76" cy="30" r="3" class="n dim"/><circle cx="50" cy="84" r="3" class="n dim"/>
+            <circle cx="50" cy="52" r="6" class="n lit"/>
           </svg>
           <div class="way-copy">
             <span class="mono">Start on the execution half</span>
             <h3>Bottom-up</h3>
-            <p class="tag">You know what needs to be fixed, built, or scaled.</p>
-            <p>Something specific. You have the details and need someone to execute.</p>
-            <span class="mono go">See how it starts &rarr;</span>
+            <p class="tag">One project. A specific fix, build, or scale.</p>
+            <p>You know the problem and you have the details. Each project that works can be added to, and they compound.</p>
           </div>
-        </button>
-        <button class="way" type="button" data-go="Top-down">
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <rect x="0" y="0" width="100" height="50" class="half"/>
-            <line x1="0" y1="50" x2="100" y2="50" class="ax"/><line x1="50" y1="0" x2="50" y2="100" class="ax"/>
-            <text x="50" y="7" text-anchor="middle">Strategy</text><text x="50" y="97" text-anchor="middle">Execution</text>
-            <path d="M50 38 V78" class="arr"/><path d="M45 72 L50 78 L55 72" class="arr"/>
+        </div>
+        <div class="way">
+          <svg viewBox="0 0 100 100" aria-hidden="true" class="net">
+            <line x1="30" y1="70" x2="70" y2="70"/><line x1="30" y1="70" x2="50" y2="44"/><line x1="70" y1="70" x2="50" y2="44"/>
+            <line x1="50" y1="44" x2="50" y2="16"/><line x1="30" y1="70" x2="14" y2="42"/><line x1="70" y1="70" x2="86" y2="42"/><line x1="50" y1="44" x2="24" y2="22"/><line x1="50" y1="44" x2="76" y2="22"/>
+            <circle cx="50" cy="16" r="3" class="n"/><circle cx="14" cy="42" r="3" class="n"/><circle cx="86" cy="42" r="3" class="n"/><circle cx="24" cy="22" r="3" class="n"/><circle cx="76" cy="22" r="3" class="n"/>
+            <circle cx="30" cy="70" r="5" class="n lit"/><circle cx="70" cy="70" r="5" class="n lit"/><circle cx="50" cy="44" r="5" class="n lit"/>
           </svg>
           <div class="way-copy">
             <span class="mono">Start on the strategy half</span>
             <h3>Top-down</h3>
-            <p class="tag">You know something needs to change, not what is broken.</p>
-            <p>Strategic review first. Execution once a plan is in place.</p>
-            <span class="mono go">See how it starts &rarr;</span>
+            <p class="tag">A strategic foundation you expand on.</p>
+            <p>You know something needs to change, not what is broken. Review the department, set the plan, then build out from it.</p>
           </div>
-        </button>
+        </div>
       </div>
     </section>
 
-    <!-- 04 bottom-up: fix, build, scale -->
+    <!-- 05 bottom-up: fix, build, scale ----->
     <section class="slide" data-name="Bottom-up">
       <p class="eyebrow mono">Bottom-up</p>
       <h2>Most people start with a project</h2>
@@ -624,84 +670,65 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
           <span class="mono">Something is broken</span>
           <h3>Fix it</h3>
           <p class="tag">Make what exists work better.</p>
-          <p>Leads stalling, a ten-step process that should be three, hours going to work that should be automated. I find where it breaks and rebuild it. Implemented, not recommended.</p>
+          <p class="exlink"><em>Example</em> Event requests arriving by email, retyped by hand, now read and ticketed into Jira and Asana automatically.</p>
         </div>
         <div class="start">
           <span class="mono">It does not exist yet</span>
           <h3>Build it</h3>
           <p class="tag">Make something new that needs to exist.</p>
-          <p>Off the shelf does not solve it, or custom is faster and cheaper. Applications, automations, AI systems, integrations, dashboards, internal tools.</p>
+          <p class="exlink"><em>Example</em> Google, LinkedIn, and Microsoft Ads connected to Claude, so the team asks for a budget shift and the same agent ships it.</p>
         </div>
         <div class="start">
           <span class="mono">It works, by hand</span>
           <h3>Scale it</h3>
           <p class="tag">Make what works scale.</p>
-          <p>It works, but it depends on one person doing it by hand. I document it, systematize the delivery, and train the team to run it.</p>
+          <p class="exlink"><em>Example</em> Two founders writing a weekly newsletter by hand, now reviewing a draft that research agents produce.</p>
         </div>
       </div>
-      <p class="note">Execution first. A specific thing, a specific problem. It often grows into how we scale it and look at the whole.</p>
+      <p class="note">Execution first. It often grows into how we scale it and look at the whole.</p>
     </section>
 
-    <!-- 05 top-down: the department review -->
+    <!-- 06 top-down: review the department -->
     <section class="slide" data-name="Top-down">
-      <p class="eyebrow mono">Top-down</p>
+      <p class="eyebrow mono">Top-down &middot; 1 of 3</p>
       <h2>Review the department</h2>
-      <p class="note intro">One function at a time, I review the people, the process, and the technology, in that order. Each review is measured against what the business needs most right now: more revenue, lower cost, or less risk.</p>
+      <p class="note intro">One function at a time. People, then process, then technology, measured against what the business needs most.</p>
       <div class="wrap">
         <div class="fnodes n3 chain lens">
-          <div class="fnode l0">
-            <span class="mono">Review 1</span>
-            <b>People</b>
-            <small>Are the right people in the right seats, doing the right things consistently?</small>
-            <span class="deliv"><em>Comes out of it</em> Roles, owners, and what good looks like for each.</span>
-          </div>
-          <button class="fnode l1" type="button" data-go="Process">
-            <span class="mono">Review 2</span>
-            <b>Process</b>
-            <small>Is the work written down, and does it run the same way every time?</small>
-            <span class="deliv"><em>Comes out of it</em> Documented processes, improved and owned.</span>
-            <span class="mono go">See the process work &rarr;</span>
-          </button>
-          <button class="fnode l2" type="button" data-go="Technology and AI">
-            <span class="mono">Review 3</span>
-            <b>Technology</b>
-            <small>Can tools, automation, and AI make the process faster, bigger, and better?</small>
-            <span class="deliv"><em>Comes out of it</em> The build plan, evaluated through the four As.</span>
-            <span class="mono go">See how I evaluate it &rarr;</span>
-          </button>
+          <div class="fnode l0"><b>People</b><small>Are the right people in the right seats, doing the right things consistently?</small></div>
+          <button class="fnode l1" type="button" data-go="Process"><b>Process</b><small>Is the work written down, and does it run the same way every time?</small><span class="mono go">Process &rarr;</span></button>
+          <button class="fnode l2" type="button" data-go="Technology and AI"><b>Technology</b><small>Can tools, automation, and AI make the process faster, bigger, and better?</small><span class="mono go">Technology &rarr;</span></button>
         </div>
         <div class="outcomes">
           <span class="mono">Measured against</span>
           <div class="chips lit"><span>Increase revenue</span><span>Decrease cost</span><span>Reduce risk</span></div>
         </div>
       </div>
-      <p class="note">They compound. The right people, doing a documented process, with technology applied to all of it. Once the plan and the rollout are in place, the work moves down into execution.</p>
     </section>
 
-    <!-- 05b top-down: process -->
+    <!-- 07 top-down: process -->
     <section class="slide" data-name="Process">
-      <p class="eyebrow mono">Top-down &middot; Process</p>
-      <h2>Document it, then improve it</h2>
+      <p class="eyebrow mono">Top-down &middot; 2 of 3</p>
+      <h2>Review it, document it, improve it</h2>
+      <p class="note intro">If it is a process problem, I work with the founder and the department to walk the work as it is done today, write it down, and improve it until it holds.</p>
       <div class="wrap">
         <div class="fnodes n3 chain">
-          <div class="fnode"><b>Review</b><small>Walk the work as it is actually done today. Find where it slows down, breaks, or depends on one person.</small></div>
-          <div class="fnode"><b>Document</b><small>Write it down as a process the team can follow. Steps, handoffs, owners, and the checks along the way.</small></div>
-          <div class="fnode lit"><b>Improve</b><small>Cut steps, fix the handoffs, add the checks that were missing. Iterate until it holds without me.</small></div>
+          <div class="fnode"><b>Review</b><small>Where it slows down, breaks, or depends on one person.</small></div>
+          <div class="fnode"><b>Document</b><small>Steps, handoffs, owners, and the checks along the way.</small></div>
+          <div class="fnode lit"><b>Improve</b><small>Cut steps, fix handoffs, add the checks that were missing.</small></div>
         </div>
-        <div class="deliverables">
+        <div class="outcomes">
           <span class="mono">What you get</span>
           <div class="chips lit"><span>Process documentation</span><span>SOPs and checklists</span><span>Roles and owners</span><span>An improvement backlog</span></div>
         </div>
       </div>
-      <p class="note">Process scales without adding people. Once it is written down and improved, technology has something to run. That is the next review.</p>
-      <button class="splash-btn ghost link-next" type="button" data-go="Technology and AI"><span>Next, technology and AI</span><svg class="ext" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     </section>
 
-    <!-- 06 technology and AI -->
+    <!-- 08 top-down: technology and AI -->
     <section class="slide" data-name="Technology and AI">
-      <p class="eyebrow mono">Top-down &middot; Technology</p>
+      <p class="eyebrow mono">Top-down &middot; 3 of 3</p>
       <h2>How I evaluate technology and AI</h2>
-      <p class="note intro">Only once the process is documented and improved. Then, for each piece of it, four questions in order.</p>
+      <p class="note intro">Once the process is documented, four questions in order for each piece of it.</p>
       <div class="wrap">
         <div class="fnodes n4 chain">
           <div class="fnode"><b>Applications</b><small>Tools that do not exist today and should.</small></div>
@@ -710,52 +737,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
           <div class="fnode"><b>Autonomous</b><small>AI end to end, inside clear bounds.</small></div>
         </div>
       </div>
-      <div class="gate">
-        <span class="mono">What each one has to improve</span>
-        <div class="gate-row">
-          <div class="gate-item"><b>Quality</b><small>Is the output better?</small></div>
-          <div class="gate-item"><b>Time</b><small>Is it done sooner?</small></div>
-          <div class="gate-item"><b>Scale</b><small>Does it handle more without more people?</small></div>
-          <div class="gate-item"><b>Efficiency</b><small>Does each unit cost less?</small></div>
-          <div class="gate-item"><b>Multi over point</b><small>Does it serve more than one workflow?</small></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 07 one-off or strategy -->
-    <section class="slide" data-name="One-off or strategy">
-      <p class="eyebrow mono">Bottom-up and top-down, in AI terms</p>
-      <h2>A one-off workflow, or a strategy</h2>
-      <div class="ways">
-        <div class="way">
-          <svg viewBox="0 0 100 100" aria-hidden="true" class="net">
-            <circle cx="50" cy="50" r="5" class="n lit"/>
-          </svg>
-          <div class="way-copy">
-            <span class="mono">One-off workflow</span>
-            <h3>Solves a specific problem</h3>
-            <p>One workflow, one job. It stays on its own, and that is fine when the problem is contained.</p>
-          </div>
-        </div>
-        <div class="way">
-          <svg viewBox="0 0 100 100" aria-hidden="true" class="net">
-            <line x1="50" y1="50" x2="22" y2="26"/><line x1="50" y1="50" x2="78" y2="24"/><line x1="50" y1="50" x2="20" y2="70"/><line x1="50" y1="50" x2="76" y2="76"/><line x1="50" y1="50" x2="52" y2="16"/><line x1="50" y1="50" x2="48" y2="86"/>
-            <line x1="22" y1="26" x2="52" y2="16"/><line x1="78" y1="24" x2="52" y2="16"/><line x1="20" y1="70" x2="48" y2="86"/><line x1="76" y1="76" x2="48" y2="86"/>
-            <circle cx="22" cy="26" r="3" class="n"/><circle cx="78" cy="24" r="3" class="n"/><circle cx="20" cy="70" r="3" class="n"/><circle cx="76" cy="76" r="3" class="n"/><circle cx="52" cy="16" r="3" class="n"/><circle cx="48" cy="86" r="3" class="n"/>
-            <circle cx="50" cy="50" r="6" class="n lit"/>
-          </svg>
-          <div class="way-copy">
-            <span class="mono">Strategy</span>
-            <h3>All the components working together</h3>
-            <p>One view of the business, and each build makes the next one cheaper.</p>
-            <ul>
-              <li>Shared components</li>
-              <li>Shared context</li>
-              <li>Shared data, one source of truth</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <p class="note">Each one has to improve quality, time, scale, or efficiency, and serve more than one workflow.</p>
     </section>
 
     <!-- 08 close: the site's intake form ---->
