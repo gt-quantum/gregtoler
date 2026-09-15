@@ -292,6 +292,9 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   .slide > .more { margin-top: 18px; }
   .net .dash { stroke-dasharray: 2 3; opacity: .45; }
   .net.mark { width: 96px; height: 96px; margin: 0 0 6px; overflow: visible; }
+  /* the four how slides anchor to the same top line so the mark, eyebrow, and title never move between them */
+  .s-how { align-content: start; padding-top: clamp(24px, 7vh, 72px); }
+  .s-how h2 { min-height: 2.1em; display: flex; align-items: flex-end; justify-content: center; }
   .net.mark line { stroke: var(--light); stroke-width: .8; opacity: .55; }
   .net.mark .n { fill: var(--ink-faint); }
   .net.mark .n.lit { fill: var(--light); }
@@ -684,7 +687,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     </section>
 
     <!-- 05 bottom-up: fix, build, scale ----->
-    <section class="slide" data-name="Bottom-up">
+    <section class="slide s-how" data-name="Bottom-up">
       <svg viewBox="0 0 100 100" aria-hidden="true" class="net mark">
         <line x1="50" y1="52" x2="24" y2="30" class="dash"/><line x1="50" y1="52" x2="76" y2="30" class="dash"/><line x1="50" y1="52" x2="50" y2="84" class="dash"/>
         <circle cx="24" cy="30" r="3" class="n dim"/><circle cx="76" cy="30" r="3" class="n dim"/><circle cx="50" cy="84" r="3" class="n dim"/>
@@ -713,7 +716,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     </section>
 
     <!-- 06 top-down: review the department -->
-    <section class="slide" data-name="Top-down">
+    <section class="slide s-how" data-name="Top-down">
       <svg viewBox="0 0 100 100" aria-hidden="true" class="net mark">
         <line x1="30" y1="70" x2="70" y2="70"/><line x1="30" y1="70" x2="50" y2="44"/><line x1="70" y1="70" x2="50" y2="44"/>
         <line x1="50" y1="44" x2="50" y2="16"/><line x1="30" y1="70" x2="14" y2="42"/><line x1="70" y1="70" x2="86" y2="42"/><line x1="50" y1="44" x2="24" y2="22"/><line x1="50" y1="44" x2="76" y2="22"/>
@@ -738,7 +741,13 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     </section>
 
     <!-- 07 top-down: process -->
-    <section class="slide" data-name="Process">
+    <section class="slide s-how" data-name="Process">
+      <svg viewBox="0 0 100 100" aria-hidden="true" class="net mark">
+        <line x1="30" y1="70" x2="70" y2="70"/><line x1="30" y1="70" x2="50" y2="44"/><line x1="70" y1="70" x2="50" y2="44"/>
+        <line x1="50" y1="44" x2="50" y2="16"/><line x1="30" y1="70" x2="14" y2="42"/><line x1="70" y1="70" x2="86" y2="42"/><line x1="50" y1="44" x2="24" y2="22"/><line x1="50" y1="44" x2="76" y2="22"/>
+        <circle cx="50" cy="16" r="3" class="n"/><circle cx="14" cy="42" r="3" class="n"/><circle cx="86" cy="42" r="3" class="n"/><circle cx="24" cy="22" r="3" class="n"/><circle cx="76" cy="22" r="3" class="n"/>
+        <circle cx="30" cy="70" r="5" class="n lit"/><circle cx="70" cy="70" r="5" class="n lit"/><circle cx="50" cy="44" r="5" class="n lit"/>
+      </svg>
       <p class="eyebrow mono">Top-down &middot; 2 of 3</p>
       <h2>Process work</h2>
       <p class="note intro">If it is a process problem, I work with the founder and the department to walk the work as it is done today, write it down, and improve it until it holds.</p>
@@ -756,7 +765,13 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     </section>
 
     <!-- 08 top-down: technology and AI -->
-    <section class="slide" data-name="Technology and AI">
+    <section class="slide s-how" data-name="Technology and AI">
+      <svg viewBox="0 0 100 100" aria-hidden="true" class="net mark">
+        <line x1="30" y1="70" x2="70" y2="70"/><line x1="30" y1="70" x2="50" y2="44"/><line x1="70" y1="70" x2="50" y2="44"/>
+        <line x1="50" y1="44" x2="50" y2="16"/><line x1="30" y1="70" x2="14" y2="42"/><line x1="70" y1="70" x2="86" y2="42"/><line x1="50" y1="44" x2="24" y2="22"/><line x1="50" y1="44" x2="76" y2="22"/>
+        <circle cx="50" cy="16" r="3" class="n"/><circle cx="14" cy="42" r="3" class="n"/><circle cx="86" cy="42" r="3" class="n"/><circle cx="24" cy="22" r="3" class="n"/><circle cx="76" cy="22" r="3" class="n"/>
+        <circle cx="30" cy="70" r="5" class="n lit"/><circle cx="70" cy="70" r="5" class="n lit"/><circle cx="50" cy="44" r="5" class="n lit"/>
+      </svg>
       <p class="eyebrow mono">Top-down &middot; 3 of 3</p>
       <h2>Technology work</h2>
       <p class="note intro">How I evaluate technology and AI. Once the process is documented, four questions in order for each piece of it.</p>
