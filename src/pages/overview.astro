@@ -104,6 +104,14 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   h3 { font-size: 1.3rem; font-weight: 500; }
   .lede { color: var(--ink-dim); font-size: clamp(.98rem, 1.5vw, 1.12rem); line-height: 1.62; max-width: 46ch; margin: 0; text-wrap: pretty; }
 
+  /* intro: text left, photo right */
+  .intro-grid { width: min(100%, 1180px); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 48px; align-items: center; }
+  .hero-left { justify-items: start; text-align: left; }
+  .hero-left .actions { justify-content: flex-start; }
+  .intro-photo { justify-self: end; width: 100%; max-width: 520px; aspect-ratio: 4 / 3; border: 1px solid var(--line); background: var(--surface); overflow: hidden; }
+  .intro-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85) contrast(1.02); }
+  @media (max-width: 900px) { .intro-grid { grid-template-columns: 1fr; gap: 24px; } .intro-photo { justify-self: center; max-width: 360px; } .hero-left { justify-items: center; text-align: center; } .hero-left .actions { justify-content: center; } }
+
   /* the splash hero, ported: seam rule under the headline, then lede, then the two actions */
   .hero { display: grid; justify-items: center; }
   .hero .eyebrow { margin-bottom: 22px; }
@@ -284,6 +292,8 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   .slide > .more { margin-top: 18px; }
   .net .dash { stroke-dasharray: 2 3; opacity: .45; }
   .net .n.dim { fill: var(--ink-faint); opacity: .5; }
+  .exnote { margin-top: 16px !important; }
+  .exnote em { font-style: normal; font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--light); margin-right: 8px; }
   .exlink { margin: 6px 0 0 !important; color: var(--ink-dim); font-size: .92rem; line-height: 1.5; text-wrap: pretty; }
   .exlink em { font-style: normal; display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--light); margin-bottom: 2px; }
   @media (max-width: 760px) { .qgrid { grid-template-columns: 1fr; margin: 20px 0 0; } .qax-left, .qax-right { display: none; } }
@@ -449,6 +459,8 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     .slide { padding-top: 1in; }
     .apage { padding-top: 1.2in; }
     .map-grid { grid-template-columns: 4in 1fr !important; gap: .5in; }
+    .intro-grid { grid-template-columns: 1.1fr .9fr !important; }
+    .intro-photo { max-width: 4.6in; }
     .map-copy { justify-items: start !important; text-align: left !important; }
     .plane { width: 7.2in !important; }
     .ways { grid-template-columns: 1fr 1fr !important; gap: .3in; }
@@ -511,21 +523,24 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
 
     <!-- 01 -->
     <section class="slide" data-name="Intro">
-      <div class="hero">
+      <div class="intro-grid">
+      <div class="hero hero-left">
         <p class="eyebrow mono">Greg Toler &middot; GT Strategies</p>
         <h1>Go-to-Market and Operations&nbsp;Support</h1>
         <div class="seam" aria-hidden="true"></div>
         <p class="lede">Strategy, systems, and hands-on execution for teams that need it fixed, built, or scaled.</p>
         <div class="actions">
-          <a class="splash-btn primary" href="https://gregtoler.com/#contact" target="_blank" rel="noopener noreferrer">
+          <button class="splash-btn primary" type="button" data-go="Work with me">
             <span class="node-ic" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
             <span>Work with me</span>
-          </a>
+          </button>
           <a class="splash-btn ghost" href="https://www.linkedin.com/in/gregtoler" target="_blank" rel="noopener noreferrer">
             <span>Connect on LinkedIn</span>
             <svg class="ext" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
           </a>
         </div>
+      </div>
+      <div class="intro-photo"><img src="/images/v2/headshot.jpg" alt="Greg Toler" width="1200" height="900" decoding="async"></div>
       </div>
     </section>
 
@@ -705,6 +720,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
           <div class="chips lit"><span>Increase revenue</span><span>Decrease cost</span><span>Reduce risk</span></div>
         </div>
       </div>
+      <p class="note exnote"><em>Example</em> A delivery company. One review of how work moved from sales through delivery and service became the foundation. Everything that followed was built on it.</p>
     </section>
 
     <!-- 07 top-down: process -->
@@ -739,6 +755,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
         </div>
       </div>
       <p class="note">Each one has to improve quality, time, scale, or efficiency, and serve more than one workflow.</p>
+      <p class="note exnote"><em>Example</em> For that delivery company, one shared brain ingests everything from sales through delivery and service. From it: the sales to delivery handoff, client onboarding prep and environment builds, and coaching and feedback for functional employees.</p>
     </section>
 
     <!-- 08 close: the site's intake form ---->
