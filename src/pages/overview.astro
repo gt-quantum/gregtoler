@@ -106,11 +106,11 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
 
   /* intro: text left, photo right */
   .intro-grid { width: min(100%, 1180px); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 48px; align-items: center; }
-  .hero-left { justify-items: start; text-align: left; }
-  .hero-left .actions { justify-content: flex-start; }
+  .hero.hero-left { justify-items: start; text-align: left; }
+  .hero.hero-left .actions { justify-content: flex-start; }
   .intro-photo { justify-self: end; width: 100%; max-width: 520px; aspect-ratio: 4 / 3; border: 1px solid var(--line); background: var(--surface); overflow: hidden; }
   .intro-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.85) contrast(1.02); }
-  @media (max-width: 900px) { .intro-grid { grid-template-columns: 1fr; gap: 24px; } .intro-photo { justify-self: center; max-width: 360px; } .hero-left { justify-items: center; text-align: center; } .hero-left .actions { justify-content: center; } }
+  @media (max-width: 900px) { .intro-grid { grid-template-columns: 1fr; gap: 24px; } .intro-photo { justify-self: center; max-width: 360px; } .hero.hero-left { justify-items: center; text-align: center; } .hero.hero-left .actions { justify-content: center; } }
 
   /* the splash hero, ported: seam rule under the headline, then lede, then the two actions */
   .hero { display: grid; justify-items: center; }
@@ -460,6 +460,8 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     .apage { padding-top: 1.2in; }
     .map-grid { grid-template-columns: 4in 1fr !important; gap: .5in; }
     .intro-grid { grid-template-columns: 1.1fr .9fr !important; }
+    .hero.hero-left { justify-items: start !important; text-align: left !important; }
+    .hero.hero-left .actions { justify-content: flex-start !important; }
     .intro-photo { max-width: 4.6in; }
     .map-copy { justify-items: start !important; text-align: left !important; }
     .plane { width: 7.2in !important; }
