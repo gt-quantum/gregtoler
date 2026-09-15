@@ -102,7 +102,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   h1 { font-size: clamp(2rem, 3.6vw + 1vh, 4.2rem); max-width: 16ch; }
   h2 { font-size: clamp(1.5rem, 2.2vw + 1vh, 2.6rem); max-width: 22ch; }
   h3 { font-size: 1.3rem; font-weight: 500; }
-  .lede { color: var(--ink-dim); font-size: clamp(.98rem, 1.5vw, 1.12rem); line-height: 1.62; max-width: 46ch; margin: 0; text-wrap: pretty; }
+  .lede { color: var(--ink-dim); font-size: clamp(1.05rem, 1.5vw, 1.2rem); line-height: 1.62; max-width: 46ch; margin: 0; text-wrap: pretty; }
 
   /* intro: text left, photo right */
   .intro-grid { width: min(100%, 1180px); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 48px; align-items: center; }
@@ -266,16 +266,16 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     padding: 18px 20px; min-width: 0; display: grid; gap: 4px; position: relative; text-align: center;
   }
   .fnode b { font-family: var(--display); font-weight: 600; font-size: 1.25rem; line-height: 1.1; }
-  .fnode small { display: block; color: var(--ink-dim); font-size: .92rem; line-height: 1.45; text-wrap: pretty; }
+  .fnode small { display: block; color: var(--ink-dim); font-size: 1.05rem; line-height: 1.5; text-wrap: pretty; }
   .fnodes.chain .fnode + .fnode::before { content: ""; position: absolute; top: 50%; right: 100%; width: 28px; height: 1px; background: var(--light); }
   .fnodes.chain .fnode + .fnode::after {
     content: ""; position: absolute; top: 50%; right: calc(100% + 1px); width: 5px; height: 5px;
     border-top: 1px solid var(--light); border-right: 1px solid var(--light); transform: translateY(-50%) rotate(45deg);
   }
   .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-  .chips span { border: 1px solid var(--line); padding: 8px 14px; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); }
+  .chips span { border: 1px solid var(--line); padding: 9px 15px; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); }
   .chips.lit span { border-color: var(--light); color: var(--ink); }
-  .note { margin: 22px 0 0; color: var(--ink-dim); font-size: 1rem; max-width: 64ch; text-wrap: pretty; }
+  .note { margin: 22px 0 0; color: var(--ink-dim); font-size: 1.12rem; max-width: 64ch; text-wrap: pretty; }
 
   /* ---- slide 03: the four quadrants as tiles, laid out like the map ---- */
   .qgrid { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; width: min(100%, 980px); margin: 26px 34px 0; padding: 22px 0; }
@@ -287,10 +287,15 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   .qtile { border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 75%, transparent); padding: 20px 24px; text-align: left; min-width: 0; }
   .qtile h3 { font-size: 1.35rem; font-weight: 600; margin-bottom: 10px; }
   .qtile ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; }
-  .qtile li { color: var(--ink-dim); font-size: 1rem; padding-left: 16px; position: relative; }
+  .qtile li { color: var(--ink-dim); font-size: 1.1rem; padding-left: 16px; position: relative; }
   .qtile li::before { content: ""; position: absolute; left: 0; top: .62em; width: 5px; height: 5px; border-radius: 50%; background: var(--light); }
   .slide > .more { margin-top: 18px; }
   .net .dash { stroke-dasharray: 2 3; opacity: .45; }
+  .net.mark { width: 96px; height: 96px; margin: 0 0 6px; overflow: visible; }
+  .net.mark line { stroke: var(--light); stroke-width: .8; opacity: .55; }
+  .net.mark .n { fill: var(--ink-faint); }
+  .net.mark .n.lit { fill: var(--light); }
+  .net.mark .n.dim { opacity: .5; }
   .net .n.dim { fill: var(--ink-faint); opacity: .5; }
   .exnote { margin-top: 16px !important; }
   .exnote em { font-style: normal; font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--light); margin-right: 8px; }
@@ -316,8 +321,8 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   .way-copy { display: grid; gap: 6px; min-width: 0; }
   .way-copy .mono { color: var(--light); }
   .way-copy h3 { font-size: clamp(1.6rem, 2.6vw, 2.4rem); font-weight: 600; }
-  .way-copy .tag { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1.05rem; margin: 0; }
-  .way-copy p { margin: 0; color: var(--ink-dim); font-size: .95rem; text-wrap: pretty; }
+  .way-copy .tag { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1.15rem; margin: 0; }
+  .way-copy p { margin: 0; color: var(--ink-dim); font-size: 1.05rem; text-wrap: pretty; }
   .way-copy .go { margin-top: 6px; color: var(--ink-faint); }
   button.way:hover .go { color: var(--light); }
   .net line { stroke: var(--light); stroke-width: .8; opacity: .55; }
@@ -332,7 +337,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   .start { border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 70%, transparent); padding: 22px 20px 24px; min-width: 0; display: grid; gap: 8px; justify-items: center; }
   .start .mono { color: var(--light); }
   .start h3 { font-size: clamp(2rem, 3.4vw, 3.2rem); font-weight: 600; }
-  .start .tag { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1rem; margin: 0; }
+  .start .tag { color: var(--ink); font-family: var(--display); font-weight: 500; font-size: 1.15rem; margin: 0; }
   .start p:not(.tag) { margin: 0; color: var(--ink-dim); font-size: .92rem; line-height: 1.5; text-wrap: pretty; }
   .start { text-align: center; }
 
@@ -618,7 +623,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     <!-- 03 what that looks like -->
     <section class="slide" data-name="What that looks like">
       <p class="eyebrow mono">What that looks like</p>
-      <h2>Concrete work in each quadrant</h2>
+      <h2>Work examples</h2>
       <div class="qgrid">
         <span class="qax qax-top mono">Strategy</span>
         <span class="qax qax-bot mono">Execution</span>
@@ -641,7 +646,6 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
           <ul><li>Tech and system integrations</li><li>Building dashboards</li><li>Onboarding workflows and internal tools</li></ul>
         </div>
       </div>
-      <a class="more mono" href="https://gregtoler.com/examples" target="_blank" rel="noopener noreferrer">Sixteen worked examples at gregtoler.com/examples &rarr;</a>
     </section>
 
     <!-- 04 how people work with me -->
@@ -681,6 +685,11 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
 
     <!-- 05 bottom-up: fix, build, scale ----->
     <section class="slide" data-name="Bottom-up">
+      <svg viewBox="0 0 100 100" aria-hidden="true" class="net mark">
+        <line x1="50" y1="52" x2="24" y2="30" class="dash"/><line x1="50" y1="52" x2="76" y2="30" class="dash"/><line x1="50" y1="52" x2="50" y2="84" class="dash"/>
+        <circle cx="24" cy="30" r="3" class="n dim"/><circle cx="76" cy="30" r="3" class="n dim"/><circle cx="50" cy="84" r="3" class="n dim"/>
+        <circle cx="50" cy="52" r="6" class="n lit"/>
+      </svg>
       <p class="eyebrow mono">Bottom-up</p>
       <h2>Most people start with a project</h2>
       <div class="starts">
@@ -688,19 +697,16 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
           <span class="mono">Something is broken</span>
           <h3>Fix it</h3>
           <p class="tag">Make what exists work better.</p>
-          <p class="exlink"><em>Example</em> Event requests arriving by email, retyped by hand, now read and ticketed into Jira and Asana automatically.</p>
         </div>
         <div class="start">
           <span class="mono">It does not exist yet</span>
           <h3>Build it</h3>
           <p class="tag">Make something new that needs to exist.</p>
-          <p class="exlink"><em>Example</em> Google, LinkedIn, and Microsoft Ads connected to Claude, so the team asks for a budget shift and the same agent ships it.</p>
         </div>
         <div class="start">
           <span class="mono">It works, by hand</span>
           <h3>Scale it</h3>
           <p class="tag">Make what works scale.</p>
-          <p class="exlink"><em>Example</em> Two founders writing a weekly newsletter by hand, now reviewing a draft that research agents produce.</p>
         </div>
       </div>
       <p class="note">Execution first. It often grows into how we scale it and look at the whole.</p>
@@ -708,14 +714,20 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
 
     <!-- 06 top-down: review the department -->
     <section class="slide" data-name="Top-down">
+      <svg viewBox="0 0 100 100" aria-hidden="true" class="net mark">
+        <line x1="30" y1="70" x2="70" y2="70"/><line x1="30" y1="70" x2="50" y2="44"/><line x1="70" y1="70" x2="50" y2="44"/>
+        <line x1="50" y1="44" x2="50" y2="16"/><line x1="30" y1="70" x2="14" y2="42"/><line x1="70" y1="70" x2="86" y2="42"/><line x1="50" y1="44" x2="24" y2="22"/><line x1="50" y1="44" x2="76" y2="22"/>
+        <circle cx="50" cy="16" r="3" class="n"/><circle cx="14" cy="42" r="3" class="n"/><circle cx="86" cy="42" r="3" class="n"/><circle cx="24" cy="22" r="3" class="n"/><circle cx="76" cy="22" r="3" class="n"/>
+        <circle cx="30" cy="70" r="5" class="n lit"/><circle cx="70" cy="70" r="5" class="n lit"/><circle cx="50" cy="44" r="5" class="n lit"/>
+      </svg>
       <p class="eyebrow mono">Top-down &middot; 1 of 3</p>
-      <h2>Review the department</h2>
+      <h2>Strategic review</h2>
       <p class="note intro">One function at a time. People, then process, then technology, measured against what the business needs most.</p>
       <div class="wrap">
         <div class="fnodes n3 chain lens">
-          <div class="fnode l0"><b>People</b><small>Are the right people in the right seats, doing the right things consistently?</small></div>
-          <button class="fnode l1" type="button" data-go="Process"><b>Process</b><small>Is the work written down, and does it run the same way every time?</small><span class="mono go">Process &rarr;</span></button>
-          <button class="fnode l2" type="button" data-go="Technology and AI"><b>Technology</b><small>Can tools, automation, and AI make the process faster, bigger, and better?</small><span class="mono go">Technology &rarr;</span></button>
+          <div class="fnode l0"><b>People</b><small>Do we have the right people?</small></div>
+          <button class="fnode l1" type="button" data-go="Process"><b>Process</b><small>Doing the right things, consistently?</small><span class="mono go">Process &rarr;</span></button>
+          <button class="fnode l2" type="button" data-go="Technology and AI"><b>Technology</b><small>With systems that help them scale and execute better?</small><span class="mono go">Technology &rarr;</span></button>
         </div>
         <div class="outcomes">
           <span class="mono">Measured against</span>
@@ -728,7 +740,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     <!-- 07 top-down: process -->
     <section class="slide" data-name="Process">
       <p class="eyebrow mono">Top-down &middot; 2 of 3</p>
-      <h2>Review it, document it, improve it</h2>
+      <h2>Process work</h2>
       <p class="note intro">If it is a process problem, I work with the founder and the department to walk the work as it is done today, write it down, and improve it until it holds.</p>
       <div class="wrap">
         <div class="fnodes n3 chain">
@@ -746,8 +758,8 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
     <!-- 08 top-down: technology and AI -->
     <section class="slide" data-name="Technology and AI">
       <p class="eyebrow mono">Top-down &middot; 3 of 3</p>
-      <h2>How I evaluate technology and AI</h2>
-      <p class="note intro">Once the process is documented, four questions in order for each piece of it.</p>
+      <h2>Technology work</h2>
+      <p class="note intro">How I evaluate technology and AI. Once the process is documented, four questions in order for each piece of it.</p>
       <div class="wrap">
         <div class="fnodes n4 chain">
           <div class="fnode"><b>Applications</b><small>Tools that do not exist today and should.</small></div>
@@ -819,6 +831,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   <footer class="foot">
     <div class="keys mono" id="keys" aria-label="Slides"></div>
     <div class="nav">
+      <a class="dl" href="/examples">See the examples</a>
       <a class="dl" id="dl" href="/overview/gt-strategies-deck.pdf" download>Download the PDF</a>
       <button type="button" id="prev" aria-label="Previous">&larr; Back</button>
       <button type="button" id="next" aria-label="Next">Next &rarr;</button>
