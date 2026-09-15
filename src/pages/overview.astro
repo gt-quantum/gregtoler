@@ -138,7 +138,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
 
   /* ---- slide 02: context left, the plane right ---- */
   .s-map { grid-template-columns: minmax(0, 1fr); }
-  .map-grid { width: 100%; display: grid; grid-template-columns: minmax(300px, 38%) minmax(0, 1fr); gap: 48px; align-items: center; }
+  .map-grid { width: min(100%, 1180px); display: grid; grid-template-columns: minmax(300px, 38%) minmax(0, 1fr); gap: 48px; align-items: center; }
   .map-copy { text-align: left; display: grid; gap: 18px; justify-items: start; }
   .map-copy .eyebrow { margin: 0; }
   .map-copy h2 { max-width: 16ch; font-size: clamp(1.6rem, 2.2vw + 1vh, 2.8rem); }
@@ -367,7 +367,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   /* ---- slide 08: the site's own intake, dropped in ---- */
   .intake-host { width: 100%; text-align: left; font-family: var(--sans); }
   .intake-host .v2-intake { max-width: none; }
-  .close-grid { width: 100%; display: grid; grid-template-columns: minmax(280px, 36%) minmax(0, 1fr); gap: 40px; align-items: center; }
+  .close-grid { width: min(100%, 1180px); display: grid; grid-template-columns: minmax(280px, 36%) minmax(0, 1fr); gap: 40px; align-items: center; }
   .close-copy { text-align: left; display: grid; justify-items: start; }
   .close-copy .seam { margin: 22px 0 22px; }
   .close-copy .actions { justify-content: flex-start; margin-top: 18px; }
