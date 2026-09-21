@@ -349,7 +349,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   .lens .l2 { border-color: var(--light); background: color-mix(in srgb, var(--light) 36%, transparent); }
   .lens .l2 small { color: var(--ink); opacity: .85; }
   .outcomes, .deliverables { margin-top: 24px; display: grid; gap: 10px; justify-items: center; }
-  .note.intro { margin: 0 0 6px; }
+  .note.intro { margin: clamp(14px, 2.4vh, 26px) 0 6px; }
   .fnode .deliv { display: block; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); color: var(--ink-dim); font-size: .88rem; line-height: 1.4; text-wrap: pretty; }
   .fnode .deliv em { font-style: normal; display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 2px; }
   button.fnode { cursor: pointer; font: inherit; color: inherit; transition: border-color .35s var(--ease-out), background .35s var(--ease-out); }
@@ -441,6 +441,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
   /* ---- print: one slide per page, then the appendix. Chrome renders the PDF from this. ---- */
   @page { size: 13.333in 7.5in; margin: 0; }
   @media print {
+    *, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     html { font-size: 13px; }
     html, body { height: auto; overflow: visible; background: #17181A; }
     .backdrop, .grain, .foot, .bar { display: none; }
@@ -560,7 +561,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
         <div class="map-copy">
           <p class="eyebrow mono">What I do</p>
           <h2>Go-to-market and operations, strategy through execution</h2>
-          <p>I help companies fix, build, and scale how they sell and how they run. The plan and the build, hands on, handed off so it runs without me.</p>
+          <p>I help companies fix, build, and scale how they go to market and how they run. The plan and the build, hands on, handed off so it runs without me.</p>
           <p>Every engagement sits somewhere on this map.</p>
           <a class="more mono" href="https://gregtoler.com/examples" target="_blank" rel="noopener noreferrer">All the examples at gregtoler.com/examples &rarr;</a>
         </div>
@@ -656,7 +657,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
       <p class="eyebrow mono">How people work with me</p>
       <h2>Bottom-up or top-down</h2>
       <div class="ways">
-        <div class="way">
+        <button class="way" type="button" data-go="Bottom-up">
           <svg viewBox="0 0 100 100" aria-hidden="true">
             <rect x="0" y="50" width="100" height="50" class="half"/>
             <line x1="0" y1="50" x2="100" y2="50" class="ax"/><line x1="50" y1="0" x2="50" y2="100" class="ax"/>
@@ -668,9 +669,10 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
             <h3>Bottom-up</h3>
             <p class="tag">One project. A specific fix, build, or scale.</p>
             <p>You know the problem and you have the details. Each project that works can be added to, and they compound.</p>
+            <span class="mono go">See how &rarr;</span>
           </div>
-        </div>
-        <div class="way">
+        </button>
+        <button class="way" type="button" data-go="Top-down">
           <svg viewBox="0 0 100 100" aria-hidden="true">
             <rect x="0" y="0" width="100" height="50" class="half"/>
             <line x1="0" y1="50" x2="100" y2="50" class="ax"/><line x1="50" y1="0" x2="50" y2="100" class="ax"/>
@@ -682,8 +684,9 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
             <h3>Top-down</h3>
             <p class="tag">A strategic foundation you expand on.</p>
             <p>You know something needs to change, not what is broken. Review the department, set the plan, then build out from it.</p>
+            <span class="mono go">See how &rarr;</span>
           </div>
-        </div>
+        </button>
       </div>
     </section>
 
@@ -726,7 +729,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
       </svg>
       <p class="eyebrow mono">Top-down &middot; 1 of 3</p>
       <h2>Strategic review</h2>
-      <p class="note intro">One function at a time. People, then process, then technology, measured against what the business needs most.</p>
+      <p class="note intro">Strategic review is for when something needs to change but you're not entirely sure what. We start with review and strategy to find out.</p>
       <div class="wrap">
         <div class="fnodes n3 chain lens">
           <div class="fnode l0"><b>People</b><small>Do we have the right people?</small></div>
@@ -734,11 +737,10 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
           <button class="fnode l2" type="button" data-go="Technology and AI"><b>Technology</b><small>With systems that help them scale and execute better?</small><span class="mono go">Technology &rarr;</span></button>
         </div>
         <div class="outcomes">
-          <span class="mono">Measured against</span>
+          <span class="mono">With the goal of</span>
           <div class="chips lit"><span>Increase revenue</span><span>Decrease cost</span><span>Reduce risk</span></div>
         </div>
       </div>
-      <p class="note exnote"><em>Example</em> A delivery company. One review of how work moved from sales through delivery and service became the foundation. Everything that followed was built on it.</p>
     </section>
 
     <!-- 07 top-down: process -->
@@ -751,7 +753,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
       </svg>
       <p class="eyebrow mono">Top-down &middot; 2 of 3</p>
       <h2>Process work</h2>
-      <p class="note intro">If it is a process problem, I work with the founder and the department to walk the work as it is done today, write it down, and improve it until it holds.</p>
+      <p class="note intro">I work with teams and founders to evaluate the process as it's done today, document it, and find ways to improve it.</p>
       <div class="wrap">
         <div class="fnodes n3 chain">
           <div class="fnode"><b>Review</b><small>Where it slows down, breaks, or depends on one person.</small></div>
@@ -778,14 +780,12 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
       <p class="note intro">How I evaluate technology and AI. Once the process is documented, four questions in order for each piece of it.</p>
       <div class="wrap">
         <div class="fnodes n4 chain">
-          <div class="fnode"><b>Applications</b><small>Tools that do not exist today and should.</small></div>
-          <div class="fnode"><b>Automations</b><small>What is already in place, made faster and more reliable.</small></div>
-          <div class="fnode"><b>Assistance</b><small>AI in the work, with a person in the loop.</small></div>
-          <div class="fnode"><b>Autonomous</b><small>AI end to end, inside clear bounds.</small></div>
+          <div class="fnode"><b>Applications</b><small>What's in place today, and whether an application worth its cost would solve the pain.</small></div>
+          <div class="fnode"><b>Automations</b><small>Tools and systems in place now, made faster and more reliable with built-in automation.</small></div>
+          <div class="fnode"><b>Assistance</b><small>AI in the work, with a person in the loop, to scale time and output.</small></div>
+          <div class="fnode"><b>Autonomous</b><small>AI end to end on a process, inside clear bounds, freeing your team's time to reduce repetitive work.</small></div>
         </div>
       </div>
-      <p class="note">Each one has to improve quality, time, scale, or efficiency, and serve more than one workflow.</p>
-      <p class="note exnote"><em>Example</em> For that delivery company, one shared brain ingests everything from sales through delivery and service. From it: the sales to delivery handoff, client onboarding prep and environment builds, and coaching and feedback for functional employees.</p>
     </section>
 
     <!-- 08 close: the site's intake form ---->
@@ -795,7 +795,7 @@ import ContactIntake from "../components/v2/ContactIntake.astro";
           <p class="eyebrow mono">Work with me</p>
           <h2>Tell me what is going on.</h2>
           <div class="seam" aria-hidden="true"></div>
-          <p class="lede">Start with the thing that is costing you the most right now. I will read it today and reply within one business day.</p>
+          <p class="lede">Let's start with the thing that is costing you the most time right now.</p>
           <div class="actions">
             <a class="splash-btn primary print-cta" href="https://gregtoler.com/#contact">
               <span class="node-ic" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
