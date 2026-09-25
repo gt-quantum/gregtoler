@@ -693,7 +693,7 @@ const ADMIN = role === "admin";
     { s: 1, dots: [[53.5, 22, 1.5]], lit: true, speed: .55, tbase: .25, tstagger: .07, show: [...BURST, 't-why', 't-y0', 't-yd0', 't-y1', 't-yd1', 't-y2', 't-yd2'], fade: BURST, cur: ['t-th1', 't-why'], pos: { 't-th1': [9, 22] } },
     ...BRAIN.map((part, i) => ({ s: 2, dots: [[50, 47.3, 5]], brain: BRAIN.slice(0, i + 1), part, ...(i === 0 ? { intro: ['t-how-eye', 't-how', 't-seam'], introDots: [[50, 32, 1.4]], introMs: 2200 } : {}) })),
     ...TL.map((x, i) => ({ s: 3, dots: [[x, 45, 1.3]], brain: BRAIN, brainMode: 'mini', tl: i, speed: .45, tbase: .05, show: [...TL_T, 't-m' + i] })),
-    { s: 4, dots: [[22, 47.6, 3]], brain: BRAIN, brainMode: 'side', show: ['t-plab', 't-d0', 't-d1', 't-d2', 't-d3', 't-d4', 't-d5', 't-d6', 't-hr', 't-n0', 't-n1'], tstagger: .05 },
+    { s: 4, dots: [[22, 49.6, 3]], brain: BRAIN, brainMode: 'side', show: ['t-plab', 't-d0', 't-d1', 't-d2', 't-d3', 't-d4', 't-d5', 't-d6', 't-hr', 't-n0', 't-n1'], tstagger: .05 },
     { s: 5, dots: [[50, 32, 1.4]], lit: true, qa: true },
     { s: 6, dots: [[50, 32, 1.4]], lit: true, cta: true }
   ];
