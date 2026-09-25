@@ -1,0 +1,922 @@
+---
+/**
+ * /earnnest — unlisted talk deck for the Earnnest pitch. Same shell and tokens as
+ * /overview. One accent dot is the thread through every slide. Text elements
+ * (.t) live on a fixed 16:9 canvas and are shown, moved, and hidden per step.
+ * Modes by query string: ?presenter (notes + previews), ?embed&step=n (bare
+ * canvas, used by the presenter previews and by scripts/earnnest-pdf.sh).
+ */
+import "../styles/v2-tokens.css";
+import { COOKIE, readConfig, roleFromCookie } from "../lib/earnnest-auth.js";
+
+export const prerender = false;
+
+// Gate: viewer sees the deck, admin also gets notes and the presenter view.
+// No passwords configured (local dev) → open as admin. In dev only, ?key=<admin
+// password> also unlocks, which is how scripts/earnnest-pdf.sh gets in.
+const cfg = readConfig(Astro.locals?.runtime?.env ?? {});
+let role = cfg.locked ? await roleFromCookie(cfg.secret, Astro.cookies.get(COOKIE)?.value) : (import.meta.env.PROD ? null : "admin");
+if (!role && import.meta.env.DEV && cfg.admin && Astro.url.searchParams.get("key") === cfg.admin) role = "admin";
+const wrong = Astro.url.searchParams.has("wrong");
+
+if (!role) {
+  return new Response(`<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>Earnnest</title>
+<style>
+  :root { --base:#17181A; --surface:#1E1F22; --line:#2A2B2E; --ink:#D8DADC; --ink-dim:#909297; --ink-faint:#66686D; --light:#7A8058; --light-soft:rgba(122,128,88,.13); color-scheme:dark; }
+  html { background: var(--base); } body { margin:0; min-height:100dvh; display:grid; place-items:center; font-family:"Hanken Grotesk", system-ui, sans-serif; color:var(--ink); background-color:var(--base); background-image:radial-gradient(#45474B 1px, transparent 1.3px); background-size:24px 24px; }
+  form { display:grid; justify-items:center; gap:18px; padding:32px; width:min(90vw, 360px); }
+  .dot { width:14px; height:14px; border-radius:50%; background:var(--light); box-shadow:0 0 18px 2px var(--light-soft); position:relative; }
+  .dot::after { content:""; position:absolute; inset:-5px; border-radius:50%; border:1px solid var(--light); opacity:.45; animation:b 3.6s cubic-bezier(.65,0,.35,1) infinite; }
+  @keyframes b { 0%,100% { transform:scale(.94); opacity:.45 } 50% { transform:scale(1.14); opacity:.1 } }
+  .k { font-family:"Martian Mono", ui-monospace, monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-dim); }
+  input { width:100%; box-sizing:border-box; font:inherit; font-size:16px; color:var(--ink); background:color-mix(in srgb, var(--surface) 85%, transparent); border:1px solid var(--line); border-radius:2px; padding:12px 14px; text-align:center; letter-spacing:.2em; }
+  input:focus { outline:none; border-color:var(--light); }
+  button { font-family:"Martian Mono", ui-monospace, monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink); background:none; border:1px solid var(--line); border-radius:100px; padding:10px 18px; cursor:pointer; }
+  button:hover { border-color:var(--light); }
+  .err { color:#c98a7a; font-size:13px; min-height:1em; }
+</style></head><body>
+<form method="post" action="/api/earnnest-auth" autocomplete="off">
+  <div class="dot" aria-hidden="true"></div>
+  <span class="k">Prepared for Earnnest</span>
+  <input type="password" name="password" placeholder="Password" autofocus required aria-label="Password">
+  <span class="err">${wrong ? "That password didn't work." : ""}</span>
+  <button type="submit">Open the deck</button>
+</form></body></html>`, { status: 401, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+}
+const ADMIN = role === "admin";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Earnnest Knowledge Brain</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/barlow-600.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/hanken-400.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/v2/martian-mono-400.woff2" crossorigin />
+    <style is:inline>html { background: #17181A; }</style>
+    <style is:global>
+  :root {
+    --base: #17181A; --surface: #1E1F22; --line: #2A2B2E; --line-soft: #212225; --dot: #45474B;
+    --ink: #D8DADC; --ink-dim: #909297; --ink-faint: #66686D;
+    --light: #7A8058; --light-soft: rgba(122,128,88,.13);
+    --mark-filter: brightness(0) invert(0.92);
+    --display: "Barlow", "Arial Narrow", system-ui, sans-serif;
+    --sans: "Hanken Grotesk", system-ui, sans-serif;
+    --mono: "Martian Mono", ui-monospace, SFMono-Regular, monospace;
+    --ease-out: cubic-bezier(.16,1,.3,1); --ease-io: cubic-bezier(.65,0,.35,1);
+    --morph: .8s;
+    color-scheme: dark;
+  }
+  html { font-size: clamp(12px, 0.5vw + 0.6vh, 17px); }
+  html, body { height: 100%; min-height: 100dvh; }
+  body { margin: 0; background: var(--base); color: var(--ink); font-family: var(--sans); line-height: 1.55; -webkit-font-smoothing: antialiased; overflow: hidden; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--light); outline-offset: 3px; border-radius: 2px; }
+  .backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-color: var(--base); background-image: radial-gradient(var(--dot) 1px, transparent 1.3px); background-size: 24px 24px; background-position: 12px 12px; opacity: .55; }
+  .grain { position: fixed; inset: 0; pointer-events: none; z-index: 90; opacity: .35; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"); }
+  .mono { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+
+  /* ---- deck shell, as /overview ---- */
+  .deck { position: relative; z-index: 1; height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; }
+  .bar { display: flex; align-items: center; justify-content: space-between; margin: 0 32px; padding: 20px 0 18px; border-bottom: 1px solid var(--line-soft); }
+  .bar img { height: 22px; width: auto; filter: var(--mark-filter); display: block; }
+  .bar .where { display: flex; gap: 18px; align-items: center; }
+  .bar .where b { color: var(--ink-dim); font-weight: 400; }
+  .foot { display: flex; align-items: center; justify-content: space-between; margin: 0 32px; padding: 18px 0; border-top: 1px solid var(--line-soft); }
+  .foot .keys, .foot .nav { display: flex; gap: 6px; }
+  .foot .nav { gap: 8px; }
+  .foot button { background: color-mix(in srgb, var(--surface) 85%, transparent); border: 1px solid var(--line); border-radius: 100px; padding: 8px 16px; font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); cursor: pointer; white-space: nowrap; transition: color .35s var(--ease-out), border-color .35s var(--ease-out); }
+  .foot button:hover { color: var(--ink); border-color: var(--light); }
+  .foot .keys button { padding: 8px 11px; }
+  .foot .keys button.k-on { color: var(--ink); border-color: var(--light); }
+  .foot button.quiet { background: none; border-color: transparent; color: var(--ink-faint); }
+  @media (max-width: 1180px) { .foot { justify-content: flex-end; } .foot .keys { display: none; } }
+  @media (max-width: 700px) { .bar, .foot { margin: 0 16px; } .canvas { width: min(calc(100cqw - 32px), calc((100cqh - 24px) * 16 / 9)); } }
+
+  /* ---- the canvas: a 16:9 plane, everything placed in % of it, type in cqw ---- */
+  .stage { position: relative; min-height: 0; display: grid; place-items: center; container-type: size; }
+  .canvas { position: relative; aspect-ratio: 16 / 9; width: min(calc(100cqw - 64px), calc((100cqh - 24px) * 16 / 9)); container-type: inline-size; }
+
+  /* the dot */
+  .d {
+    position: absolute; z-index: 5; border-radius: 50%; background: var(--light); transform: translate(-50%, -50%);
+    box-shadow: 0 0 1.2cqw .1cqw var(--light-soft), 0 0 .5cqw 0 var(--light-soft);
+    transition: left var(--morph) var(--ease-io), top var(--morph) var(--ease-io), width var(--morph) var(--ease-io), height var(--morph) var(--ease-io), opacity .5s var(--ease-io);
+    transition-delay: var(--dl, 0s);
+  }
+  .d.snap { transition: none !important; }
+  .d::before { content: ""; position: absolute; inset: -90%; border-radius: 50%; background: radial-gradient(circle, var(--light-soft) 0%, transparent 62%); opacity: 0; transition: opacity .6s; pointer-events: none; }
+  .d.lit::before { opacity: 1; }
+  .d .ring { position: absolute; inset: -22%; border-radius: 50%; border: 1px solid var(--light); opacity: 0; transition: opacity .5s; }
+  .d.lit .ring { opacity: .45; animation: breathe 3.6s var(--ease-io) infinite; }
+  @keyframes breathe { 0%,100% { transform: scale(.94); opacity: .45 } 50% { transform: scale(1.12); opacity: .1 } }
+  .still .d .ring { animation: none !important; }
+
+  /* text: fades in after the dot settles, out quickly, and can move between steps */
+  .t { position: absolute; z-index: 6; opacity: 0; pointer-events: none; transition: opacity .3s var(--ease-out), left var(--morph) var(--ease-io), top var(--morph) var(--ease-io), color .5s; }
+  .t.on { opacity: 1; transition: opacity .6s var(--ease-out) var(--tdl, .85s), left var(--morph) var(--ease-io), top var(--morph) var(--ease-io), color .5s; }
+  .still .t.on { transition: opacity .01s; }
+  .c { transform: translate(-50%, -50%); text-align: center; }
+  .l { transform: translateY(-50%); text-align: left; }
+  .r { transform: translate(-100%, -50%); text-align: right; }
+  .t.big, .t.word, .t.stat b { font-family: var(--display); font-weight: 600; letter-spacing: -.015em; line-height: 1.04; }
+  .t.big { font-size: 4.4cqw; width: 70cqw; text-wrap: balance; }
+  .t.word { font-size: 3cqw; white-space: nowrap; }
+  .t.word.md { font-size: 2.6cqw; }
+  .t.word.sm { font-size: 2.2cqw; }
+  .t.word.q { font-size: 2.6cqw; color: var(--ink-dim); white-space: normal; width: 33cqw; line-height: 1.08; }
+  .t.word.q.cur { color: var(--ink); }
+  .t.mk { padding-left: 2.2cqw; }
+  .t.mk::before { content: ""; position: absolute; left: 0; top: 50%; width: .6cqw; height: .6cqw; margin-top: -.3cqw; border-radius: 50%; background: var(--light); }
+  .t.pt { font-size: 1.6cqw; line-height: 1.4; color: var(--ink-dim); width: 40cqw; padding-left: 1.6cqw; text-wrap: pretty; }
+  .t.pt::before { content: ""; position: absolute; left: 0; top: .75em; width: .45cqw; height: .45cqw; border-radius: 50%; background: var(--light); }
+  .t.state { font-family: var(--display); font-weight: 600; font-size: 3.4cqw; line-height: 1.12; width: 60cqw; text-wrap: balance; letter-spacing: -.01em; }
+  .t.lab { font-family: var(--mono); font-size: .95cqw; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; }
+  .t.step { font-family: var(--mono); font-size: .8cqw; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); width: 9cqw; line-height: 1.5; text-wrap: balance; }
+  .t.step.cur { color: var(--ink); }
+  .t.sum { font-size: 1.55cqw; line-height: 1.5; color: var(--ink-dim); width: 54cqw; text-wrap: pretty; }
+  .t.sum b { display: block; font-family: var(--mono); font-size: .8cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--light); margin-bottom: .5cqw; font-weight: 400; }
+  .t.seam { width: 4.5cqw; height: 1px; background: var(--light); }
+  .t.rule { width: 1px; height: 7cqw; background: var(--line); }
+  .t.sub { font-family: var(--mono); font-size: .75cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
+  .t.desc { font-family: var(--sans); font-size: 1.25cqw; color: var(--ink-dim); white-space: nowrap; }
+  .t.on.faded { opacity: .22; transition-delay: 0s; }
+  .t.hr { height: 1px; width: 46cqw; background: var(--line); }
+  .t.num { font-family: var(--display); font-weight: 600; font-size: 2.6cqw; line-height: 1.04; letter-spacing: -.015em; white-space: nowrap; }
+  .t.num small { display: block; font-family: var(--mono); font-size: .8cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: .6cqw; font-weight: 400; }
+  /* questions and discussion, with appendix panels */
+  .qa { position: absolute; z-index: 7; left: 50%; top: 42%; transform: translateX(-50%); width: 70cqw; display: grid; justify-items: center; gap: 1.2cqw; opacity: 0; pointer-events: none; transition: opacity .5s var(--ease-out), transform var(--morph) var(--ease-io); }
+  .qa.on { opacity: 1; pointer-events: auto; transition-delay: .7s, 0s; }
+  .qa.away { opacity: 0; pointer-events: none; transform: translateX(-70%); transition-delay: 0s; }
+  .qa .ctx { margin-top: 2.4cqw; font-family: var(--mono); font-size: .8cqw; letter-spacing: .16em; text-transform: uppercase; color: var(--light); }
+  .qa h2 { font-family: var(--display); font-weight: 600; font-size: 4.4cqw; letter-spacing: -.015em; line-height: 1.04; margin: 0; }
+  .qa .links { display: flex; flex-wrap: wrap; justify-content: center; gap: .6cqw 2.2cqw; }
+  .qa .links button { position: relative; background: none; border: 0; padding: .4cqw 0 .4cqw 1.3cqw; border-bottom: 1px solid transparent; font-family: var(--mono); font-size: .85cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); cursor: pointer; transition: color .3s, border-color .3s; }
+  .qa .links button::before { content: ""; position: absolute; left: 0; top: 50%; width: .45cqw; height: .45cqw; margin-top: -.22cqw; border-radius: 50%; background: var(--light); }
+  .qa .links button:hover { color: var(--ink); border-bottom-color: var(--light); }
+  .appx { position: absolute; z-index: 8; inset: 2cqw 3cqw; box-sizing: border-box; padding: 2.4cqw 3cqw; overflow-y: auto; overscroll-behavior: contain; background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--line); border-radius: 2px; transform: translateX(106%); opacity: 0; pointer-events: none; transition: transform var(--morph) var(--ease-io), opacity .4s; text-align: left; }
+  .appx.open { transform: none; opacity: 1; pointer-events: auto; }
+  .appx section { display: none; }
+  .appx section.on { display: block; }
+  .appx .back { position: absolute; top: 1.4cqw; right: 1.6cqw; background: none; border: 1px solid var(--line); border-radius: 100px; padding: .5cqw 1.1cqw; font-family: var(--mono); font-size: .75cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); cursor: pointer; }
+  .appx .back:hover { color: var(--ink); border-color: var(--light); }
+  .appx .k { font-family: var(--mono); font-size: .8cqw; letter-spacing: .16em; text-transform: uppercase; color: var(--light); }
+  .appx h3 { font-family: var(--display); font-weight: 600; font-size: 2.4cqw; letter-spacing: -.01em; line-height: 1.1; margin: .4cqw 0 1.4cqw; }
+  .appx h4 { font-family: var(--mono); font-size: .8cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); margin: 1.8cqw 0 .6cqw; font-weight: 400; }
+  .appx p, .appx li, .appx td { font-size: 1.15cqw; line-height: 1.5; color: var(--ink-dim); text-wrap: pretty; }
+  .appx p { margin: .8cqw 0 0; max-width: 70ch; }
+  .appx ul { margin: 0; padding: 0; list-style: none; display: grid; gap: .5cqw; max-width: 80ch; }
+  .appx li { position: relative; padding-left: 1.4cqw; }
+  .appx li::before { content: ""; position: absolute; left: 0; top: .65em; width: .4cqw; height: .4cqw; border-radius: 50%; background: var(--light); }
+  .appx table { width: 100%; border-collapse: collapse; }
+  .appx th { font-family: var(--mono); font-size: .75cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 400; text-align: left; padding: .6cqw .9cqw .6cqw 0; border-bottom: 1px solid var(--line); }
+  .appx td { vertical-align: top; padding: .8cqw .9cqw .8cqw 0; border-bottom: 1px solid var(--line-soft); }
+  .appx td:first-child { color: var(--ink); white-space: nowrap; }
+  .appx table.cols td:first-child { font-family: var(--mono); font-size: .8cqw; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); }
+  .appx .two { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4cqw; }
+  .appx .tabs { display: flex; gap: .4cqw; margin: .2cqw 0 1cqw; }
+  .appx .tabs button { background: none; border: 1px solid var(--line); border-radius: 100px; padding: .5cqw 1.1cqw; font-family: var(--mono); font-size: .75cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); cursor: pointer; transition: color .3s, border-color .3s; }
+  .appx .tabs button:hover, .appx .tabs button.on { color: var(--ink); border-color: var(--light); }
+  .appx .cap { width: 100%; height: auto; display: block; margin: .4cqw 0 1cqw; }
+  .appx .cap rect, .appx .cap path { transition: x .7s var(--ease-io), y .7s var(--ease-io), width .7s var(--ease-io), height .7s var(--ease-io), opacity .5s; }
+  .appx .cap .frame { fill: none; stroke: var(--line); stroke-width: 1.5; }
+  .appx .cap .flex { fill: none; stroke: var(--light); stroke-width: 1; stroke-dasharray: 5 6; opacity: .8; }
+  .appx .cap .lab { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; fill: var(--ink-faint); }
+  .appx .cap .tag { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; fill: var(--ink); transition: opacity .4s; }
+  .appx .cap .tag.dim { fill: var(--ink-faint); }
+  .appx .cap .other { fill: color-mix(in srgb, var(--ink-faint) 40%, transparent); }
+  .appx .cap .earn { fill: var(--light); opacity: .85; }
+  .appx .cap .ops { fill: var(--light-soft); stroke: var(--light); stroke-width: 1; }
+  .appx .opt { display: none; }
+  .appx .opt.on { display: block; }
+  .appx .opt p { max-width: 80ch; }
+  .appx .opt b { color: var(--ink); font-weight: 400; }
+  .appx .fine { margin-top: 1.4cqw; font-size: .95cqw; color: var(--ink-faint); }
+  body.embed .appx, body.embed .qa .links { display: none; }
+
+  /* thank you: the one interactive block on the canvas */
+  .cta { position: absolute; z-index: 7; left: 50%; top: 41.5%; transform: translateX(-50%); width: 40cqw; display: grid; justify-items: center; gap: 1.2cqw; opacity: 0; pointer-events: none; transition: opacity .6s var(--ease-out); }
+  .cta.on { opacity: 1; pointer-events: auto; transition-delay: .9s; }
+  .cta h2 { font-family: var(--display); font-weight: 600; font-size: 4.4cqw; letter-spacing: -.015em; line-height: 1.04; margin: 0; }
+  .cta .who { font-family: var(--mono); font-size: .95cqw; letter-spacing: .16em; text-transform: uppercase; color: var(--light); }
+  .cta .go { position: relative; margin-top: 3cqw; background: none; border: 0; padding: .4cqw 0 .4cqw 1.3cqw; border-bottom: 1px solid transparent; font-family: var(--mono); font-size: .85cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); cursor: pointer; transition: color .3s, border-color .3s; }
+  .cta .go::before { content: ""; position: absolute; left: 0; top: 50%; width: .45cqw; height: .45cqw; margin-top: -.22cqw; border-radius: 50%; background: var(--light); }
+  .cta .go:hover { color: var(--ink); border-bottom-color: var(--light); }
+  .cta .go i { display: none; }
+  .cta form { display: none; width: 100%; grid-template-columns: 1fr 1fr; gap: .8cqw; margin-top: 1cqw; text-align: left; }
+  .cta.open form { display: grid; }
+  .cta.open .go { display: none; }
+  .cta label { display: grid; gap: .3cqw; font-family: var(--mono); font-size: .7cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+  .cta label.wide { grid-column: 1 / -1; }
+  .cta input, .cta textarea { font: inherit; font-size: 1.05cqw; color: var(--ink); background: color-mix(in srgb, var(--surface) 85%, transparent); border: 1px solid var(--line); border-radius: 2px; padding: .6cqw .8cqw; width: 100%; box-sizing: border-box; color-scheme: dark; }
+  .cta input:focus, .cta textarea:focus { outline: none; border-color: var(--light); }
+  .cta .send { grid-column: 1 / -1; justify-self: end; padding: .7cqw 1.6cqw; border: 1px solid var(--line); border-radius: 100px; background: none; font-family: var(--mono); font-size: .8cqw; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); cursor: pointer; }
+  .cta .send:hover { border-color: var(--light); }
+  .cta .done { display: none; color: var(--ink-dim); font-size: 1.3cqw; text-align: center; max-width: 34ch; }
+  .cta.sent form, .cta.sent .go { display: none; }
+  .cta.sent .done { display: block; }
+  .cta .err { grid-column: 1 / -1; color: #c98a7a; font-size: .95cqw; display: none; }
+  .cta.error .err { display: block; }
+
+  /* ---- brain diagram: the dot is the core, the svg only draws a core when scaled down ---- */
+  .brain { position: absolute; inset: 0; z-index: 3; pointer-events: none; transform-origin: 50% 48%; transition: transform var(--morph) var(--ease-io), opacity .5s; opacity: 0; }
+  .brain.on { opacity: 1; }
+  .brain.mini { transform: translate(-37%, -2.7%) scale(.5); }
+  .brain.side { transform: translate(-28%, 2%) scale(.6); }
+  .brain svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .brain path, .brain line { fill: none; stroke: var(--light); stroke-width: 2; stroke-linecap: round; opacity: .7; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .9s var(--ease-io) var(--pd, 0s); }
+  .brain path.dim { opacity: .3; }
+  .brain .ring { fill: none; stroke: var(--light); stroke-width: 1; stroke-dasharray: 3 5; opacity: 0; transition: opacity .6s .3s; }
+  .brain .n { fill: var(--ink-faint); opacity: 0; transition: opacity .5s var(--pd, .5s); }
+  .brain .n.lit { fill: var(--light); }
+  .brain .core { fill: var(--light); opacity: 0; }
+  .brain .head { fill: var(--light); opacity: 0; transition: opacity .3s var(--pd, .8s); }
+  .brain .bt { font-family: var(--mono); font-size: 17px; letter-spacing: .14em; text-transform: uppercase; fill: var(--ink-dim); opacity: 0; transition: opacity .5s var(--pd, .6s); }
+  .brain .bt.h { font-family: var(--display); font-weight: 600; font-size: 30px; letter-spacing: -.01em; text-transform: none; fill: var(--ink); }
+  .brain .bt.s { font-size: 15px; fill: var(--ink-faint); }
+  .brain .bt.lit { fill: var(--ink); }
+  .brain .bt.ko { paint-order: stroke; stroke: var(--base); stroke-width: 12px; stroke-linejoin: round; }
+  .brain .spin { opacity: 0; transition: opacity .8s .2s; transform-origin: 800px 426px; transform-box: view-box; }
+  .brain .spin circle { fill: none; stroke: var(--light); stroke-width: 1.5; stroke-dasharray: 42 16; opacity: .7; }
+  .brain .spin polygon { fill: var(--light); opacity: .9; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .brain.p-loop .spin { opacity: 1; animation: spin 36s linear infinite; }
+  .brain.p-loop .ring { opacity: 0; transition-delay: 0s; }
+  .brain.p-loop #g-core .bt.h, .brain.p-loop #g-core .bt.s { opacity: 0; transition-delay: 0s; }
+  /* scaled-down modes: only the core and the rotating ring, plus the rays on the project slide */
+  .brain.mini :is(path, line, .n, .bt, .head, .ring), .brain.side :is(path, line, .n, .bt, .head, .ring) { opacity: 0 !important; transition-delay: 0s; }
+  .brain.side #g-rays line { opacity: .45 !important; stroke-dashoffset: 0; }
+  .brain.side #g-rays .n { opacity: .6 !important; transition-delay: .6s; }
+  .brain.p-core #g-core path, .brain.p-ingest #g-ingest path, .brain.p-output #g-output path, .brain.p-access #g-access path, .brain.p-access #g-access line { stroke-dashoffset: 0; }
+  .brain.p-core #g-core :is(.n, .bt, .ring), .brain.p-ingest #g-ingest :is(.n, .bt), .brain.p-loop #g-loop .bt, .brain.p-output #g-output :is(.n, .bt), .brain.p-access #g-access :is(.n, .bt, .head) { opacity: 1; }
+  .brain.p-output #g-output .bt.dim, .brain.p-output #g-output .n.dim { opacity: .45; }
+  /* the current part is lit, the parts before it fall back */
+  .brain[data-cur="ingest"] #g-core .bt, .brain[data-cur="output"] #g-core .bt, .brain[data-cur="access"] #g-core .bt, .brain[data-cur="loop"] #g-core .bt { opacity: 0; transition-delay: 0s; }
+  .brain[data-cur="output"] #g-ingest :is(.n, .bt), .brain[data-cur="access"] #g-ingest :is(.n, .bt), .brain[data-cur="access"] #g-output :is(.n, .bt) { opacity: .25; transition-delay: 0s; }
+  .brain[data-cur="output"] #g-ingest path, .brain[data-cur="access"] #g-ingest path, .brain[data-cur="access"] #g-output path { opacity: .2; }
+  .brain[data-cur="loop"] :is(#g-ingest, #g-output, #g-access) :is(path, line, .n, .head) { opacity: .15; transition-delay: 0s; }
+  .brain[data-cur="loop"] :is(#g-ingest, #g-output, #g-access) .bt { opacity: 0; transition-delay: 0s; }
+  .brain[data-cur="loop"] #g-output .bt.dim { opacity: 0; transition-delay: 0s; }
+  .brain[data-cur="loop"] #g-output .n.dim { opacity: .15; transition-delay: 0s; }
+  .brain.rev * { transition-delay: 0s !important; }
+
+  /* ---- timeline ---- */
+  .tl { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+  .tl svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .tl line { stroke: var(--line); stroke-width: 2; }
+  .tl .tick { stroke: var(--ink-faint); stroke-width: 1.5; }
+  .tl .brk { stroke: var(--light); stroke-width: 1.5; }
+  .tl .draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .9s var(--ease-io); }
+  .tl.on .draw { stroke-dashoffset: 0; }
+  .tl .tick { opacity: 0; transition: opacity .4s .6s; }
+  .tl.on .tick { opacity: 1; }
+
+  /* ---- modes ---- */
+  body.embed .bar, body.embed .foot, body.embed .grain { display: none; }
+  body.embed .deck { grid-template-rows: 1fr; }
+  body.embed .stage { height: 100dvh; }
+  body.embed .canvas { width: min(100cqw, calc(100cqh * 16 / 9)); }
+  .presenter { display: none; }
+  body.presenting .deck { display: none; }
+  body.presenting .presenter { position: relative; z-index: 1; display: grid; height: 100dvh; box-sizing: border-box; padding: 24px 32px; gap: 24px; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .presenter .top { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line-soft); padding-bottom: 16px; }
+  .presenter .top b { color: var(--ink); font-weight: 400; font-size: 13px; }
+  .presenter .clock { font-size: 13px; color: var(--ink-dim); }
+  .presenter .pane { min-height: 0; display: grid; gap: 14px; align-content: start; }
+  .presenter iframe { width: 100%; aspect-ratio: 16 / 9; border: 1px solid var(--line); background: var(--base); display: block; pointer-events: none; }
+  .presenter .notes { font-size: 1.45rem; line-height: 1.55; color: var(--ink); max-width: 62ch; overflow-y: auto; margin: 0; text-wrap: pretty; }
+  .presenter .notes .ph { color: var(--light); }
+  .presenter .notes .off { opacity: .35; }
+  .presenter .nextname { color: var(--ink-dim); }
+  @media (max-width: 900px) { body.presenting .presenter { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .d, .brain, .t, .t.on { transition: opacity .35s ease !important; transition-delay: 0s !important; }
+    .brain path, .brain line, .tl .draw { transition: none !important; }
+    .brain.side .spin { animation: none; }
+    .brain.p-loop .spin { animation: none; }
+    .canvas { transition: opacity .3s ease; }
+    .canvas.fading { opacity: 0; }
+  }
+    </style>
+  </head>
+  <body data-role={role}>
+
+<div class="backdrop" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="deck">
+  <header class="bar">
+    <img src="/logo.png" alt="GT Strategies">
+    <div class="where mono"><span id="slide-name">Opening</span><b id="slide-count">1 / 7</b></div>
+  </header>
+
+  <main class="stage">
+    <div class="canvas" id="canvas">
+
+      <!-- 01 opening and 07 close -->
+      <div class="t lab c" id="t-eyebrow" style="left:50%;top:41.5%;color:var(--light)">Prepared for Earnnest &middot; September 2026</div>
+      <div class="t big c" id="t-title" style="left:50%;top:50%">AI and Operations&nbsp;Support</div>
+      <div class="t seam c" id="t-seam" style="left:50%;top:59.5%"></div>
+
+      <!-- 02 key themes: four themes, one dot, key points on the right; then collapse into one and burst -->
+      <div class="t lab l" id="t-themes" style="left:9%;top:18%">Key themes across discussions</div>
+      <div class="t word q l" id="t-th0" style="left:9%;top:30%">Time and expertise</div>
+      <div class="t word q l" id="t-th1" style="left:9%;top:42%">Documentation as the foundation</div>
+      <div class="t word q l" id="t-th2" style="left:9%;top:54%">Where efficiency comes from</div>
+      <div class="t word q l" id="t-th3" style="left:9%;top:66%">Financial impact</div>
+      <div class="t rule c" id="t-vr" style="left:46%;top:49%;height:24cqw"></div>
+      <div class="t pt l" id="t-k00" style="left:50%;top:37%">Nobody has the time to work out what to build, and less to build it</div>
+      <div class="t pt l" id="t-k01" style="left:50%;top:47%">Nobody with hands-on experience applying AI at scale, and it isn't anyone's job</div>
+      <div class="t pt l" id="t-k02" style="left:50%;top:57%">Time goes to manual effort and research: follow-ups, ticket updates, admin work, finding and updating documentation</div>
+      <div class="t pt l" id="t-k10" style="left:50%;top:37%">Thorough, and difficult to navigate for quick answers</div>
+      <div class="t pt l" id="t-k11" style="left:50%;top:47%">Takes a lot to build, a lot to maintain, and goes stale when it isn't</div>
+      <div class="t pt l" id="t-k12" style="left:50%;top:57%">Raised in every conversation, as a strength and a frustration for the team</div>
+      <div class="t pt l" id="t-k20" style="left:50%;top:37%">Enable the job: tools that make people faster at what only they can do</div>
+      <div class="t pt l" id="t-k21" style="left:50%;top:47%">Automate the work: the repetitive, administrative work done for people</div>
+      <div class="t pt l" id="t-k22" style="left:50%;top:57%">Improve the process: find real answers, then iterate on the foundation</div>
+      <div class="t pt l" id="t-k30" style="left:50%;top:37%">Growth: new and more efficient ways to go to market, and a top line above 30 percent</div>
+      <div class="t pt l" id="t-k31" style="left:50%;top:47%">Cost: a lower cost to operate and iterate, from tech spend to limited hiring</div>
+      <div class="t pt l" id="t-k32" style="left:50%;top:57%">Capacity: more of it across the current team, as the effect of both</div>
+      <div class="t word md mk l" id="t-h0" style="left:9%;top:38%">Hard to use</div>
+      <div class="t desc l" id="t-hd0" style="left:11.2%;top:43.2%">Consistently difficult, even for the people who like Notion</div>
+      <div class="t word md mk l" id="t-h1" style="left:9%;top:50%">Falls behind</div>
+      <div class="t desc l" id="t-hd1" style="left:11.2%;top:55.2%">Manual effort to keep it updated as the product changes</div>
+      <div class="t word md mk l" id="t-h2" style="left:9%;top:62%">Isolated</div>
+      <div class="t desc l" id="t-hd2" style="left:11.2%;top:67.2%">Calls, Salesforce, and transcripts sit outside it</div>
+      <div class="t word md mk l" id="t-h3" style="left:9%;top:74%">No shared foundation</div>
+      <div class="t desc l" id="t-hd3" style="left:11.2%;top:79.2%">AI efforts are starting in different places, for people and for AI</div>
+      <div class="t word q cur l" id="t-why" style="left:57%;top:22%">Why focus here</div>
+      <div class="t word md mk l" id="t-y0" style="left:57%;top:38%">Accessibility</div>
+      <div class="t desc l" id="t-yd0" style="left:59.2%;top:43.2%">Quick answers and real understanding, for the product and the procedures</div>
+      <div class="t word md mk l" id="t-y1" style="left:57%;top:50%">Current by design</div>
+      <div class="t desc l" id="t-yd1" style="left:59.2%;top:55.2%">Updates with the product, not by re-reading every page after a release</div>
+      <div class="t word md mk l" id="t-y2" style="left:57%;top:62%">One context for people and AI</div>
+      <div class="t desc l" id="t-yd2" style="left:59.2%;top:67.2%">The same core feeds support, call insights, and every workflow after</div>
+
+      <div class="t lab c" id="t-how-eye" style="left:50%;top:41.5%;color:var(--light)">The knowledge brain</div>
+      <div class="t big c" id="t-how" style="left:50%;top:50%">How it works</div>
+      <!-- 03 how it works: the brain on a 1600 x 900 plane. The dot sits on (800, 432) as the core. -->
+      <div class="brain" id="brain" aria-hidden="true">
+        <svg viewBox="0 0 1600 900">
+          <g transform="translate(0 -6)">
+          <circle class="core" cx="800" cy="432" r="40" />
+          <g id="g-rays">
+            <line pathLength="1" x1="635" y1="527" x2="540" y2="582" style="--pd:0.00s" /><circle class="n" cx="530" cy="588" r="7" />
+            <line pathLength="1" x1="610" y1="432" x2="500" y2="432" style="--pd:0.08s" /><circle class="n" cx="488" cy="432" r="7" />
+            <line pathLength="1" x1="635" y1="337" x2="540" y2="282" style="--pd:0.16s" /><circle class="n" cx="530" cy="276" r="7" />
+            <line pathLength="1" x1="965" y1="337" x2="1060" y2="282" style="--pd:0.24s" /><circle class="n" cx="1070" cy="276" r="7" />
+            <line pathLength="1" x1="990" y1="432" x2="1100" y2="432" style="--pd:0.32s" /><circle class="n" cx="1112" cy="432" r="7" />
+            <line pathLength="1" x1="965" y1="527" x2="1060" y2="582" style="--pd:0.40s" /><circle class="n" cx="1070" cy="588" r="7" />
+          </g>
+          <g id="g-core">
+            <circle class="ring" cx="800" cy="432" r="118" />
+            <text class="bt" x="700" y="348" text-anchor="end">Documentation and knowledge base</text>
+            <text class="bt" x="900" y="348">Customer data and analytics</text>
+            <text class="bt" x="900" y="530">Organized for people, structured for AI</text>
+            <text class="bt" x="700" y="530" text-anchor="end">Market and product feedback</text>
+            <text class="bt h" x="800" y="118" text-anchor="middle">Core</text>
+            <text class="bt s" x="800" y="154" text-anchor="middle">What exists in pieces today, consolidated into one brain</text>
+          </g>
+          <g id="g-ingest">
+            <text class="bt h" x="305" y="118" text-anchor="end">Ingest</text>
+            <text class="bt s" x="305" y="154" text-anchor="end">New sources make it smarter</text>
+            <path pathLength="1" d="M330 232 C 560 232, 620 432, 760 432" />
+            <path pathLength="1" style="--pd:.1s" d="M330 332 C 560 332, 620 432, 760 432" />
+            <path pathLength="1" style="--pd:.2s" d="M330 432 L 760 432" />
+            <path pathLength="1" style="--pd:.3s" d="M330 532 C 560 532, 620 432, 760 432" />
+            <path pathLength="1" style="--pd:.4s" d="M330 632 C 560 632, 620 432, 760 432" />
+            <circle class="n" cx="330" cy="232" r="8" /><circle class="n" cx="330" cy="332" r="8" /><circle class="n" cx="330" cy="432" r="8" /><circle class="n" cx="330" cy="532" r="8" /><circle class="n" cx="330" cy="632" r="8" />
+            <text class="bt" x="305" y="238" text-anchor="end">Call transcripts</text>
+            <text class="bt" x="305" y="338" text-anchor="end">Salesforce</text>
+            <text class="bt" x="305" y="438" text-anchor="end">Product documentation</text>
+            <text class="bt" x="305" y="538" text-anchor="end">Marketing content</text>
+            <text class="bt" x="305" y="638" text-anchor="end">Customer feedback</text>
+          </g>
+          <g id="g-output">
+            <text class="bt h" x="1265" y="118">Output</text>
+            <text class="bt s" x="1265" y="154">AI-assisted workflows</text>
+            <path pathLength="1" style="--pd:0s" d="M840 432 C 1000 432, 1060 232, 1240 232" />
+            <path pathLength="1" style="--pd:.22s" d="M840 432 C 1000 432, 1060 332, 1240 332" />
+            <path pathLength="1" style="--pd:.44s" d="M840 432 L 1240 432" />
+            <path class="dim" pathLength="1" style="--pd:.66s" d="M840 432 C 1000 432, 1060 532, 1240 532" />
+            <path class="dim" pathLength="1" style="--pd:.88s" d="M840 432 C 1000 432, 1060 632, 1240 632" />
+            <circle class="n lit" cx="1240" cy="232" r="8" style="--pd:.5s" /><text class="bt lit" x="1265" y="238" style="--pd:.6s">Customer intelligence</text>
+            <circle class="n lit" cx="1240" cy="332" r="8" style="--pd:.72s" /><text class="bt lit" x="1265" y="338" style="--pd:.82s">Support drafts</text>
+            <circle class="n lit" cx="1240" cy="432" r="8" style="--pd:.94s" /><text class="bt lit" x="1265" y="438" style="--pd:1.04s">Product updates</text>
+            <circle class="n dim" cx="1240" cy="532" r="8" style="--pd:1.16s" /><text class="bt dim" x="1265" y="538" style="--pd:1.26s">Go-to-market content</text>
+            <circle class="n dim" cx="1240" cy="632" r="8" style="--pd:1.38s" /><text class="bt dim" x="1265" y="638" style="--pd:1.48s">Vendor questionnaires</text>
+          </g>
+          <g id="g-access">
+            <line pathLength="1" x1="400" y1="750" x2="1200" y2="750" />
+            <path pathLength="1" style="--pd:0s" d="M400 750 L 400 652" /><polygon class="head" points="400,628 388,652 412,652" style="--pd:.9s" />
+            <path pathLength="1" style="--pd:.3s" d="M667 750 L 667 562" /><polygon class="head" points="667,538 655,562 679,562" style="--pd:1.2s" />
+            <path pathLength="1" style="--pd:.6s" d="M933 538 L 933 708" /><polygon class="head" points="933,732 921,708 945,708" style="--pd:1.5s" />
+            <path pathLength="1" style="--pd:.9s" d="M1200 652 L 1200 708" /><polygon class="head" points="1200,732 1188,708 1212,708" style="--pd:1.8s" />
+            <circle class="n lit" cx="400" cy="750" r="8" style="--pd:0s" /><circle class="n lit" cx="667" cy="750" r="8" style="--pd:.3s" /><circle class="n lit" cx="933" cy="750" r="8" style="--pd:.6s" /><circle class="n lit" cx="1200" cy="750" r="8" style="--pd:.9s" />
+            <text class="bt" x="400" y="786" text-anchor="middle" style="--pd:.2s">Human input</text>
+            <text class="bt" x="667" y="786" text-anchor="middle" style="--pd:.5s">Feedback</text>
+            <text class="bt" x="933" y="786" text-anchor="middle" style="--pd:.8s">Find and use</text>
+            <text class="bt" x="1200" y="786" text-anchor="middle" style="--pd:1.1s">Improve the output</text>
+            <text class="bt h" x="800" y="846" text-anchor="middle" style="--pd:1s">Access</text>
+            <text class="bt s" x="800" y="880" text-anchor="middle" style="--pd:1.1s">Everyone feeds the brain, and everyone can use it</text>
+          </g>
+          </g>
+          </g>
+          <g id="g-loop">
+            <g class="spin">
+              <circle cx="800" cy="426" r="165" />
+              <polygon points="786,591 810,600 810,582" />
+              <polygon points="664.1,331.4 644.3,347.7 659.9,356.7" />
+              <polygon points="949.9,352.2 945.7,330.3 930.1,339.3" />
+            </g>
+            <text class="bt h" x="800" y="112" text-anchor="middle">Make it intelligent</text>
+            <text class="bt s" x="800" y="148" text-anchor="middle">Reviews, improves, and learns from use</text>
+          </g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- 04 how we get there: 12 weeks from x 30% to 94%, a summary under the current step -->
+      <div class="tl" id="tl" aria-hidden="true">
+        <svg viewBox="0 0 1600 900" preserveAspectRatio="none">
+          <line class="draw" pathLength="1" x1="480" y1="405" x2="1504" y2="405" />
+          <line class="brk draw" pathLength="1" x1="480" y1="340" x2="815" y2="340" />
+          <line class="brk draw" pathLength="1" x1="829" y1="340" x2="1504" y2="340" />
+          <g id="ticks"></g>
+        </svg>
+      </div>
+      <div class="t lab c" id="t-strat" style="left:40.7%;top:30%">Strategy</div>
+      <div class="t sub c" id="t-strat2" style="left:40.7%;top:34.5%">Weeks 1 to 4</div>
+      <div class="t lab c" id="t-exec" style="left:72.7%;top:30%">Execution</div>
+      <div class="t sub c" id="t-exec2" style="left:72.7%;top:34.5%">Weeks 5 to 12</div>
+      <div class="t sub r" id="t-wk1" style="left:28.5%;top:45%">Week 1</div>
+      <div class="t sub l" id="t-wk12" style="left:95.5%;top:45%">Week 12</div>
+      <div class="t step c" id="t-s0" style="left:35.3%;top:53%">Discover</div>
+      <div class="t step c" id="t-s1" style="left:46%;top:53%">Architect</div>
+      <div class="t step c" id="t-s2" style="left:67.3%;top:53%">Brain build and enablement</div>
+      <div class="t step c" id="t-s3" style="left:83.3%;top:53%">Use case build and enablement</div>
+      <div class="t step c" id="t-s4" style="left:92.6%;top:53%">Roadmap</div>
+      <div class="t sum l" id="t-m0" style="left:30%;top:72%"><b>Weeks 1 to 2</b>Map how knowledge is stored, used, and connected today. Rank the highest-value content for rebuild. Agree on the current state and priorities before anything is designed.</div>
+      <div class="t sum l" id="t-m1" style="left:30%;top:72%"><b>Weeks 3 to 4</b>Design the structure, metadata, ownership, and access. Recommend the tools, and choose the first source and use case. Approved before anything is built.</div>
+      <div class="t sum l" id="t-m2" style="left:30%;top:72%"><b>Weeks 5 to 9</b>Rebuild the highest-value content and connect it to the team's everyday tools. Get the loop running and train the team on it.</div>
+      <div class="t sum l" id="t-m3" style="left:30%;top:72%"><b>Weeks 9 to 12</b>Wire in the first source and build the first AI-assisted use case on top of the brain. Enable the team on it, with the pattern ready to repeat.</div>
+      <div class="t sum l" id="t-m4" style="left:30%;top:72%"><b>Week 12</b>A prioritized plan for the next sources, use cases, and improvements, focused on the business's biggest bottlenecks.</div>
+
+      <!-- 05 what you get: the brain on the left, deliverables on the right, then the numbers -->
+      <div class="t lab l" id="t-plab" style="left:44%;top:16%">What you get</div>
+      <div class="t word sm mk l" id="t-d0" style="left:44%;top:24%">A documented current state and priorities</div>
+      <div class="t word sm mk l" id="t-d1" style="left:44%;top:31%">Approved architecture and a build plan</div>
+      <div class="t word sm mk l" id="t-d2" style="left:44%;top:38%">A working brain with team access and training</div>
+      <div class="t word sm mk l" id="t-d3" style="left:44%;top:45%">The first AI-assisted use case</div>
+      <div class="t word sm mk l" id="t-d4" style="left:44%;top:52%">A priority roadmap for the next builds</div>
+      <div class="t word sm mk l" id="t-d5" style="left:44%;top:59%">A knowledge ownership model, so it stays owned</div>
+      <div class="t word sm mk l" id="t-d6" style="left:44%;top:66%">A repeatable pattern for every use case after</div>
+      <div class="t hr l" id="t-hr" style="left:44%;top:73%"></div>
+      <div class="t num l" id="t-n0" style="left:44%;top:83%"><small>Timeline</small>12 weeks</div>
+      <div class="t num l" id="t-n1" style="left:68%;top:83%"><small>Investment</small>$42,000 fixed</div>
+
+      <!-- 06 questions and discussion, with appendix panels that slide in over it -->
+      <div class="qa" id="qa">
+        <h2>Questions and discussion</h2>
+        <span class="ctx">Additional context</span>
+        <div class="links">
+          <button type="button" data-appx="process">Process and timeline</button>
+          <button type="button" data-appx="options">Ways of working together</button>
+          <button type="button" data-appx="return">Outcomes and return</button>
+          <button type="button" data-appx="scope">Scope and what Earnnest provides</button>
+        </div>
+      </div>
+      <div class="appx" id="appx">
+        <button type="button" class="back" id="appx-back">&larr; Back to discussion</button>
+        <section data-appx="process">
+          <span class="k">Appendix</span><h3>Process and timeline</h3>
+          <table>
+            <thead><tr><th>Weeks</th><th>Stage</th><th>Step</th><th>Deliverable</th><th>Done when</th></tr></thead>
+            <tbody>
+              <tr><td>1 to 2</td><td>Strategy</td><td>Discover</td><td>Documented current state and rebuild priorities. The highest-value content ranked for rebuild, and the questions the team most needs answered.</td><td>Current state and priorities agreed</td></tr>
+              <tr><td>3 to 4</td><td>Strategy</td><td>Architect</td><td>Design for structure, metadata, ownership, and access. Recommended tools. The initial source and use case chosen.</td><td>Architecture, tooling decisions, and build plan approved</td></tr>
+              <tr><td>5 to 9</td><td>Execution</td><td>Brain build and enablement</td><td>Highest-value content rebuilt and current, connected to the team's everyday tools, the review loop running, the team trained.</td><td>Team reliably gets grounded answers where they work. Priority content is current and owned.</td></tr>
+              <tr><td>9 to 12</td><td>Execution</td><td>Use case build and enablement</td><td>Initial source ingested and the first AI-assisted use case built on the brain. Example: Aircall call data into a monthly report of top complaints and feature requests.</td><td>Use case producing useful output, team enabled, pattern ready to repeat</td></tr>
+              <tr><td>12</td><td>Execution</td><td>Roadmap</td><td>Prioritized plan for the next sources, use cases, and improvements, focused on the biggest bottlenecks.</td><td>Delivered and reviewed together</td></tr>
+            </tbody>
+          </table>
+          <h4>Working together</h4>
+          <ul>
+            <li>A consistent cadence set at kickoff: regular check-ins and a review at the end of each stage.</li>
+            <li>The timeline assumes timely access to systems, time from the people involved, and decisions. If any of these slip, the timeline adjusts.</li>
+            <li>Requests outside this scope are agreed in writing before work begins, as a future build or an adjustment to the fee.</li>
+          </ul>
+        </section>
+        <section data-appx="options">
+          <span class="k">Appendix</span><h3>Ways of working together</h3>
+          <div class="tabs" id="cap-tabs">
+            <button type="button" data-tab="t12" class="on">12 weeks</button>
+            <button type="button" data-tab="t8">8 weeks</button>
+            <button type="button" data-tab="ops">Support alongside</button>
+            <button type="button" data-tab="run">Ongoing execution</button>
+          </div>
+          <svg class="cap" id="cap" viewBox="0 0 1000 150" aria-label="My capacity as one bar, and how much of it each option takes">
+            <text class="lab" x="40" y="24">My capacity, on average</text>
+            <text class="lab" id="cap-when" x="960" y="24" text-anchor="end">Twelve weeks</text>
+            <rect class="frame" x="40" y="36" width="920" height="64" />
+            <rect class="other" id="cap-a" x="40" y="36" width="110" height="64" />
+            <rect class="earn" id="cap-e" x="150" y="36" width="368" height="64" />
+            <rect class="ops" id="cap-o" x="518" y="36" width="0" height="64" />
+            <rect class="flex" id="cap-f" x="518" y="36" width="0" height="64" />
+            <text class="tag dim" id="cap-at" x="95" y="72" text-anchor="middle">Other</text>
+            <text class="tag" id="cap-et" x="334" y="72" text-anchor="middle">Earnnest project</text>
+            <text class="tag" id="cap-ot" x="0" y="72" text-anchor="middle" opacity="0">Additional support</text>
+            <text class="tag dim" id="cap-ft" x="0" y="72" text-anchor="middle" opacity="0">Flex</text>
+            <text class="tag dim" id="cap-rt" x="940" y="72" text-anchor="end">Open</text>
+            <text class="lab" x="40" y="128">Other clients</text>
+            <text class="lab" id="cap-note" x="960" y="128" text-anchor="end">About 15 to 20 hours a week</text>
+          </svg>
+          <div class="opt" data-tab="t12"><p><b>Recommended.</b> About 15 to 20 hours a week on average, alongside my other client work. Enough to do it properly at the team's pace on decisions and access. $42,000 fixed.</p></div>
+          <div class="opt" data-tab="t8"><p><b>Move faster.</b> Roughly 25 to 30 hours a week. Same scope and deliverables, compressed, and other work moves to make room. Needs decisions and access within days. $45,000 fixed, prioritizing speed.</p></div>
+          <div class="opt" data-tab="ops"><p><b>If things change internally,</b> I have room to flex into additional functions alongside the project without putting it at risk. Roughly 25 to 30 hours a week combined. Scoped and agreed in writing, as a future build or an adjustment to the fee.</p></div>
+          <div class="opt" data-tab="run"><p><b>After the twelve weeks,</b> roll into ongoing execution on the roadmap: the next sources and use cases, with the team building alongside. A steady base, and the dashed range is how far it can flex up or down month to month.</p></div>
+        </section>
+        <section data-appx="return">
+          <span class="k">Appendix</span><h3>Outcomes and return</h3>
+          <p>The aim is a team that is faster, better, and more effective, with the output to show for it, and a business that is worth more because its knowledge compounds instead of walking out the door.</p>
+          <div class="two">
+            <div>
+              <h4>Top line</h4>
+              <ul>
+                <li>Time back goes to the go-to-market motion and cash-to-close, where growth comes from</li>
+                <li>Customer intelligence from calls and transactions reaches product, support, and marketing from one source</li>
+                <li>Faster follow-up and better answers shorten the time to outcome on every customer effort</li>
+              </ul>
+              <h4>Bottom line</h4>
+              <ul>
+                <li>Capacity grows without headcount, so growth is absorbed by the current team</li>
+                <li>Documentation updates, support boilerplate, and call review stop being someone's hours</li>
+                <li>A lower cost to operate, as a growth play rather than a cost play</li>
+              </ul>
+            </div>
+            <div>
+              <h4>The team</h4>
+              <ul>
+                <li>Quick answers where people already work, for support, success, and new hires</li>
+                <li>Less time searching, waiting, and re-creating what already exists</li>
+                <li>Documentation that stays current as part of the work, not as a chore after every release</li>
+              </ul>
+              <h4>Enterprise value</h4>
+              <ul>
+                <li>Institutional knowledge that stays with the company, not with individuals</li>
+                <li>One context for people and AI, so every future workflow is consistent and cheaper to build</li>
+                <li>Implemented AI with a foundation and a roadmap: a concrete answer to the question acquirers now ask</li>
+              </ul>
+            </div>
+          </div>
+          <h4>What the research says</h4>
+          <ul>
+            <li>Knowledge workers spend about 1.8 hours a day, 9.3 hours a week, searching for and gathering information (McKinsey Global Institute).</li>
+            <li>US knowledge workers lose 5.3 hours a week waiting for information from colleagues or re-creating knowledge that already exists, 42 percent of institutional knowledge is unique to one person, and 81 percent of employees are frustrated when they can't get the information they need (Panopto, Workplace Knowledge and Productivity Report).</li>
+            <li>Nearly 70 percent of effectively onboarded employees stay at least three years (Society for Human Resource Management).</li>
+          </ul>
+        </section>
+        <section data-appx="scope">
+          <span class="k">Appendix</span><h3>Scope and what Earnnest provides</h3>
+          <div class="two">
+            <div>
+              <h4>In scope</h4>
+              <ul>
+                <li>The knowledge base rebuilt as the foundation of the brain</li>
+                <li>One initial source integrated, others defined for future builds</li>
+                <li>The review loop for priority content</li>
+                <li>The first AI-assisted use case, chosen from a prioritized list out of discovery</li>
+                <li>The knowledge ownership model</li>
+                <li>Documentation and enablement throughout</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Outside this project</h4>
+              <ul>
+                <li>Customer-facing self-service and anything inside the Earnnest product</li>
+                <li>Engineering's codebase documentation work. We coordinate where it connects.</li>
+                <li>Continuous automated updating across all sources. Planned as future builds.</li>
+                <li>Organizational change beyond the knowledge ownership model</li>
+              </ul>
+            </div>
+          </div>
+          <h4>What Earnnest provides</h4>
+          <ul>
+            <li>A single decision owner and timely decisions</li>
+            <li>Time from the people who hold the knowledge, for discovery, review, and enablement</li>
+            <li>Access to in-scope systems, including Notion and Aircall</li>
+            <li>A technical or engineering partner for technical components and anything running in Earnnest's environment</li>
+            <li>Pre-approved access and budget for testing, and willingness to review tooling decisions</li>
+          </ul>
+          <h4>Investment</h4>
+          <table class="cols">
+            <tbody>
+              <tr><td>Scope</td><td>Strategy and execution as described</td></tr>
+              <tr><td>Target timeline</td><td>12 weeks</td></tr>
+              <tr><td>Project fee</td><td>$42,000, fixed</td></tr>
+              <tr><td>Technology costs</td><td>Not included</td></tr>
+            </tbody>
+          </table>
+          <p>The project fee covers strategy, build, and enablement services only. We build primarily with the tools Earnnest already has, or custom build where that saves cost. Software, API, infrastructure, and testing costs are owned by Earnnest and reviewed together before they are incurred.</p>
+        </section>
+      </div>
+
+      <!-- 06 thank you, with a short form that posts to the site's intake -->
+      <div class="cta" id="cta">
+        <h2>Thank you</h2>
+        <span class="who">Greg Toler &middot; GT Strategies</span>
+        <button type="button" class="go" id="cta-go"><i aria-hidden="true">&rarr;</i><span>Let's get started</span></button>
+        <form id="cta-form" novalidate>
+          <label>Name<input type="text" name="name" autocomplete="name" required /></label>
+          <label>Email<input type="email" name="email" autocomplete="email" required /></label>
+          <label>Preferred start<input type="date" name="start" required /></label>
+          <label>Anything to add<input type="text" name="note" /></label>
+          <span class="err" id="cta-err">That didn't go through. Try again, or email greg@gregtoler.com.</span>
+          <button type="submit" class="send">Send</button>
+        </form>
+        <p class="done">Got it. I'll confirm the start date by email and send the agreement.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="keys mono" id="keys" aria-label="Slides"></div>
+    <div class="nav">
+      {ADMIN && <button type="button" class="quiet" id="open-notes" aria-label="Open presenter view">N &middot; Notes</button>}
+      <button type="button" id="prev" aria-label="Previous">&larr; Back</button>
+      <button type="button" id="next" aria-label="Next">Next &rarr;</button>
+    </div>
+  </footer>
+</div>
+
+<div class="presenter" id="presenter">
+  <div class="top mono"><span><b id="p-name">Opening</b> &nbsp; <span id="p-count">1 / 7</span></span><span class="clock" id="p-clock">00:00</span></div>
+  <div class="pane">
+    <iframe id="p-cur" title="Current" tabindex="-1"></iframe>
+    <p class="notes" id="p-notes"></p>
+  </div>
+  <div class="pane">
+    <span class="mono">Next &middot; <span class="nextname" id="p-next-name"></span></span>
+    <iframe id="p-next" title="Next" tabindex="-1"></iframe>
+    <span class="mono">Arrows or space to advance. Click the clock to reset it.</span>
+  </div>
+</div>
+
+<script is:inline>
+  const SLIDES = [
+    { name: "Opening", notes: "Thank you for the time. Russell has framed where I'm focused, so I'll get straight to it. I'm going to be more direct with you than I would be with the department heads later, because I think that's what's useful here. In about fifteen minutes I want to walk through what I heard, how I'd approach it, and what it takes. Then I'd rather spend the time on your questions." },
+    { name: "Key themes", notes: "[Step 1, Time and expertise] I spoke with everyone on the leadership side and read through what came out of Russell's one-on-one cycle with the team. Four themes, in the order I heard them most. The first is time and expertise. Nobody has the time to work out what to build, and less to build it in a practical, scalable way. There's nobody with hands-on experience applying AI at scale, and it isn't anyone's job. And the hours go to manual work: event lists and follow-up on the go-to-market side, ticket updates and hunting for documentation in support.\n\n[Step 2, Documentation] The second is documentation as the foundation. It came up in every conversation, as a strength and a frustration. It's thorough, and when you need a quick answer you're out of luck. It goes stale the moment nobody's maintaining it, and stale is worse than none because people trust it. And it's what everything else depends on: support responses, vendor questionnaires, keeping ops in sync with releases.\n\n[Step 3, Where efficiency comes from] The third is where efficiency actually comes from. I split it three ways: customer-facing, helping employees do their job, and doing the admin work for them. In this industry I'd stay away from customer-facing first. The risk is too high and the phone is your differentiator. The opportunity is enabling the job, so people are faster at what only they can do, and automating the admin around it.\n\n[Step 4, Growth and cost] The fourth is the two numbers everything comes back to. Growth above thirty percent, with cash-to-close carrying it. And a lower cost to operate, as a growth play rather than a cost play. Every recommendation I make has to land in one of those.\n\n[Step 5, collapse] Underneath all four there's one thing, and it's the same thing Russell hears in his one-on-ones. Documentation is the foundation, and it sits upstream of nearly everything else.\n\n[Step 6, burst] Specifically. It's hard to use. Consistently difficult, and not just for the people who don't like Notion. It falls behind, and keeping it current is manual effort on the people doing the work, especially engineering. It's isolated from sources like your recorded calls, Salesforce, and transcripts. And there's no shared foundation, so AI efforts are starting in different places, for people and for AI.\n\n[Step 7, why here] So this is where I'd focus, for three reasons that came straight out of the conversations. Accessible: Russell's words were that anytime you need a quick answer you're completely out of luck, and what the team wants is both quick answers and real understanding of the product and the procedures behind it. Current by design: right now the ask is for engineers to go back and re-read every Notion page after every change, and the moment that doesn't happen it goes stale, which is worse than nothing because it gives false positives. This updates with the product instead. One context for people and AI: the same core feeds support drafts, the monthly call insights, marketing content, onboarding, and every workflow after, so it compounds instead of fragmenting. That's also why it comes before any AI use case. Most companies I work with start with the AI use case and build it on knowledge that's incomplete or out of date, and adoption stalls. A team can only be enabled by AI once it's enabled by its own knowledge." },
+    { name: "How it works", notes: "[Step 1, Core] Today the core is documentation. It needs updating, review, and organization, and it isn't very accessible. Even the people who like it say that when you need a quick answer you're out of luck. What we do first is rebuild the core so it functions better and is accessible to the team: product and procedure docs still, plus the customer and transaction data behind them, tagged so it can be found, and organized by how people ask rather than how the pages were written. Then we turn it into a brain. Notion may well stay as the home for it. The point is what it becomes, not where it lives.\n\n[Step 2, Ingest] It stops being process documentation and becomes a smarter central hub for your data sources. Ingest brings them in and makes the brain smarter. Call transcripts, Salesforce, product documentation, marketing content, customer feedback. Engineering's module docs are another. We choose the first source to wire in during discovery, and Aircall is the leading candidate because it's already recording every call.\n\n[Step 3, Output] Output is where the AI-assisted workflows live, and each branch is a use case built on the same core. Customer intelligence: the monthly view of top complaints and feature requests from call data that Russell described. Support drafts: responses drafted from the knowledge and reviewed by a person, with the phone left to the humans. Product updates: release changes reflected in support and ops documentation without a manual pass. Go-to-market content and vendor questionnaires are further out. We build one in this project, and the pattern for the rest.\n\n[Step 4, Access] It doesn't live in isolation. Everyone has access to the brain, in the environment they already work in. Two things go in: human input alongside the ingested sources, and feedback on the brain itself, so what people know and correct becomes part of it. Two things come out: people find and use what they need directly, and they use and improve the output of the workflows downstream. Nothing goes out without a person until it has earned that.\n\n[Step 5, Loop] The last piece is what makes it intelligent, not just smarter. Ingest makes it smarter. The loop makes it intelligent: it reviews what's there, flags what's stale, connects new information to old, learns from how it's used and corrected, and keeps the core current as the product changes. Nobody is doing that by hand after every release. To the team it should feel like faster, easier systems, not replacement." },
+    { name: "How we get there", notes: "Twelve weeks, two stages, and a review at the end of each. Each step produces what the next one depends on, and you see it before we move.\n\n[Step 1, Discover] Weeks one and two. I map how knowledge is stored, used, and connected today, rank the highest-value content for rebuild, and we agree on the current state and the priorities.\n\n[Step 2, Architect] Weeks three and four. Structure, metadata, ownership, access, the tools, and the first source and use case. Approved before anything gets built.\n\n[Step 3, Brain build] Weeks five through nine. The highest-value content rebuilt and current, connected to the team's tools, the loop running, the team trained. Done when the team reliably gets grounded answers where they work.\n\n[Step 4, Use case] Weeks nine through twelve. The first source wired in and the first AI-assisted use case live on the brain, with the team enabled and the pattern ready to repeat.\n\n[Step 5, Roadmap] Week twelve. A prioritized plan for the next sources, use cases, and improvements, focused on your biggest bottlenecks. Once the first source and the first use case work, the brain grows the same way: more pipelines in, more workflows out, on the same core." },
+    { name: "What you get", notes: "[Step 1, deliverables] What you'll have at the end of twelve weeks. A documented current state and priorities. Approved architecture and a build plan. A working brain with team access and training. The first AI-assisted use case. A priority roadmap for the next builds. A knowledge ownership model, so it stays owned after I leave. And a repeatable pattern for every use case after this one. Every one is done when you agree it's done, and there's a review at the end of strategy and at the end of execution. This is about the team and how it works, so anything customer-facing, anything inside the product, and engineering's codebase documentation are outside it. From your side I need one decision owner, time from the people who hold the knowledge, access to the systems, and a technical partner for anything running in your environment. What I'm leaving behind is the pattern, so the team can repeat it with or without me.\n\n[Step 2, the numbers] Twelve weeks, at fifteen to twenty hours a week on average, for forty-two thousand dollars, fixed. It's sized from the time I expect the work to take. Software and infrastructure costs are separate. We build primarily with what you already have, and we'd review any options and costs together before any are incurred. On the return, I'd rather use the research than a promise. The baseline for knowledge workers is close to two hours a day searching for information and about five hours a week waiting for it or re-creating it. Even a fraction of that back across the team is real capacity, before you count what implemented AI with a roadmap does for how the company reads from the outside. Russell put it well. There's no budget line for this, it's about the return versus other uses of that capital, and that's how I'd want you to judge it. If you want to move faster, I have the capacity to increase my weekly time. If something changes internally, we keep the main thing the main thing and add to the scope in writing." },
+    { name: "Questions and discussion", notes: "I'd welcome your questions. The links open the detail: the full process and timeline, the 8-week option against the 12, outcomes and the return frame, and scope with what Earnnest provides. Escape or Back closes a panel." },
+    { name: "Thank you", notes: "I'd welcome your questions. When you're ready, the button picks a start date and it comes straight to me." }
+  ];
+
+  const TL = [35.3, 46, 67.3, 86, 91.3];
+  const TL_T = ['t-strat', 't-strat2', 't-exec', 't-exec2', 't-wk1', 't-wk12', 't-s0', 't-s1', 't-s2', 't-s3', 't-s4'];
+  const BRAIN = ['core', 'ingest', 'output', 'access', 'loop'];
+  const TH = ['t-themes', 't-th0', 't-th1', 't-th2', 't-th3', 't-vr'];
+  const THY = [30, 42, 54, 66];
+
+  /* every step: which slide, where the dot is ([x%, y%, size cqw]), which texts are on, and any moved texts */
+  const BURST = ['t-th1', 't-h0', 't-hd0', 't-h1', 't-hd1', 't-h2', 't-hd2', 't-h3', 't-hd3'];
+  const STEPS = [
+    { s: 0, dots: [[50, 32, 1.4]], lit: true, show: ['t-eyebrow', 't-title', 't-seam'] },
+    ...[0, 1, 2, 3].map(k => ({ s: 1, dots: [[5.5, THY[k], 1.5]], lit: true, speed: .45, tbase: .1, tstagger: .08, show: [...TH, 't-k' + k + '0', 't-k' + k + '1', 't-k' + k + '2'], cur: ['t-th' + k] })),
+    { s: 1, dots: [[5.5, 22, 1.5]], lit: true, speed: .55, tbase: .25, tstagger: .07, show: BURST, cur: ['t-th1'], pos: { 't-th1': [9, 22] } },
+    { s: 1, dots: [[53.5, 22, 1.5]], lit: true, speed: .55, tbase: .25, tstagger: .07, show: [...BURST, 't-why', 't-y0', 't-yd0', 't-y1', 't-yd1', 't-y2', 't-yd2'], fade: BURST, cur: ['t-th1', 't-why'], pos: { 't-th1': [9, 22] } },
+    ...BRAIN.map((part, i) => ({ s: 2, dots: [[50, 47.3, 5]], brain: BRAIN.slice(0, i + 1), part, ...(i === 0 ? { intro: ['t-how-eye', 't-how', 't-seam'], introDots: [[50, 32, 1.4]], introMs: 2200 } : {}) })),
+    ...TL.map((x, i) => ({ s: 3, dots: [[x, 45, 1.3]], brain: BRAIN, brainMode: 'mini', tl: i, speed: .45, tbase: .05, show: [...TL_T, 't-m' + i] })),
+    { s: 4, dots: [[22, 47.6, 3]], brain: BRAIN, brainMode: 'side', show: ['t-plab', 't-d0', 't-d1', 't-d2', 't-d3', 't-d4', 't-d5', 't-d6', 't-hr', 't-n0', 't-n1'], tstagger: .05 },
+    { s: 5, dots: [[50, 32, 1.4]], lit: true, qa: true },
+    { s: 6, dots: [[50, 32, 1.4]], lit: true, cta: true }
+  ];
+
+  const params = new URLSearchParams(location.search);
+  const IS_ADMIN = document.body.dataset.role === 'admin';
+  const EMBED = params.has('embed'), PRESENTER = params.has('presenter') && IS_ADMIN;
+  if (EMBED) document.body.classList.add('embed');
+  if (PRESENTER) document.body.classList.add('presenting');
+
+  const canvas = document.getElementById('canvas');
+  const brain = document.getElementById('brain');
+  const tl = document.getElementById('tl');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.getElementById('ticks').innerHTML = Array.from({ length: 13 }, (_, i) => {
+    const x = 480 + i * (1024 / 12);
+    return `<line class="tick" x1="${x}" y1="395" x2="${x}" y2="415" />`;
+  }).join('');
+
+  /* the dot pool: index 0 is the thread, the rest exist for splits */
+  const POOL = 6;
+  const dots = Array.from({ length: POOL }, (_, i) => {
+    const el = document.createElement('div'); el.className = 'd'; el.setAttribute('aria-hidden', 'true');
+    if (i === 0) el.innerHTML = '<span class="ring" aria-hidden="true"></span>';
+    el.style.opacity = i === 0 ? '1' : '0';
+    canvas.appendChild(el);
+    return el;
+  });
+  const place = (el, x, y, s) => { el.style.left = x + '%'; el.style.top = y + '%'; el.style.width = s + 'cqw'; el.style.height = s + 'cqw'; };
+
+  const texts = [...canvas.querySelectorAll('.t')];
+  const HOME = {}; texts.forEach(t => HOME[t.id] = [parseFloat(t.style.left), parseFloat(t.style.top)]);
+  let cur = -1, introTimer;
+
+  function render(i, instant, back) {
+    const st = STEPS[i];
+    canvas.classList.toggle('still', !!st.still);
+    canvas.style.setProperty('--morph', (st.speed || .8) + 's');
+    document.getElementById('cta').classList.toggle('on', !!st.cta);
+    document.getElementById('qa').classList.toggle('on', !!st.qa);
+    if (!st.qa) closeAppx();
+    clearTimeout(introTimer);
+    const intro = st.intro && !instant && !back && (cur < 0 || STEPS[cur].s !== st.s);
+
+    const dotsNow = intro && st.introDots ? st.introDots : st.dots;
+    const first = dotsNow[0];
+    dots.forEach((el, j) => {
+      el.classList.toggle('snap', !!instant);
+      const d = dotsNow[j];
+      if (d) { el.style.setProperty('--dl', instant ? '0s' : (j * (st.stagger || 0)) + 's'); place(el, d[0], d[1], d[2]); el.style.opacity = 1; }
+      else { el.style.setProperty('--dl', '0s'); place(el, first[0], first[1], 0); el.style.opacity = 0; }
+    });
+    dots[0].classList.toggle('lit', !!st.lit || !!(intro && st.introDots));
+
+    const on = new Set(st.show || []);
+    if (intro) st.intro.forEach(id => on.add(id));
+    let k = 0;
+    texts.forEach(t => {
+      const show = on.has(t.id);
+      const p = (st.pos && st.pos[t.id]) || HOME[t.id];
+      if (show && !t.classList.contains('on')) t.style.setProperty('--tdl', (instant ? 0 : (st.tbase ?? .85) + (st.tstagger || 0) * k++) + 's');
+      if (instant) { t.style.transition = 'none'; requestAnimationFrame(() => t.style.transition = ''); }
+      t.style.left = p[0] + '%'; t.style.top = p[1] + '%';
+      t.classList.toggle('on', show);
+      t.classList.toggle('cur', !!(st.cur && st.cur.includes(t.id)));
+      t.classList.toggle('faded', !!(st.fade && st.fade.includes(t.id)));
+    });
+
+    brain.classList.toggle('rev', !!back);
+    brain.classList.toggle('on', !!st.brain);
+    BRAIN.forEach(p => brain.classList.toggle('p-' + p, !!st.brain && st.brain.includes(p) && !(intro && p === st.part)));
+    if (intro) introTimer = setTimeout(() => {
+      st.intro.forEach(id => document.getElementById(id).classList.remove('on'));
+      dots.forEach((el, j) => { el.classList.remove('snap'); const d = st.dots[j]; if (d) place(el, d[0], d[1], d[2]); });
+      dots[0].classList.toggle('lit', !!st.lit);
+      setTimeout(() => brain.classList.add('p-' + st.part), 500);
+    }, st.introMs);
+    if (st.part) brain.dataset.cur = st.part; else delete brain.dataset.cur;
+    if (st.brain) { brain.classList.toggle('mini', st.brainMode === 'mini'); brain.classList.toggle('side', st.brainMode === 'side'); }
+    tl.classList.toggle('on', st.tl !== undefined);
+    TL.forEach((_, j) => document.getElementById('t-s' + j).classList.toggle('cur', st.tl === j));
+
+    if (instant) {
+      [brain, tl, ...brain.querySelectorAll('path, line, .n, .head, .bt, .ring, .spin'), ...tl.querySelectorAll('line')].forEach(el => {
+        el.style.transition = 'none'; requestAnimationFrame(() => requestAnimationFrame(() => el.style.transition = ''));
+      });
+    }
+  }
+
+  /* ---- navigation ---- */
+  const keys = document.getElementById('keys');
+  const firstStepOf = s => STEPS.findIndex(st => st.s === s);
+  SLIDES.forEach((sl, i) => {
+    const k = document.createElement('button'); k.type = 'button'; k.textContent = String(i + 1).padStart(2, '0');
+    k.setAttribute('aria-label', sl.name); k.addEventListener('click', () => go(firstStepOf(i)));
+    keys.appendChild(k);
+  });
+  const chan = 'BroadcastChannel' in window && !EMBED ? new BroadcastChannel('earnnest-deck') : null;
+
+  function go(i, { instant = false, quiet = false } = {}) {
+    i = Math.max(0, Math.min(STEPS.length - 1, i));
+    if (i === cur) return;
+    const s = STEPS[i].s, back = i < cur;
+    if (reduce.matches && !instant && cur >= 0) {
+      canvas.classList.add('fading');
+      setTimeout(() => { render(i, true, back); canvas.classList.remove('fading'); }, 300);
+    } else render(i, instant, back);
+    cur = i;
+    document.getElementById('slide-name').textContent = SLIDES[s].name;
+    document.getElementById('slide-count').textContent = `${s + 1} / ${SLIDES.length}`;
+    keys.querySelectorAll('button').forEach((k, j) => k.classList.toggle('k-on', j === s));
+    if (!EMBED) history.replaceState(null, '', `?${PRESENTER ? 'presenter&' : ''}step=${i}`);
+    if (PRESENTER) updatePresenter();
+    if (chan && !quiet) chan.postMessage({ step: i });
+  }
+
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  const openNotes = () => window.open('/earnnest?presenter&step=' + cur, 'earnnest-presenter', 'width=1400,height=860');
+  if (IS_ADMIN) document.getElementById('open-notes').addEventListener('click', openNotes);
+  document.addEventListener('keydown', ev => {
+    if (EMBED) return;
+    if (ev.key === 'ArrowRight' || ev.key === ' ' || ev.key === 'PageDown' || ev.key === 'ArrowDown') { ev.preventDefault(); go(cur + 1); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp' || ev.key === 'ArrowUp') { ev.preventDefault(); go(cur - 1); }
+    else if (ev.key === 'Home') go(0);
+    else if (ev.key === 'End') go(STEPS.length - 1);
+    else if ((ev.key === 'n' || ev.key === 'N') && !PRESENTER && IS_ADMIN) openNotes();
+  });
+  if (chan) chan.onmessage = ({ data }) => {
+    if (data.step !== undefined) go(data.step, { quiet: true });
+    if (data.hello && !PRESENTER) chan.postMessage({ step: cur });
+  };
+  if (EMBED) window.addEventListener('message', ({ data }) => { if (data && data.step !== undefined) go(data.step, { instant: !!data.instant }); });
+
+  /* ---- presenter view ---- */
+  const pCur = document.getElementById('p-cur'), pNext = document.getElementById('p-next');
+  const t0 = { at: Date.now() };
+  function updatePresenter() {
+    const s = STEPS[cur].s, nxt = Math.min(cur + 1, STEPS.length - 1);
+    document.getElementById('p-name').textContent = SLIDES[s].name;
+    document.getElementById('p-count').textContent = `${s + 1} / ${SLIDES.length}`;
+    const sub = cur - firstStepOf(s);
+    document.getElementById('p-notes').innerHTML = SLIDES[s].notes.split('\n\n').map((para, k) => {
+      const html = para.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\[[^\]]+\]/g, m => `<span class="ph">${m}</span>`);
+      const stepped = /^\[Step \d/.test(para);
+      return `<span class="${stepped && k !== sub ? 'off' : ''}">${html}</span>`;
+    }).join('<br><br>');
+    const onPara = document.querySelector('#p-notes > span:not(.off)'); if (onPara) onPara.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    document.getElementById('p-next-name').textContent = nxt === cur ? 'End' : SLIDES[STEPS[nxt].s].name + (STEPS[nxt].s === s ? ' (next step)' : '');
+    const send = (f, msg) => f.dataset.ready ? f.contentWindow.postMessage(msg, '*') : (f.dataset.pending = JSON.stringify(msg));
+    send(pCur, { step: cur });
+    send(pNext, { step: nxt, instant: true });
+  }
+  if (PRESENTER) {
+    [pCur, pNext].forEach(f => {
+      f.addEventListener('load', () => { f.dataset.ready = '1'; if (f.dataset.pending) f.contentWindow.postMessage(JSON.parse(f.dataset.pending), '*'); });
+      f.src = '/earnnest?embed&step=0' + (params.get('key') ? '&key=' + encodeURIComponent(params.get('key')) : '');
+    });
+    const clock = document.getElementById('p-clock');
+    clock.addEventListener('click', () => t0.at = Date.now());
+    setInterval(() => { const s = Math.floor((Date.now() - t0.at) / 1000); clock.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }, 1000);
+  }
+
+  /* ---- appendix panels on the discussion slide ---- */
+  const qa = document.getElementById('qa'), appx = document.getElementById('appx');
+  function openAppx(key) {
+    appx.querySelectorAll('section').forEach(sec => sec.classList.toggle('on', sec.dataset.appx === key));
+    appx.scrollTop = 0; appx.classList.add('open'); qa.classList.add('away');
+  }
+  function closeAppx() { appx.classList.remove('open'); qa.classList.remove('away'); }
+  qa.querySelectorAll('[data-appx]').forEach(b => b.addEventListener('click', () => openAppx(b.dataset.appx)));
+  document.getElementById('appx-back').addEventListener('click', closeAppx);
+  document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && appx.classList.contains('open')) { ev.stopImmediatePropagation(); closeAppx(); } }, true);
+
+  /* capacity chart: one bar from x 40 to 960 is 100% of my average week. Segments in percent. */
+  const TABS = {
+    t12: { other: 12, earn: 40, ops: 0, flex: 0, when: 'Twelve weeks', note: 'About 15 to 20 hours a week', label: 'Earnnest project' },
+    t8:  { other: 12, earn: 65, ops: 0, flex: 0, when: 'Eight weeks', note: 'Roughly 25 to 30 hours a week', label: 'Earnnest project' },
+    ops: { other: 12, earn: 40, ops: 22, flex: 0, when: 'Twelve weeks', note: 'Roughly 25 to 30 hours a week combined', label: 'Earnnest project' },
+    run: { other: 12, earn: 35, ops: 0, flex: 25, when: 'Month to month', note: 'Flexes with the roadmap', label: 'Ongoing execution' }
+  };
+  function setTab(key) {
+    const t = TABS[key], X = p => 40 + 9.2 * p, W = p => 9.2 * p;
+    document.querySelectorAll('#cap-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === key));
+    document.querySelectorAll('.appx .opt').forEach(o => o.classList.toggle('on', o.dataset.tab === key));
+    const seg = (id, from, pct) => { const el = document.getElementById(id); el.style.x = X(from) + 'px'; el.style.width = W(pct) + 'px'; };
+    const tag = (id, from, pct, show) => { const el = document.getElementById(id); el.setAttribute('x', X(from) + W(pct) / 2); el.setAttribute('opacity', show ? 1 : 0); };
+    let at = 0;
+    seg('cap-a', at, t.other); tag('cap-at', at, t.other, true); at += t.other;
+    seg('cap-e', at, t.earn); tag('cap-et', at, t.earn, true); document.getElementById('cap-et').textContent = t.label; at += t.earn;
+    seg('cap-o', at, t.ops); tag('cap-ot', at, t.ops, t.ops > 0); at += t.ops;
+    seg('cap-f', at, t.flex); tag('cap-ft', at, t.flex, t.flex > 0); at += t.flex;
+    document.getElementById('cap-rt').setAttribute('opacity', at < 92 ? 1 : 0);
+    document.getElementById('cap-when').textContent = t.when;
+    document.getElementById('cap-note').textContent = t.note;
+  }
+  document.querySelectorAll('#cap-tabs button').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  setTab('t12');
+
+  /* ---- thank you form: same endpoint and Slack channel as the site intake ---- */
+  const cta = document.getElementById('cta'), ctaForm = document.getElementById('cta-form');
+  document.getElementById('cta-go').addEventListener('click', () => { cta.classList.add('open'); ctaForm.querySelector('input').focus(); });
+  ctaForm.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const f = new FormData(ctaForm);
+    if (!ctaForm.reportValidity()) return;
+    cta.classList.remove('error');
+    const payload = {
+      source: 'earnnest-deck', name: f.get('name'), email: f.get('email'), contactMethod: 'email',
+      situation: 'Earnnest: ready to get started', involvement: 'Knowledge brain, 12 weeks, $42,000 fixed',
+      message: `Preferred start: ${f.get('start') || '(not given)'}${f.get('note') ? '\n' + f.get('note') : ''}`
+    };
+    try {
+      const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error(res.status);
+      cta.classList.add('sent');
+    } catch (e) { cta.classList.add('error'); }
+  });
+  document.addEventListener('keydown', ev => { if (ev.target.closest('input, textarea')) ev.stopImmediatePropagation(); }, true);
+
+  go(+(params.get('step') || 0), { instant: true, quiet: true });
+  if (chan && PRESENTER && !params.has('step')) chan.postMessage({ hello: true });
+</script>
+  </body>
+</html>
